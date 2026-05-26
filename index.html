@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MathMentor - Interactive Math Teacher</title>
+  <link rel="icon" href="data:," />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="bg-shapes" aria-hidden="true">
+    <span class="shape s1">S</span><span class="shape s2">pi</span>
+    <span class="shape s3">sqrt</span><span class="shape s4">inf</span>
+    <span class="shape s5">D</span><span class="shape s6">int</span>
+    <span class="shape s7">+-</span><span class="shape s8">th</span>
+  </div>
+
+  <header class="site-header">
+    <button class="logo" onclick="location.reload()" aria-label="Restart MathMentor">
+      <span class="logo-mark">Mr.</span>
+      <span>Mentors</span>
+    </button>
+    <div class="header-actions">
+      <div class="grade-badge" id="gradeBadge" style="display:none"></div>
+    </div>
+  </header>
+
+  <section id="screenSelect" class="screen active">
+    <div class="select-hero">
+      <p class="eyebrow">Interactive classroom</p>
+      <h1 class="title-main">Choose your learning guide</h1>
+      <p class="subtitle">A conversational lab with animated teaching, guided steps, and touch-friendly practice.</p>
+    </div>
+
+    <div class="teacher-cards">
+      <button class="teacher-card available" onclick="App.selectTeacher('math')" aria-label="Start with Mr. Mathew, Math Teacher">
+        <div class="card-glow"></div>
+        <div class="mini-teacher" aria-hidden="true">
+          <div class="mt-head">
+            <div class="mt-hair"></div>
+            <div class="mt-face">
+              <div class="mt-eye left"><div class="mt-pupil"></div></div>
+              <div class="mt-eye right"><div class="mt-pupil"></div></div>
+              <div class="mt-smile"></div>
+            </div>
+            <div class="mt-glasses"></div>
+          </div>
+          <div class="mt-body">
+            <div class="mt-tie"></div>
+            <div class="mt-hand left-h"></div>
+            <div class="mt-hand right-h"></div>
+          </div>
+        </div>
+        <h2>Mr. Mathew</h2>
+        <p>Math Teacher</p>
+        <span class="badge-available">Start lesson</span>
+      </button>
+
+      <button class="teacher-card available science-card" onclick="App.selectTeacher('science')" aria-label="Start with Ms. Scientia, Science Teacher">
+        <div class="card-glow"></div>
+        <div class="science-visual" aria-hidden="true">
+          <span class="atom-ring r1"></span>
+          <span class="atom-ring r2"></span>
+          <span class="atom-core"></span>
+        </div>
+        <h2>Mr. Scientia</h2>
+        <p>Science Teacher</p>
+        <span class="badge-available">Start lab</span>
+      </button>
+      
+      <button class="teacher-card available geography-card" onclick="App.selectTeacher('geography')" aria-label="Start with Ms. Gaia, Geography Teacher">
+        <div class="card-glow"></div>
+        <div class="mini-teacher" aria-hidden="true">
+          <div class="mt-head">
+            <div class="mt-hair"></div>
+            <div class="mt-face">
+              <div class="mt-eye left"><div class="mt-pupil"></div></div>
+              <div class="mt-eye right"><div class="mt-pupil"></div></div>
+              <div class="mt-smile"></div>
+            </div>
+          </div>
+          <div class="mt-bodyy">
+            <div class="mt-hand left-h"></div>
+            <div class="mt-hand right-h"></div>
+          </div>
+        </div>
+        <h2>Mr. Gain</h2>
+        <p>Geography Teacher</p>
+        <span class="badge-available">Open world</span>
+      </button>
+      <article class="teacher-card coming-soon">
+        <div class="cs-icon">ENG</div>
+        <h2>Mr. Linguist</h2>
+        <p>English Teacher</p>
+        <span class="badge-soon">Coming Soon</span>
+      </article>
+    </div>
+  </section>
+
+  <section id="screenClassroom" class="screen">
+    <div class="stage">
+      <div class="stage-copy">
+        <p class="eyebrow">Live lesson</p>
+        <h2>Ask, solve, learn.</h2>
+        <p>Pick a level, choose a chapter, and Mr. Mathew will walk through each answer step by step.</p>
+        <div class="class-stats">
+          <span><b id="statChapters">30</b> chapters</span>
+          <span><b>1:1</b> guidance</span>
+        </div>
+      </div>
+
+      <div class="blackboard">
+        <div class="bb-content" id="bbContent">y = mx + b</div>
+      </div>
+
+      <div class="teacher-wrap" id="teacherWrap">
+        <div class="teacher-character" id="teacherChar">
+          <div class="speech-bubble" id="speechBubble">
+            <div class="bubble-text" id="bubbleText">Hello!</div>
+            <div class="bubble-tail"></div>
+          </div>
+
+          <div class="char-head">
+            <div class="char-hair"></div>
+            <div class="char-face">
+              <div class="char-eye left" id="eyeLeft">
+                <div class="char-pupil" id="pupilLeft"></div>
+                <div class="char-eyelid" id="eyelidLeft"></div>
+              </div>
+              <div class="char-eye right" id="eyeRight">
+                <div class="char-pupil" id="pupilRight"></div>
+                <div class="char-eyelid" id="eyelidRight"></div>
+              </div>
+              <div class="char-nose"></div>
+              <div class="char-mouth" id="charMouth"></div>
+              <div class="char-cheek left"></div>
+              <div class="char-cheek right"></div>
+            </div>
+            <div class="char-glasses"></div>
+            <div class="char-ear left"></div>
+            <div class="char-ear right"></div>
+          </div>
+
+          <div class="char-body">
+            <div class="char-collar"></div>
+            <div class="char-tie"></div>
+            <div class="char-pocket"></div>
+            <div class="char-arm left" id="armLeft">
+              <div class="char-hand"></div>
+            </div>
+            <div class="char-arm right" id="armRight">
+              <div class="char-hand"></div>
+            </div>
+          </div>
+
+          <div class="char-legs">
+            <div class="char-leg left"></div>
+            <div class="char-leg right"></div>
+            <div class="char-shoe left"></div>
+            <div class="char-shoe right"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="interaction-panel" id="interactionPanel">
+      <div class="panel-inner">
+        <div class="panel-section" id="secGrade">
+          <button class="btn-back" onclick="location.reload()" aria-label="Refresh page">Back</button>
+          <div>
+          <p class="panel-kicker">Step 1</p>
+          <p class="panel-question" id="gradeQuestion">Which path should we open?</p>
+        </div>
+          <div class="btn-group">
+            <button class="btn-choice btn-junior" id="gradeBtnA" onclick="App.selectGrade(App.gradeOptions[0].id)">
+              <span>Junior Mode</span>
+              <small>Below Grade 6</small>
+            </button>
+            <button class="btn-choice btn-senior" id="gradeBtnB" onclick="App.selectGrade(App.gradeOptions[1].id)">
+              <span>Senior Mode</span>
+              <small>Grades 6-9</small>
+            </button>
+          </div>
+        </div>
+
+        <div class="panel-section hidden" id="secChapters">
+          <div class="chapter-header">
+            <button class="btn-back" onclick="App.goBack('grade')" aria-label="Back to grade selection">Back</button>
+            <div>
+              <p class="panel-kicker">Step 2</p>
+              <p class="panel-question">Choose a chapter</p>
+            </div>
+          </div>
+          <div class="chapter-grid" id="chapterGrid"></div>
+        </div>
+
+        <div class="panel-section hidden" id="secWorkspace">
+          <div class="chapter-header">
+            <button class="btn-back" onclick="App.goBack('chapters')" aria-label="Back to chapters">Chapters</button>
+            <div>
+              <p class="panel-kicker">Practice space</p>
+              <h3 class="ws-title" id="wsTitle">Chapter Title</h3>
+            </div>
+          </div>
+          <div class="ws-toolbar">
+            <button class="btn-theory" id="btnTheory" onclick="App.showTheory()">Theory</button>
+            <button class="btn-practice" id="btnPractice" onclick="App.newQuestion()">New Question</button>
+          </div>
+          <div class="ws-body" id="wsBody"></div>
+          <div class="ws-steps" id="wsSteps"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="js/teacher.js"></script>
+
+  <script src="js/junior/chapters-list.js"></script>
+  <script src="js/junior/ch01-counting.js"></script>
+  <script src="js/junior/ch02-addition.js"></script>
+  <script src="js/junior/ch03-subtraction.js"></script>
+  <script src="js/junior/ch04-multiplication.js"></script>
+  <script src="js/junior/ch05-division.js"></script>
+  <script src="js/junior/ch06-fractions.js"></script>
+  <script src="js/junior/ch07-decimals.js"></script>
+  <script src="js/junior/ch08-geometry.js"></script>
+  <script src="js/junior/ch09-measurement.js"></script>
+  <script src="js/junior/ch10-patterns.js"></script>
+
+  <script src="js/senior/chapters-list.js"></script>
+  <script src="js/senior/ch01-integers.js"></script>
+  <script src="js/senior/ch02-algebra.js"></script>
+  <script src="js/senior/ch03-linear-eq.js"></script>
+  <script src="js/senior/ch04-quadratic.js"></script>
+  <script src="js/senior/ch05-ratios.js"></script>
+  <script src="js/senior/ch11-circles.js"></script>
+  <script src="js/senior/ch12-statistics.js"></script>
+  <script src="js/senior/ch13-probability.js"></script>
+  <script src="js/senior/ch14-sets.js"></script>
+  <script src="js/senior/ch15-sequences.js"></script>
+  <script src="js/senior/ch16-logarithms.js"></script>
+  <script src="js/senior/ch17-trigonometry.js"></script>
+  <script src="js/senior/ch18-matrices.js"></script>
+  <script src="js/senior/ch19-coordinate.js"></script>
+  <script src="js/senior/ch20-mensuration.js"></script>
+  <script src="js/science.js"></script>
+  <script src="js/geography.js"></script>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
