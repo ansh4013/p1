@@ -15,6 +15,7 @@
   --coral: #ff6f4e;
   --violet: #8c6cff;
   --pink: #ff6fa7;
+  --crimson: #DC143C;
   --text: #e9f7fb;
   --muted: #8ba5b4;
   --dark-text: #101c23;
@@ -206,7 +207,7 @@ button { border: 0; }
   overflow: hidden;
   color: var(--text);
   text-align: center;
-  background: var(--surface);
+  background: var(--crimson);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
