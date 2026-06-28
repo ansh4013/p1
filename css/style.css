@@ -207,7 +207,7 @@ button { border: 0; }
   overflow: hidden;
   color: var(--text);
   text-align: center;
-  background: var(--crimson);
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
