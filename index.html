@@ -8,6 +8,57 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <style>
+    /* ── contact ── */
+    .contact-section {
+      background: var(--surface); border-top: 1px solid var(--border);
+      padding: 2.5rem 1.4rem;
+      padding-left: max(1.4rem, var(--safe-l));
+      padding-right: max(1.4rem, var(--safe-r));
+      position: relative; z-index: 1;
+    }
+    .contact-inner { max-width: 860px; margin: 0 auto; }
+    .contact-lbl {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .65rem; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-bottom: .6rem;
+    }
+    .contact-title {
+      font-family: 'Cinzel', serif; font-size: 1.2rem; font-weight: 700;
+      color: var(--text); margin-bottom: .4rem;
+    }
+    .contact-sub { font-size: .9rem; font-weight: 300; color: var(--dim); margin-bottom: 1.4rem; line-height: 1.7; }
+    .heads-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: .7rem; }
+    .head-card {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 4px; padding: .9rem 1.1rem;
+      transition: border-color .2s;
+    }
+    .head-card:hover { border-color: rgba(201,168,76,.3); }
+    .head-name { font-size: .92rem; font-weight: 600; color: var(--text); margin-bottom: .25rem; }
+    .head-class {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; color: var(--gold);
+    }
+
+    footer {
+      background: #000;
+      padding: 1.1rem 1.4rem;
+      padding-left: max(1.4rem, var(--safe-l));
+      padding-right: max(1.4rem, var(--safe-r));
+      padding-bottom: max(1.1rem, var(--safe-bot));
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: .4rem;
+      border-top: 1px solid rgba(201,168,76,.1);
+      position: relative; z-index: 1;
+    }
+    .ft-left {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .62rem; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.15);
+    }
+    .ft-right {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .62rem; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); opacity: .6;
+    }
+
 </style>
 <body>
   <div class="bg-shapes" aria-hidden="true">
