@@ -1,228 +1,457 @@
+GitHub Copilot Chat Assistant — Single-file runnable HTML/CSS/JS that uses only HTML/CSS (with a bit of JS to trigger detachment, progress, and parallax). Open in a browser.
+
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>3D HUD Loader — Technex-style</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg:#030913;
-      --accent:#18f7e6;
-      --accent2:#3be7ff;
-      --muted:#12212a;
-    }
-    html,body{height:100%;margin:0;background:var(--bg);font-family:Orbitron,system-ui,monospace;}
-    #container{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-    canvas{display:block;}
-    /* Center HUD overlay text */
-    .center-text{
-      position:fixed;
-      left:50%;
-      top:50%;
-      transform:translate(-50%,-50%);
-      color:var(--accent);
-      font-size:20px;
-      letter-spacing:0.18em;
-      opacity:0.85;
-      pointer-events:none;
-      text-transform:uppercase;
-      mix-blend-mode:screen;
-    }
-    /* subtle vignette */
-    .vignette{
-      position:fixed;inset:0;pointer-events:none;
-      background:radial-gradient(ellipse at center, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0.45) 60%, rgba(0,0,0,0.75) 100%);
-      mix-blend-mode:multiply;
-    }
-    /* small note: can hide when integrating */
-    .hint{position:fixed;left:12px;bottom:12px;color:#6fa6a6;font-size:12px;opacity:0.8}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Detach & Float 3D HUD — HTML/CSS</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#040912;
+    --hud-accent:#24f0e6;
+    --hud-accent-2:#3be7ff;
+    --hud-muted:#0f2430;
+    --hud-glow: 0 0 18px rgba(36,240,230,0.14), 0 0 42px rgba(36,240,230,0.06);
+  }
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,#02060b 0%,#061423 100%);font-family:Orbitron,system-ui,monospace;overflow:hidden;color:#9dd;}
+
+/* Scene & perspective */
+.scene{
+  position:relative;
+  width:100%;
+  height:100%;
+  perspective:1200px; /* stronger perspective for 3D feel */
+  -webkit-perspective:1200px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* Anchor point simulating "from its place" (start left-bottom) */
+.anchor{
+  position:absolute;
+  left:10%;
+  bottom:12%;
+  width:260px;
+  height:260px;
+  transform-origin:center;
+  transition: transform 0.9s cubic-bezier(.2,.9,.3,1), left 0.9s, bottom 0.9s;
+  will-change:transform,left,bottom;
+  pointer-events:auto;
+}
+
+/* HUD root (preserve 3d) */
+.hud{
+  width:100%;
+  height:100%;
+  transform-style:preserve-3d;
+  -webkit-transform-style:preserve-3d;
+  position:relative;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.65));
+  cursor:pointer;
+}
+
+/* When detached: center & float, larger and more frontal */
+.anchor.detached{
+  left:50%;
+  bottom:50%;
+  transform:translate(-50%,50%); /* move anchor to center visually */
+  width:420px;
+  height:420px;
+  transition: transform 1.05s cubic-bezier(.2,.9,.25,1), left 1.05s, bottom 1.05s, width 0.8s, height 0.8s;
+  z-index:40;
+}
+
+/* Float animation applied once detached */
+.anchor.detached .hud{
+  animation: floatPitch 6s ease-in-out infinite;
+}
+
+/* slight group rotation to read 3D */
+.hud-layer{
+  position:absolute; inset:0;
+  transform-origin:center;
+  transform:translateZ(0px);
+  pointer-events:none;
+}
+
+/* center glass plate (backdrop filter if supported) */
+.hud-glass{
+  position:absolute; left:50%; top:50%;
+  width:58%; height:58%;
+  transform:translate(-50%,-50%) translateZ(30px);
+  background:linear-gradient(180deg, rgba(20,40,45,0.18), rgba(3,10,15,0.12));
+  border-radius:50%;
+  border: 1px solid rgba(60,230,210,0.12);
+  box-shadow: var(--hud-glow);
+  backdrop-filter: blur(4px) saturate(1.2);
+  -webkit-backdrop-filter: blur(4px) saturate(1.2);
+}
+
+/* concentric ring container (SVG will render rings) */
+.hud-svg{
+  position:absolute; left:50%; top:50%;
+  transform:translate(-50%,-50%) translateZ(40px);
+  width:96%; height:96%;
+  pointer-events:none;
+  mix-blend-mode:screen;
+}
+
+/* center UI text */
+.hud-center{
+  position:absolute; left:50%; top:50%;
+  transform:translate(-50%,-50%) translateZ(42px);
+  text-align:center;
+  color:var(--hud-accent);
+  user-select:none;
+  pointer-events:none;
+}
+.hud-center .label{font-size:12px; color:rgba(60,240,220,0.82); letter-spacing:0.22em; text-transform:uppercase; opacity:0.9;}
+.hud-center .value{font-size:36px; margin-top:6px; color:white; filter:drop-shadow(0 8px 18px rgba(36,240,230,0.12));}
+
+/* details overlay (readouts & bars) */
+.hud-info{
+  position:absolute;
+  width:100%;
+  bottom:6%;
+  transform:translateZ(26px);
+  display:flex;
+  justify-content:center;
+  gap:18px;
+  pointer-events:none;
+}
+.readout{
+  padding:8px 12px;
+  background:linear-gradient(180deg, rgba(3,10,15,0.25), rgba(10,20,24,0.09));
+  border-radius:8px;
+  border:1px solid rgba(60,230,210,0.06);
+  color:rgba(180,230,230,0.92);
+  font-size:12px;
+  min-width:80px;
+  text-align:center;
+  box-shadow:0 6px 18px rgba(2,7,10,0.6);
+  backdrop-filter: blur(2px);
+}
+
+/* Hover/press visual feedback */
+.anchor:hover .hud{ transform: translateZ(18px) rotateX(8deg); transition: transform 0.35s; }
+.anchor.detached:hover .hud{ transform: translateZ(28px) rotateX(6deg) rotateY(-4deg); }
+
+/* SVG animations (rotate groups) */
+.rot-slow { animation: rotA 18s linear infinite; transform-origin:center; }
+.rot-med  { animation: rotA -9s linear infinite; transform-origin:center; }
+.rot-fast { animation: rotA 5s linear infinite; transform-origin:center; }
+@keyframes rotA { from{transform:rotateZ(0deg)} to{transform:rotateZ(360deg)} }
+
+/* pulse / scan sweep */
+.scan{
+  position:absolute; inset:0; pointer-events:none;
+  background: radial-gradient(circle at 50% 18%, rgba(60,230,210,0.18), rgba(60,230,210,0.02) 12%, transparent 30%);
+  mix-blend-mode:overlay; opacity:0.9; transform:translateZ(50px);
+  transition:opacity 0.5s;
+}
+.anchor.detached .scan{ animation: sweep 6s linear infinite; opacity:1; }
+@keyframes sweep{
+  0%{ filter: hue-rotate(0deg) brightness(1); transform: translateZ(50px) rotate(0deg); opacity:0.95 }
+  50%{ transform: translateZ(50px) rotate(180deg); opacity:1 }
+  100%{ transform: translateZ(50px) rotate(360deg); opacity:0.95 }
+}
+
+/* glow ring behind for soft bloom using pseudo element */
+.hud::before{
+  content:"";
+  position:absolute; inset:0;
+  border-radius:50%;
+  box-shadow: 0 0 60px 14px rgba(36,240,230,0.035), 0 0 36px 8px rgba(59,231,255,0.02);
+  pointer-events:none;
+  transform:translateZ(10px);
+}
+
+/* small HUD pieces (ticks, arcs) created in HTML for easier CSS control */
+.tick{
+  position:absolute; left:50%; top:50%;
+  width:2px; height:48px;
+  background:linear-gradient(180deg, rgba(60,240,220,1), rgba(60,240,220,0.2));
+  transform-origin:center bottom;
+  border-radius:1px;
+  opacity:0.9;
+  mix-blend-mode:screen;
+  filter:blur(0.15px);
+}
+
+/* segmented arc accents */
+.segment{
+  position:absolute; left:50%; top:50%;
+  width:10px; height:4px; border-radius:2px;
+  background:linear-gradient(90deg, rgba(60,240,220,1), rgba(59,231,255,0.35));
+  transform-origin:left center;
+  mix-blend-mode:screen;
+  opacity:0.95;
+  filter:drop-shadow(0 6px 14px rgba(36,240,230,0.06));
+}
+
+/* keyframe for subtle pulsing on some segments */
+.pulse{ animation: pulseGlow 1.6s ease-in-out infinite; }
+@keyframes pulseGlow {
+  0%{ transform:scale(1); opacity:0.85; filter:blur(0.1px) }
+  50%{ transform:scale(1.18); opacity:1; filter:blur(1px) }
+  100%{ transform:scale(1); opacity:0.85; filter:blur(0.1px) }
+}
+
+/* floating keyframe slightly tilting/bobbing */
+@keyframes floatPitch{
+  0%{ transform: translateZ(0) rotateX(0.06rad) rotateY(0.02rad) translateY(0) }
+  50%{ transform: translateZ(6px) rotateX(0.09rad) rotateY(-0.02rad) translateY(-10px) }
+  100%{ transform: translateZ(0) rotateX(0.06rad) rotateY(0.02rad) translateY(0) }
+}
+
+/* subtle entrance for detached state */
+.anchor.detached{ animation: popin 0.9s cubic-bezier(.2,.9,.25,1) both; }
+@keyframes popin{
+  0%{ transform: translate(-30%,50%) scale(0.75); opacity:0.0 }
+  60%{ transform: translate(-48%,50%) scale(1.03); opacity:1.0 }
+  100%{ transform: translate(-50%,50%) scale(1.0); opacity:1.0 }
+}
+
+/* Accessibility: reduce motion */
+@media (prefers-reduced-motion: reduce){
+  .rot-slow,.rot-med,.rot-fast,.scan,.pulse,.anchor.detached .hud{ animation:none !important; }
+}
+</style>
 </head>
 <body>
-  <div id="container"></div>
-  <div class="center-text" id="status">LOADING</div>
-  <div class="vignette"></div>
-  <div class="hint">GitHub Copilot Chat Assistant — 3D HUD loader</div>
+<div class="scene" id="scene">
+  <!-- Anchor representing where the HUD originates (e.g., world position) -->
+  <div class="anchor" id="anchor" title="Click to detach the HUD">
+    <div class="hud" id="hud">
+      <!-- subtle glass -->
+      <div class="hud-layer hud-glass"></div>
 
-  <!-- Three.js -->
-  <script src="https://unpkg.com/three@0.152.0/build/three.min.js"></script>
+      <!-- background scan overlay -->
+      <div class="hud-layer scan"></div>
 
-  <script>
-  // Basic scene + camera + renderer
-  const container = document.getElementById('container');
-  const scene = new THREE.Scene();
+      <!-- SVG layers for rings, arcs, and details -->
+      <svg class="hud-layer hud-svg" viewBox="-200 -200 400 400" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <!-- soft outer ring glow (thick, low opacity) -->
+        <g class="rot-slow" style="transform-origin:50% 50%;">
+          <circle cx="0" cy="0" r="155" fill="none" stroke="rgba(36,240,230,0.045)" stroke-width="26"></circle>
+        </g>
 
-  const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 50);
-  camera.position.z = 3.0;
+        <!-- segmented outer arc -->
+        <g class="rot-med" style="transform-origin:50% 50%;">
+          <!-- create segments with stroke-dasharray -->
+          <circle cx="0" cy="0" r="120" fill="none" stroke="url(#gradA)" stroke-width="6"
+            stroke-dasharray="18 14" stroke-linecap="round" opacity="0.98"></circle>
+        </g>
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setSize(innerWidth, innerHeight);
-  renderer.outputEncoding = THREE.sRGBEncoding;
-  container.appendChild(renderer.domElement);
+        <!-- inner mechanical ring -->
+        <g class="rot-fast" style="transform-origin:50% 50%;">
+          <circle cx="0" cy="0" r="85" fill="none" stroke="rgba(59,231,255,0.18)" stroke-width="12"></circle>
+          <circle cx="0" cy="0" r="68" fill="none" stroke="rgba(36,240,230,0.06)" stroke-width="2"></circle>
+        </g>
 
-  // Helpers: create emissive-like material using MeshBasicMaterial
-  function glowMaterial(hex, opacity=0.9) {
-    return new THREE.MeshBasicMaterial({
-      color: hex,
-      transparent: true,
-      opacity,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      side: THREE.DoubleSide
-    });
+        <!-- gradient defs -->
+        <defs>
+          <linearGradient id="gradA" x1="0" x2="1">
+            <stop offset="0%" stop-color="#24f0e6" stop-opacity="0.98"/>
+            <stop offset="60%" stop-color="#3be7ff" stop-opacity="0.65"/>
+            <stop offset="100%" stop-color="#24f0e6" stop-opacity="0.04"/>
+          </linearGradient>
+        </defs>
+
+        <!-- animated sweeping arc (stroke-dashoffset animated via JS for smoother control) -->
+        <circle id="sweepArc" cx="0" cy="0" r="135" fill="none"
+                stroke="#24f0e6" stroke-width="3" stroke-linecap="round" stroke-opacity="0.95"
+                stroke-dasharray="10 380"></circle>
+
+        <!-- small rotating ticks (rendered as paths to look crisp) -->
+        <g id="ticks" opacity="0.95" transform="rotate(12)">
+          <!-- JS will populate ticks where needed -->
+        </g>
+      </svg>
+
+      <!-- center content -->
+      <div class="hud-layer hud-center" aria-hidden="false" role="status">
+        <div class="label">SYSTEM</div>
+        <div class="value" id="progressValue">0%</div>
+      </div>
+
+      <!-- readouts -->
+      <div class="hud-layer hud-info" aria-hidden="true">
+        <div class="readout">FPS 60</div>
+        <div class="readout">NET - 12ms</div>
+        <div class="readout">GPU MED</div>
+      </div>
+
+      <!-- ticks and small segments created in DOM for CSS control (placed via JS) -->
+      <div id="tickContainer" aria-hidden="true"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/*
+  Behavior:
+  - Click the HUD (anchor) to "detach" it: it moves into center (detached state)
+  - Detached state enables float (CSS animation), sweep, and parallax mouse tilt
+  - Progress simulated below; you can hook `setProgress(percentage)` to real loader
+  - Ticks and segments are generated dynamically for crisp positioning
+*/
+
+const anchor = document.getElementById('anchor');
+const hud = document.getElementById('hud');
+const tickContainer = document.getElementById('tickContainer');
+const progressValue = document.getElementById('progressValue');
+const sweepArc = document.getElementById('sweepArc');
+const ticksGroup = document.getElementById('ticks');
+
+let detached = false;
+let preferReduced = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+// generate radial ticks around a circle (visual mechanical ticks)
+function createTicks(count = 60, radius = 92){
+  // clear existing
+  ticksGroup.innerHTML = '';
+  tickContainer.innerHTML = '';
+  for(let i=0;i<count;i++){
+    const angle = (i / count) * Math.PI * 2;
+    // SVG tick (short or long)
+    const isMajor = (i % 5 === 0);
+    const len = isMajor ? 14 : 8;
+    const stroke = isMajor ? 'rgba(59,231,255,0.92)' : 'rgba(36,240,230,0.62)';
+    const strokeW = isMajor ? 3 : 1.6;
+    // append to SVG group
+    const x1 = Math.cos(angle) * (radius + 6);
+    const y1 = Math.sin(angle) * (radius + 6);
+    const x2 = Math.cos(angle) * (radius + 6 + len);
+    const y2 = Math.sin(angle) * (radius + 6 + len);
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+    line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+    line.setAttribute('stroke', stroke);
+    line.setAttribute('stroke-width', strokeW);
+    line.setAttribute('stroke-linecap', 'round');
+    // slight opacity variance for mechanical look
+    if(!isMajor) line.setAttribute('opacity', 0.72);
+    ticksGroup.appendChild(line);
+
+    // small DOM segment accents (for CSS pulse)
+    const seg = document.createElement('div');
+    seg.className = 'segment' + (isMajor ? ' pulse' : '');
+    seg.style.width = (isMajor ? 14 : 10) + 'px';
+    const segX = Math.cos(angle) * (radius + 22);
+    const segY = Math.sin(angle) * (radius + 22);
+    // position from center of HUD element: container is relative; we use 50% center offset
+    seg.style.left = '50%';
+    seg.style.top = '50%';
+    seg.style.transform = `translate(-50%,-50%) translate(${segX}px,${segY}px) rotate(${angle + Math.PI/2}rad) translateZ(24px)`;
+    tickContainer.appendChild(seg);
   }
+}
 
-  // Create layered rings (outer, inner, glow layers)
-  const group = new THREE.Group();
-  scene.add(group);
+// sweep arc control: animate stroke-dashoffset for a sweeping effect
+let sweepLen = 2 * Math.PI * 135; // circumference for r=135
+sweepArc.setAttribute('stroke-dasharray', `${Math.round(sweepLen*0.06)} ${Math.round(sweepLen)}`);
+let sweepOffset = 0;
+function updateSweep(now){
+  // only run in detached state to save CPU
+  if(!detached || preferReduced) return;
+  sweepOffset = (sweepOffset + 1.8) % sweepLen;
+  sweepArc.setAttribute('stroke-dashoffset', sweepOffset);
+}
 
-  // Outer segmented ring (use Torus with dashed appearance via multiple slices)
-  function makeSegmentedRing(radius, tube, segments, color){
-    const ringGroup = new THREE.Group();
-    const segCount = segments;
-    for(let i=0;i<segCount;i++){
-      // create an arc segment by extruding short torus arc (approx with thin box curved by position/rotation)
-      const arcLen = 2 * Math.PI / segCount * 0.65; // gap by factor 0.65
-      // approximate with thin box rotated and positioned on circle
-      const length = arcLen * radius;
-      const geom = new THREE.BoxGeometry(length, tube, 0.01);
-      const mesh = new THREE.Mesh(geom, glowMaterial(color, 0.95));
-      const angle = (i/segCount) * Math.PI * 2;
-      mesh.position.set(Math.cos(angle) * radius, Math.sin(angle) * radius, 0);
-      mesh.rotation.z = angle + Math.PI/2;
-      ringGroup.add(mesh);
-    }
-    return ringGroup;
+// parallax: rotate HUD slightly based on mouse movement when detached
+function onPointerMove(e){
+  if(!detached) return;
+  const rect = anchor.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const dx = (e.clientX - cx) / rect.width;
+  const dy = (e.clientY - cy) / rect.height;
+  // limit angles
+  const rx = Math.max(-1, Math.min(1, -dy)) * 8; // tilt up/down
+  const ry = Math.max(-1, Math.min(1, dx)) * 10; // tilt left/right
+  hud.style.transform = `translateZ(20px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+}
+
+// reset tilt on leave
+function onPointerLeave(){
+  if(!detached) return;
+  hud.style.transform = '';
+}
+
+// toggle detach on click
+anchor.addEventListener('click', () => {
+  detached = !detached;
+  if(detached) {
+    anchor.classList.add('detached');
+    // small delay to allow entrance then enable mouse listeners
+    setTimeout(()=> {
+      window.addEventListener('pointermove', onPointerMove);
+      window.addEventListener('pointerleave', onPointerLeave);
+    }, 260);
+  } else {
+    anchor.classList.remove('detached');
+    hud.style.transform = '';
+    window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerleave', onPointerLeave);
   }
+});
 
-  // Outer segmented ring
-  const outer = makeSegmentedRing(1.08, 0.016, 40, 0x28f4e6);
-  group.add(outer);
-
-  // Thin solid outer torus
-  const torusGeom = new THREE.TorusGeometry(1.02, 0.008, 12, 128);
-  const torus = new THREE.Mesh(torusGeom, glowMaterial(0x3be7ff, 0.6));
-  group.add(torus);
-
-  // soft glow ring (wider, low opacity)
-  const glowOuterGeom = new THREE.TorusGeometry(1.02, 0.06, 8, 64);
-  const glowOuter = new THREE.Mesh(glowOuterGeom, glowMaterial(0x18f7e6, 0.08));
-  group.add(glowOuter);
-
-  // inner ring + inner glow
-  const innerTorus = new THREE.Mesh(new THREE.TorusGeometry(0.78, 0.006, 8, 128), glowMaterial(0x1fffcf, 0.6));
-  group.add(innerTorus);
-  const innerGlow = new THREE.Mesh(new THREE.TorusGeometry(0.78, 0.05, 8, 64), glowMaterial(0x18f7e6, 0.06));
-  group.add(innerGlow);
-
-  // radial ticks (short bars)
-  const ticks = new THREE.Group();
-  const tickCount = 60;
-  for(let i=0;i<tickCount;i++){
-    const major = (i % 5 === 0);
-    const len = major ? 0.15 : 0.085;
-    const geometry = new THREE.BoxGeometry(0.008, len, 0.003);
-    const material = glowMaterial(major ? 0x3be7ff : 0x18f7e6, major ? 0.85 : 0.55);
-    const mesh = new THREE.Mesh(geometry, material);
-    const angle = (i / tickCount) * Math.PI * 2;
-    mesh.position.set(Math.cos(angle) * 0.92, Math.sin(angle) * 0.92, 0.02);
-    mesh.rotation.z = angle;
-    ticks.add(mesh);
+// progress API: call setProgress(n) with 0..100
+let simulated = 0;
+function setProgress(n){
+  simulated = Math.max(0, Math.min(100, Math.round(n)));
+  progressValue.textContent = simulated + '%';
+  // visual scaling of center text
+  const v = progressValue;
+  const scale = 0.85 + (simulated/100) * 0.35;
+  v.style.transform = `scale(${scale}) translateZ(26px)`;
+  // also pulse some segments when progress increases
+  if(simulated > 0 && simulated < 100){
+    anchor.classList.add('detached');
+    detached = true;
   }
-  group.add(ticks);
-
-  // animated orbiting dots
-  const dots = new THREE.Group();
-  const dotCount = 10;
-  const dotMeshes = [];
-  for(let i=0;i<dotCount;i++){
-    const g = new THREE.CircleGeometry(0.012, 12);
-    const m = glowMaterial(0x9ffeff, 0.95);
-    const mesh = new THREE.Mesh(g, m);
-    const angle = i / dotCount * Math.PI * 2;
-    mesh.position.set(Math.cos(angle) * 0.93, Math.sin(angle) * 0.93, 0.03);
-    dots.add(mesh);
-    dotMeshes.push(mesh);
+  if(simulated >= 100){
+    // graceful ready animation
+    v.textContent = 'READY';
+    v.style.color = '#9ff';
+    // small glow flash
+    anchor.animate([{opacity:1},{opacity:0.98},{opacity:1}], {duration:900,iterations:1});
   }
-  group.add(dots);
+}
 
-  // small rotating centerpiece (faint disk + ring)
-  const centerDisk = new THREE.Mesh(new THREE.CircleGeometry(0.085, 32), new THREE.MeshBasicMaterial({color:0x05242b, transparent:true, opacity:0.45}));
-  group.add(centerDisk);
-  const centerRing = new THREE.Mesh(new THREE.RingGeometry(0.11, 0.12, 64), glowMaterial(0x3be7ff, 0.22));
-  centerRing.rotation.x = Math.PI; // keep facing camera consistently
-  group.add(centerRing);
+// small simulated progress so you can see the behavior. Replace with real loader hook.
+let tStart = performance.now();
+let progressTimer = setInterval(()=>{
+  if(simulated >= 100) { clearInterval(progressTimer); return; }
+  setProgress(simulated + Math.floor(1 + Math.random()*6));
+}, 500);
 
-  // subtle depth: place a few concentric semi-transparent rings for HUD-like layers
-  for(let i=0;i<3;i++){
-    const r = 0.6 + i*0.1;
-    const g = new THREE.RingGeometry(r - 0.005, r + 0.005, 64);
-    const mat = glowMaterial(0x2feee0, 0.06 + i*0.02);
-    const ring = new THREE.Mesh(g, mat);
-    ring.rotation.x = Math.PI; // face camera
-    ring.position.z = -0.01 - i*0.01;
-    group.add(ring);
-  }
-
-  // subtle parallax by rotating group slowly
-  group.rotation.x = 0.08;
-
-  // animation loop
-  let last = performance.now();
-  function animate(now){
-    const dt = (now - last) / 1000;
+// FPS-ish & sweep updater using rAF (lightweight)
+let last = 0;
+function rafLoop(now){
+  requestAnimationFrame(rafLoop);
+  // throttle to ~60fps; update sweep only every frame
+  if(now - last > 12){
+    updateSweep(now);
     last = now;
-
-    // rotation speeds
-    outer.rotation.z += dt * 0.6;     // outer segmented ring
-    torus.rotation.z -= dt * 0.35;
-    innerTorus.rotation.z += dt * 0.22;
-    ticks.rotation.z -= dt * 0.28;
-    centerRing.rotation.z += dt * 0.5;
-
-    // orbiting dots animate opacity & scale in waves
-    for(let i=0;i<dotMeshes.length;i++){
-      const d = dotMeshes[i];
-      const phase = (now * 0.002 + i * 0.14) % (Math.PI * 2);
-      d.scale.setScalar(0.7 + 0.6 * Math.abs(Math.sin(phase)));
-      d.material.opacity = 0.25 + 0.85 * Math.abs(Math.sin(phase));
-      // pulsate position slightly (radial breathing)
-      const baseAngle = (i / dotCount) * Math.PI * 2 + now * 0.0008 * (i%2?1:-1);
-      const radius = 0.88 + 0.03 * Math.sin(now * 0.0015 + i);
-      d.position.x = Math.cos(baseAngle) * radius;
-      d.position.y = Math.sin(baseAngle) * radius;
-    }
-
-    // subtle camera/scene sway for holographic depth
-    group.rotation.y = Math.sin(now * 0.0005) * 0.08;
-    group.rotation.x = 0.08 + Math.cos(now * 0.0004) * 0.02;
-
-    renderer.render(scene, camera);
-    requestAnimationFrame(animate);
   }
-  requestAnimationFrame(animate);
+}
+requestAnimationFrame(rafLoop);
 
-  // resize handling
-  window.addEventListener('resize', () => {
-    camera.aspect = innerWidth / innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(innerWidth, innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  });
+// build ticks on load
+createTicks(60, 92);
 
-  // Optional: simulate a loading finish after X seconds (for demo). Remove in real uses.
-  // Replace with actual asset-loading progress to set status text and stop the loader.
-  setTimeout(() => {
-    document.getElementById('status').textContent = 'READY';
-    // fade out after short delay
-    setTimeout(() => {
-      document.body.style.transition = 'opacity 0.9s';
-      document.body.style.opacity = '0';
-      // (In production you might remove the loader element instead)
-    }, 700);
-  }, 4200);
-  </script>
+/* Integration notes:
+   - Hook setProgress(percentage) to your asset loader's progress events.
+   - To trigger detach programmatically: anchor.classList.add('detached'); detached = true;
+   - For stronger bloom, consider duplicating the SVG layers with blur or using CSS filter: blur on clones.
+   - For performance, reduce tick count on mobile and honor prefers-reduced-motion.
+*/
+</script>
 </body>
 </html>
+
