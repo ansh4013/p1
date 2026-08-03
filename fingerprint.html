@@ -1,0 +1,155 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>Studio Manifesto</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link as="style" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" onload="this.onload=null;this.rel='stylesheet'" rel="stylesheet">
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" onload="this.onload=null;this.rel='stylesheet'" rel="stylesheet">
+<noscript>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+</noscript>
+<style>
+        body { overflow-x: hidden; }
+        .fluid-text { font-size: clamp(1.2rem, 4vw, 4rem); }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#1b1b1b",
+                        "outline": "#8e9192",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-container": "#1f1f1f",
+                        "on-error": "#690005",
+                        "on-secondary-container": "#bab8b7",
+                        "surface-container-highest": "#353535",
+                        "on-secondary-fixed-variant": "#474646",
+                        "on-primary-container": "#636565",
+                        "primary-container": "#e2e2e2",
+                        "on-surface-variant": "#c4c7c8",
+                        "inverse-on-surface": "#303030",
+                        "surface-container-lowest": "#0e0e0e",
+                        "tertiary-container": "#e4e2e1",
+                        "on-tertiary": "#303030",
+                        "background": "#131313",
+                        "on-tertiary-fixed": "#1b1c1c",
+                        "error": "#ffb4ab",
+                        "primary-fixed-dim": "#c6c6c7",
+                        "on-secondary-fixed": "#1c1b1b",
+                        "error-container": "#93000a",
+                        "surface-bright": "#393939",
+                        "surface": "#131313",
+                        "inverse-primary": "#5d5f5f",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-fixed": "#e4e2e1",
+                        "primary-fixed": "#e2e2e2",
+                        "surface-variant": "#353535",
+                        "outline-variant": "#444748",
+                        "on-tertiary-container": "#656464",
+                        "on-primary-fixed": "#1a1c1c",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "on-primary": "#2f3131",
+                        "surface-tint": "#c6c6c7",
+                        "on-primary-fixed-variant": "#454747",
+                        "secondary-container": "#4a4949",
+                        "primary": "#ffffff",
+                        "tertiary-fixed-dim": "#c8c6c5",
+                        "on-tertiary-fixed-variant": "#474746",
+                        "on-background": "#e2e2e2",
+                        "on-secondary": "#313030",
+                        "on-surface": "#e2e2e2",
+                        "surface-dim": "#131313",
+                        "secondary-fixed": "#e5e2e1",
+                        "inverse-surface": "#e2e2e2",
+                        "tertiary": "#ffffff",
+                        "secondary": "#c8c6c5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "nav-padding": "10px",
+                        "element-gap": "20px",
+                        "grid-margin": "40px",
+                        "base-unit": "10px",
+                        "section-gap": "160px",
+                        "footer-padding": "10px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "display-xl": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-black text-white antialiased min-h-screen flex flex-col font-['Inter'] uppercase overflow-x-hidden selection:bg-white selection:text-black">
+<!-- TopNavBar -->
+<nav class="fixed z-50 w-full top-0 flex justify-between items-center px-nav-padding pt-nav-padding pb-6 text-white bg-black">
+<div class="font-bold tracking-tight text-[12px] uppercase" style="">
+            STUDIO
+        </div>
+<div class="hidden md:flex items-center absolute left-1/2 -translate-x-1/2 gap-8">
+<a class="text-[10px] uppercase font-semibold tracking-[0.15em] transition-opacity duration-150 hover:opacity-70" href="#" style="">WORK</a>
+<a class="text-[10px] uppercase font-semibold tracking-[0.15em] hover:opacity-70 transition-opacity duration-150" href="#" style="">ABOUT</a>
+<a class="text-[10px] uppercase font-semibold tracking-[0.15em] hover:opacity-70 transition-opacity duration-150" href="#" style="">NEWS</a>
+<a class="text-[10px] uppercase font-semibold tracking-[0.15em] hover:opacity-70 transition-opacity duration-150" href="#" style="">CAREERS</a>
+</div>
+<a class="hover:opacity-70 transition-opacity duration-150 flex items-center gap-2 text-[10px] uppercase tracking-[0.15em] font-semibold" href="#" style="">
+            GET IN TOUCH <span class="material-symbols-outlined text-[14px]" style="">arrow_forward</span>
+</a>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow flex flex-col items-center justify-center pt-[160px] pb-16 px-grid-margin md:px-[80px] max-w-[1920px] mx-auto w-full">
+<!-- Manifesto Section -->
+<section class="w-full flex flex-col items-center justify-center text-center gap-8 md:gap-12 my-auto">
+<div class="w-full max-w-[1400px]">
+<h1 class="font-['Inter'] fluid-text font-bold leading-[1.1] tracking-[-0.03em] text-white break-words uppercase mx-auto" style="">
+                    DESIGN IS A TEAM SPORT. IT’S WHERE GRIT MEETS FINESSE. WHERE SETBACKS SHAPE CHAMPIONS. OVER THE YEARS, WE’VE BUILT A <span class="italic font-light" style="">DYNASTY</span>, A SHINING GOLD STANDARD THAT FUELS OUR HUSTLE IN THIS DIGITAL GAME.
+                </h1>
+</div>
+<!-- Image & Detail Section -->
+<div class="flex flex-col items-center gap-8 w-full max-w-[500px]">
+<!-- Image Container -->
+<div class="w-full aspect-[16/9] relative overflow-hidden flex items-center justify-center">
+<!-- Abstract shape representation / Image -->
+<img alt="Abstract digital asset" class="w-full h-full object-cover filter opacity-90 hover:opacity-100 transition-opacity duration-700" loading="lazy" src="https://images.unsplash.com/photo-1727341552527-7429cbfdae6e?q=80&amp;w=1480&amp;auto=format&amp;fit=crop&amp;ixlib=rb-4.1.0&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" style="">
+</div>
+<!-- Text Block -->
+<div class="flex flex-col items-center text-center w-full">
+<p class="font-['Inter'] text-[10px] uppercase text-white/70 tracking-[0.2em] leading-[1.8] max-w-[400px]" style="">
+                        CRAFTING DIGITAL LEGACIES THROUGH RELENTLESS PURSUIT OF EXCELLENCE AND COLLABORATIVE SPIRIT. EVERY PIXEL SERVES A PURPOSE, EVERY INTERACTION TELLS A STORY.
+                    </p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-black flex justify-between items-center w-full px-nav-padding pb-[10px] pt-8 max-w-[1920px] mx-auto uppercase mt-auto border-t border-white/10">
+<div class="text-[10px] font-bold tracking-[0.1em] text-white" style="">
+            STUDIO
+        </div>
+<div class="hidden md:flex items-center gap-8 text-[10px] tracking-[0.15em] font-medium absolute left-1/2 -translate-x-1/2">
+<a class="text-white/60 hover:text-white transition-colors duration-300 cursor-pointer" href="#" style="">INSTAGRAM</a>
+<a class="text-white/60 hover:text-white transition-colors duration-300 cursor-pointer" href="#" style="">LINKEDIN</a>
+<a class="text-white/60 hover:text-white transition-colors duration-300 cursor-pointer" href="#" style="">TWITTER</a>
+</div>
+<div class="text-[10px] font-medium tracking-[0.15em] text-white/60" style="">
+            © STUDIO MMXXIV
+        </div>
+</footer>
+</body></html>
