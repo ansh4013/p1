@@ -1,148 +1,231 @@
-<!DOCTYPE html>
+
+
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HUD Loader Example</title>
-    
-    <style>
-        /* --- HUD LOADER STYLING --- */
-        #hud-loader-wrapper {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: #0d1117; /* Dark futuristic background */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            font-family: 'Courier New', Courier, monospace;
-            color: #00ffcc; /* Glowing cyan/green HUD color */
-            transition: opacity 0.5s ease; /* Smooth fade-out */
-        }
-
-        /* Radar Scanning Effect */
-        .radar-spinner {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            border: 2px solid rgba(0, 255, 204, 0.2);
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .radar-spinner::before {
-            content: '';
-            position: absolute;
-            top: -2px; left: -2px; right: -2px; bottom: -2px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            border-top-color: #00ffcc;
-            animation: spin 2s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Inner Ring */
-        .inner-ring {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 1px dashed #00ffcc;
-            animation: spin-reverse 4s linear infinite;
-        }
-
-        @keyframes spin-reverse {
-            0% { transform: rotate(360deg); }
-            100% { transform: rotate(0deg); }
-        }
-
-        /* Loading Text */
-        .hud-text {
-            margin-top: 30px;
-            font-size: 18px;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-        }
-
-        .hud-percentage {
-            margin-top: 10px;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        /* Crosshairs (Corner accents) */
-        .corner-crosshair {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #00ffcc;
-        }
-        .top-left { top: 20px; left: 20px; border-right: none; border-bottom: none; }
-        .top-right { top: 20px; right: 20px; border-left: none; border-bottom: none; }
-        .bottom-left { bottom: 20px; left: 20px; border-right: none; border-top: none; }
-        .bottom-right { bottom: 20px; right: 20px; border-left: none; border-top: none; }
-    </style>
+  <meta charset="utf-8" />
+  <title>3D HUD Loader — Technex-style</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#030913;
+      --accent:#18f7e6;
+      --accent2:#3be7ff;
+      --muted:#12212a;
+    }
+    html,body{height:100%;margin:0;background:var(--bg);font-family:Orbitron,system-ui,monospace;}
+    #container{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+    canvas{display:block;}
+    /* Center HUD overlay text */
+    .center-text{
+      position:fixed;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%);
+      color:var(--accent);
+      font-size:20px;
+      letter-spacing:0.18em;
+      opacity:0.85;
+      pointer-events:none;
+      text-transform:uppercase;
+      mix-blend-mode:screen;
+    }
+    /* subtle vignette */
+    .vignette{
+      position:fixed;inset:0;pointer-events:none;
+      background:radial-gradient(ellipse at center, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0.45) 60%, rgba(0,0,0,0.75) 100%);
+      mix-blend-mode:multiply;
+    }
+    /* small note: can hide when integrating */
+    .hint{position:fixed;left:12px;bottom:12px;color:#6fa6a6;font-size:12px;opacity:0.8}
+  </style>
 </head>
-<body style="margin: 0; padding: 0; font-family: sans-serif;">
+<body>
+  <div id="container"></div>
+  <div class="center-text" id="status">LOADING</div>
+  <div class="vignette"></div>
+  <div class="hint">GitHub Copilot Chat Assistant — 3D HUD loader</div>
 
-    <!-- --- HUD LOADER HTML --- -->
-    <div id="hud-loader-wrapper">
-        <div class="corner-crosshair top-left"></div>
-        <div class="corner-crosshair top-right"></div>
-        <div class="corner-crosshair bottom-left"></div>
-        <div class="corner-crosshair bottom-right"></div>
+  <!-- Three.js -->
+  <script src="https://unpkg.com/three@0.152.0/build/three.min.js"></script>
 
-        <div class="radar-spinner">
-            <div class="inner-ring"></div>
-        </div>
-        
-        <div class="hud-text">Initializing Systems</div>
-        <div class="hud-percentage" id="hud-percent">0%</div>
-    </div>
+  <script>
+  // Basic scene + camera + renderer
+  const container = document.getElementById('container');
+  const scene = new THREE.Scene();
 
-    <!-- --- MAIN WEBSITE CONTENT --- -->
-    <div style="padding: 50px; text-align: center;">
-        <h1>Welcome to My HUD Website</h1>
-        <p>This is your main webpage content that loads behind the HUD animation.</p>
-    </div>
+  const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 50);
+  camera.position.z = 3.0;
 
-    <!-- --- HUD LOADER JAVASCRIPT --- -->
-    <script>
-        // 1. Percentage counter simulation
-        const percentText = document.getElementById('hud-percent');
-        let count = 0;
-        const interval = setInterval(() => {
-            count += Math.floor(Math.random() * 10);
-            if (count >= 100) {
-                count = 100;
-                clearInterval(interval);
-            }
-            percentText.textContent = count + '%';
-        }, 100);
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  container.appendChild(renderer.domElement);
 
-        // 2. Hide loader once the actual page finishes loading
-        window.addEventListener('load', () => {
-            const loaderWrapper = document.getElementById('hud-loader-wrapper');
-            
-            // Wait for the percentage to reach 100% before fading out
-            setTimeout(() => {
-                loaderWrapper.style.opacity = '0';
-                
-                // Remove from DOM entirely after the fade-out transition completes
-                setTimeout(() => {
-                    loaderWrapper.style.display = 'none';
-                }, 500);
-            }, 1000); // 1-second delay so user sees the 100% completion
-        });
-    </script>
+  // Helpers: create emissive-like material using MeshBasicMaterial
+  function glowMaterial(hex, opacity=0.9) {
+    return new THREE.MeshBasicMaterial({
+      color: hex,
+      transparent: true,
+      opacity,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      side: THREE.DoubleSide
+    });
+  }
+
+  // Create layered rings (outer, inner, glow layers)
+  const group = new THREE.Group();
+  scene.add(group);
+
+  // Outer segmented ring (use Torus with dashed appearance via multiple slices)
+  function makeSegmentedRing(radius, tube, segments, color){
+    const ringGroup = new THREE.Group();
+    const segCount = segments;
+    for(let i=0;i<segCount;i++){
+      // create an arc segment by extruding short torus arc (approx with thin box curved by position/rotation)
+      const arcLen = 2 * Math.PI / segCount * 0.65; // gap by factor 0.65
+      // approximate with thin box rotated and positioned on circle
+      const length = arcLen * radius;
+      const geom = new THREE.BoxGeometry(length, tube, 0.01);
+      const mesh = new THREE.Mesh(geom, glowMaterial(color, 0.95));
+      const angle = (i/segCount) * Math.PI * 2;
+      mesh.position.set(Math.cos(angle) * radius, Math.sin(angle) * radius, 0);
+      mesh.rotation.z = angle + Math.PI/2;
+      ringGroup.add(mesh);
+    }
+    return ringGroup;
+  }
+
+  // Outer segmented ring
+  const outer = makeSegmentedRing(1.08, 0.016, 40, 0x28f4e6);
+  group.add(outer);
+
+  // Thin solid outer torus
+  const torusGeom = new THREE.TorusGeometry(1.02, 0.008, 12, 128);
+  const torus = new THREE.Mesh(torusGeom, glowMaterial(0x3be7ff, 0.6));
+  group.add(torus);
+
+  // soft glow ring (wider, low opacity)
+  const glowOuterGeom = new THREE.TorusGeometry(1.02, 0.06, 8, 64);
+  const glowOuter = new THREE.Mesh(glowOuterGeom, glowMaterial(0x18f7e6, 0.08));
+  group.add(glowOuter);
+
+  // inner ring + inner glow
+  const innerTorus = new THREE.Mesh(new THREE.TorusGeometry(0.78, 0.006, 8, 128), glowMaterial(0x1fffcf, 0.6));
+  group.add(innerTorus);
+  const innerGlow = new THREE.Mesh(new THREE.TorusGeometry(0.78, 0.05, 8, 64), glowMaterial(0x18f7e6, 0.06));
+  group.add(innerGlow);
+
+  // radial ticks (short bars)
+  const ticks = new THREE.Group();
+  const tickCount = 60;
+  for(let i=0;i<tickCount;i++){
+    const major = (i % 5 === 0);
+    const len = major ? 0.15 : 0.085;
+    const geometry = new THREE.BoxGeometry(0.008, len, 0.003);
+    const material = glowMaterial(major ? 0x3be7ff : 0x18f7e6, major ? 0.85 : 0.55);
+    const mesh = new THREE.Mesh(geometry, material);
+    const angle = (i / tickCount) * Math.PI * 2;
+    mesh.position.set(Math.cos(angle) * 0.92, Math.sin(angle) * 0.92, 0.02);
+    mesh.rotation.z = angle;
+    ticks.add(mesh);
+  }
+  group.add(ticks);
+
+  // animated orbiting dots
+  const dots = new THREE.Group();
+  const dotCount = 10;
+  const dotMeshes = [];
+  for(let i=0;i<dotCount;i++){
+    const g = new THREE.CircleGeometry(0.012, 12);
+    const m = glowMaterial(0x9ffeff, 0.95);
+    const mesh = new THREE.Mesh(g, m);
+    const angle = i / dotCount * Math.PI * 2;
+    mesh.position.set(Math.cos(angle) * 0.93, Math.sin(angle) * 0.93, 0.03);
+    dots.add(mesh);
+    dotMeshes.push(mesh);
+  }
+  group.add(dots);
+
+  // small rotating centerpiece (faint disk + ring)
+  const centerDisk = new THREE.Mesh(new THREE.CircleGeometry(0.085, 32), new THREE.MeshBasicMaterial({color:0x05242b, transparent:true, opacity:0.45}));
+  group.add(centerDisk);
+  const centerRing = new THREE.Mesh(new THREE.RingGeometry(0.11, 0.12, 64), glowMaterial(0x3be7ff, 0.22));
+  centerRing.rotation.x = Math.PI; // keep facing camera consistently
+  group.add(centerRing);
+
+  // subtle depth: place a few concentric semi-transparent rings for HUD-like layers
+  for(let i=0;i<3;i++){
+    const r = 0.6 + i*0.1;
+    const g = new THREE.RingGeometry(r - 0.005, r + 0.005, 64);
+    const mat = glowMaterial(0x2feee0, 0.06 + i*0.02);
+    const ring = new THREE.Mesh(g, mat);
+    ring.rotation.x = Math.PI; // face camera
+    ring.position.z = -0.01 - i*0.01;
+    group.add(ring);
+  }
+
+  // subtle parallax by rotating group slowly
+  group.rotation.x = 0.08;
+
+  // animation loop
+  let last = performance.now();
+  function animate(now){
+    const dt = (now - last) / 1000;
+    last = now;
+
+    // rotation speeds
+    outer.rotation.z += dt * 0.6;     // outer segmented ring
+    torus.rotation.z -= dt * 0.35;
+    innerTorus.rotation.z += dt * 0.22;
+    ticks.rotation.z -= dt * 0.28;
+    centerRing.rotation.z += dt * 0.5;
+
+    // orbiting dots animate opacity & scale in waves
+    for(let i=0;i<dotMeshes.length;i++){
+      const d = dotMeshes[i];
+      const phase = (now * 0.002 + i * 0.14) % (Math.PI * 2);
+      d.scale.setScalar(0.7 + 0.6 * Math.abs(Math.sin(phase)));
+      d.material.opacity = 0.25 + 0.85 * Math.abs(Math.sin(phase));
+      // pulsate position slightly (radial breathing)
+      const baseAngle = (i / dotCount) * Math.PI * 2 + now * 0.0008 * (i%2?1:-1);
+      const radius = 0.88 + 0.03 * Math.sin(now * 0.0015 + i);
+      d.position.x = Math.cos(baseAngle) * radius;
+      d.position.y = Math.sin(baseAngle) * radius;
+    }
+
+    // subtle camera/scene sway for holographic depth
+    group.rotation.y = Math.sin(now * 0.0005) * 0.08;
+    group.rotation.x = 0.08 + Math.cos(now * 0.0004) * 0.02;
+
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+
+  // resize handling
+  window.addEventListener('resize', () => {
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  });
+
+  // Optional: simulate a loading finish after X seconds (for demo). Remove in real uses.
+  // Replace with actual asset-loading progress to set status text and stop the loader.
+  setTimeout(() => {
+    document.getElementById('status').textContent = 'READY';
+    // fade out after short delay
+    setTimeout(() => {
+      document.body.style.transition = 'opacity 0.9s';
+      document.body.style.opacity = '0';
+      // (In production you might remove the loader element instead)
+    }, 700);
+  }, 4200);
+  </script>
 </body>
 </html>
+
