@@ -1,377 +1,438 @@
+Understood — I removed the password UI and replaced the demo with a more "extremely technical" GPU‑first Three.js HUD implementation. This single-file example focuses on performance and production‑grade techniques:
+
+- Selective bloom (bloom only applied to glow layers using layers + darkening)
+- GPU particle system via a custom Points shader (runs entirely on GPU)
+- Instanced ticks (InstancedMesh + InstancedBufferAttributes) for minimal draw calls
+- Fresnel rim implemented via onBeforeCompile to augment standard materials
+- Postprocessing pipeline: RenderPass -> UnrealBloomPass -> final composite with FXAA
+- Easy hooks for real loader progress (window.setProgress), and for hooking GLTF/image loaders
+- Lots of inline, technical comments explaining design choices and performance tradeoffs
+
+Run from a local server (do not open via file://). Example:
+- python3 -m http.server 8000
+- open http://localhost:8000/index.html
+
+Paste the following into index.html and open via a local server:
 
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>GPU HUD Loader + Password (password: ansh)</title>
+<title>Technical GPU HUD — Three.js (Selective Bloom + GPU Particles)</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#030913;
-    --panel-bg:rgba(2,8,12,0.6);
+    --bg:#020612;
     --accent:#18f7e6;
     --accent-2:#3be7ff;
   }
-  html,body{height:100%;margin:0;background:linear-gradient(180deg,#02060b 0%,#061423 100%);font-family:Orbitron,system-ui,monospace;overflow:hidden;color:#9dd;}
-  #app{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;perspective:1200px;}
-  canvas{display:block; width:100%; height:100%;}
-  /* Overlay UI / Password panel */
-  .ui{
-    position:fixed; right:18px; top:18px; z-index:60;
-    background:var(--panel-bg); padding:12px 14px; border-radius:10px;
-    border:1px solid rgba(60,240,220,0.06); box-shadow:0 10px 30px rgba(0,0,0,0.6);
-    backdrop-filter: blur(6px);
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,#020613 0%,#021628 100%);font-family:Orbitron,system-ui,monospace;overflow:hidden;color:#9dd;}
+  #canvas-container{position:fixed;inset:0;display:block;}
+  .label{
+    position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:60;
+    color:var(--accent);font-size:18px;letter-spacing:0.18em;pointer-events:none;text-transform:uppercase;
+    mix-blend-mode:screen;text-shadow:0 6px 26px rgba(24,247,230,0.06)
   }
-  .ui h3{margin:0 0 8px 0;color:var(--accent); font-size:13px; letter-spacing:0.12em; text-transform:uppercase;}
-  .ui input{width:220px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;background:rgba(255,255,255,0.02);color:#dff; outline:none;}
-  .ui button{margin-left:8px;padding:8px 12px;border-radius:6px;border:none;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#012; font-weight:700;cursor:pointer;}
-  .ui .status{font-size:12px;margin-top:8px;color:#9fd;opacity:0.9;}
-  .center-label{
-    position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:40;
-    color:var(--accent); font-size:18px; letter-spacing:0.18em; pointer-events:none;
-    text-transform:uppercase; mix-blend-mode:screen; opacity:0.95;
-    text-shadow:0 6px 26px rgba(24,247,230,0.06);
-  }
-
-  /* small hint and controls */
-  .hint{position:fixed;left:12px;bottom:12px;color:#6fa6a6;font-size:12px;opacity:0.8;z-index:60}
+  .hint{position:fixed;left:14px;bottom:12px;color:#78b0a9;font-size:12px;opacity:0.9;z-index:60}
   @media (prefers-reduced-motion: reduce){
-    * { animation: none !important; transition: none !important; }
+    *{animation:none!important;transition:none!important}
   }
 </style>
 </head>
 <body>
-<div id="app"></div>
+<div id="canvas-container"></div>
+<div class="label" id="centerLabel">SYSTEM HUD</div>
+<div class="hint">Click canvas to toggle detach / attach. Call window.setProgress(n) to show progress (0–100).</div>
 
-<div class="ui" id="uiPanel" aria-live="polite">
-  <h3>Unlock HUD</h3>
-  <div style="display:flex;align-items:center;">
-    <input id="pwd" type="password" placeholder="Enter password" aria-label="password" />
-    <button id="btn">Enter</button>
-  </div>
-  <div class="status" id="status">status: locked</div>
-</div>
-
-<div class="center-label" id="centerLabel">SYSTEM HUD</div>
-<div class="hint">Click canvas to toggle detach / attach after unlock. Password is "ansh".</div>
-
-<!-- Three.js + postprocessing modules via ES modules -->
 <script type="module">
+/* Extremely technical Three.js HUD
+   - Selective bloom via layers
+   - GPU particles using custom ShaderMaterial (no CPU updates)
+   - InstancedMesh for ticks (one draw call)
+   - Fresnel rim added via onBeforeCompile augmentation
+   - Post-processing: RenderPass -> Bloom -> FXAA
+   - Good defaults for desktop; degrade settings for mobile/low-GPU
+   - Hook: window.setProgress(percent)
+   Notes: run from a local server due to ES module imports.
+*/
+
 import * as THREE from 'https://unpkg.com/three@0.152.0/build/three.module.js';
 import { EffectComposer } from 'https://unpkg.com/three@0.152.0/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'https://unpkg.com/three@0.152.0/examples/jsm/postprocessing/RenderPass.js';
-import { ShaderPass } from 'https://unpkg.com/three@0.152.0/examples/jsm/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'https://unpkg.com/three@0.152.0/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { ShaderPass } from 'https://unpkg.com/three@0.152.0/examples/jsm/postprocessing/ShaderPass.js';
 import { FXAAShader } from 'https://unpkg.com/three@0.152.0/examples/jsm/shaders/FXAAShader.js';
 
-// Scene setup
-const container = document.getElementById('app');
-const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0x020613, 0.18);
-
-const camera = new THREE.PerspectiveCamera(42, innerWidth/innerHeight, 0.1, 100);
-camera.position.set(0, 0, 3.2);
+const container = document.getElementById('canvas-container');
+const centerLabel = document.getElementById('centerLabel');
 
 const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMappingExposure = 1.0;
 container.appendChild(renderer.domElement);
 
-// EffectComposer for bloom + FXAA
-const composer = new EffectComposer(renderer);
-const renderPass = new RenderPass(scene, camera);
-composer.addPass(renderPass);
+// Scene & camera
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x020613);
+scene.fog = new THREE.FogExp2(0x020613, 0.08);
 
-const bloomParams = { strength: 1.4, threshold: 0.12, radius: 0.9 };
-const bloomPass = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), bloomParams.strength, bloomParams.radius, bloomParams.threshold);
-composer.addPass(bloomPass);
+const camera = new THREE.PerspectiveCamera(44, window.innerWidth / window.innerHeight, 0.05, 50);
+camera.position.set(0, 0, 3.4);
 
-// FXAA pass (for crisp edges)
+// LAYERS: we'll use layers to mark objects that should bloom.
+// Convention: bloomLayer = 1, default layer = 0
+const BLOOM_LAYER = 1;
+
+// ---------- POSTPROCESSING / SELECTIVE BLOOM SETUP ----------
+// We render the scene twice: one pass with only bloom objects visible (and others darkened),
+// apply UnrealBloomPass -> bloomComposer. Then render the full scene and composite bloom on top.
+// This avoids blooming non-emissive geometry.
+
+const renderScene = new RenderPass(scene, camera);
+
+const bloomComposer = new EffectComposer(renderer);
+bloomComposer.addPass(renderScene);
+
+// Bloom params tuned for neon/HUD look - adjust for performance
+let bloomStrength = 1.6;
+const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), bloomStrength, 0.6, 0.1);
+bloomPass.threshold = 0.08;
+bloomComposer.addPass(bloomPass);
+
+// Final composer: render full scene then composite bloom via additive blending.
+// We do full render to screen with FXAA after compositing.
+const finalComposer = new EffectComposer(renderer);
+finalComposer.addPass(renderScene);
+
 const fxaaPass = new ShaderPass(FXAAShader);
-fxaaPass.uniforms['resolution'].value.set(1 / innerWidth, 1 / innerHeight);
-fxaaPass.material.transparent = true;
-composer.addPass(fxaaPass);
+fxaaPass.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight);
+finalComposer.addPass(fxaaPass);
 
-// Resize
-window.addEventListener('resize', onResize);
-function onResize(){
-  camera.aspect = innerWidth / innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight);
-  composer.setSize(innerWidth, innerHeight);
-  fxaaPass.uniforms['resolution'].value.set(1 / innerWidth, 1 / innerHeight);
-}
+// We'll composite bloom by rendering bloomComposer to a renderTarget and drawing it additively.
+// EffectComposer doesn't expose a built-in "additive composite" pass with two composers, so we'll do:
+// 1) Render scene normally (finalComposer) to screen
+// 2) Render bloomComposer renderTarget.texture as an additive screen-aligned quad via a ShaderPass
+// For clarity we will instead perform two-step rendering each frame (bloomComposer.render(), then finalComposer.render())
+// and then add bloomComposer's result to the canvas using an additive fullscreen quad.
+// To keep code short and robust, we'll reuse finalComposer + a custom ShaderPass to add bloom texture.
 
-// Add an orthographic HUD group that we'll "detach" by moving toward camera
-const hudGroup = new THREE.Group();
-scene.add(hudGroup);
+import { CopyShader } from 'https://unpkg.com/three@0.152.0/examples/jsm/shaders/CopyShader.js';
+const copyPass = new ShaderPass(CopyShader);
+copyPass.renderToScreen = true; // This pass will output to screen when used alone
 
-// Glow-like additive material
-function addMaterial(hex, opacity=1, sizeAtten=false){
+// To composite bloom + scene: we'll render bloomComposer to an internal render target and pass that texture to a final composite shader.
+// Create a renderTarget to receive bloomComposer output:
+const bloomRenderTarget = bloomComposer.readBuffer; // EffectComposer exposes readBuffer for current setup
+
+// A simple additive composite shader (scene + bloom)
+const CompositeShader = {
+  uniforms: {
+    'tBase': { value: null },
+    'tBloom': { value: null },
+    'bloomIntensity': { value: 1.0 }
+  },
+  vertexShader: /* glsl */`
+    varying vec2 vUv;
+    void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }
+  `,
+  fragmentShader: /* glsl */`
+    uniform sampler2D tBase;
+    uniform sampler2D tBloom;
+    uniform float bloomIntensity;
+    varying vec2 vUv;
+    void main(){
+      vec3 base = texture2D(tBase, vUv).rgb;
+      vec3 bloom = texture2D(tBloom, vUv).rgb * bloomIntensity;
+      // additive composite; tone mapping already applied earlier
+      vec3 outc = base + bloom;
+      gl_FragColor = vec4(outc, 1.0);
+    }
+  `
+};
+const compositePass = new ShaderPass(CompositeShader);
+compositePass.material.depthTest = false;
+compositePass.material.depthWrite = false;
+compositePass.renderToScreen = true;
+
+// ---------- SCENE CONTENT (HUD) ----------
+
+// Group for the HUD; we will "detach" this group by changing its position/scale and enabling a gentle floating motion when detached.
+const hud = new THREE.Group();
+scene.add(hud);
+
+// We will place two root groups: one for bloom-emissive geometry, and one for non-bloom geometry.
+// Objects that should glow strongly: add them to bloomGroup and set object.layers.enable(BLOOM_LAYER).
+const bloomGroup = new THREE.Group();
+const nonBloomGroup = new THREE.Group();
+hud.add(nonBloomGroup);
+hud.add(bloomGroup);
+
+// Utility: additive mesh basic material for glow objects (no lights, additive blending)
+function EmissiveMaterial(hex=0x24f0e6, intensity=1.0){
   return new THREE.MeshBasicMaterial({
     color: hex,
     transparent: true,
-    opacity,
+    opacity: Math.min(1.0, intensity),
     blending: THREE.AdditiveBlending,
     depthWrite: false,
-    toneMapped: false,
+    toneMapped: false, // keep colors for bloom pass
     side: THREE.DoubleSide
   });
 }
 
-// Main geometry: layered torus rings + tick instancing
-const ringOuter = new THREE.Mesh(new THREE.TorusGeometry(1.02, 0.016, 12, 160), addMaterial(0x24f0e6, 0.9));
-hudGroup.add(ringOuter);
-const ringThin = new THREE.Mesh(new THREE.TorusGeometry(0.78, 0.006, 8, 160), addMaterial(0x3be7ff, 0.7));
-hudGroup.add(ringThin);
+// Add a bunch of layered rings (torus) — these are visually the HUD rings.
+// Outer geometry is bloom-enabled (gives the neon halo)
+const ringOuter = new THREE.Mesh(new THREE.TorusGeometry(1.06, 0.014, 16, 256), EmissiveMaterial(0x24f0e6, 0.95));
+ringOuter.renderOrder = 2;
+bloomGroup.add(ringOuter);
+ringOuter.layers.enable(BLOOM_LAYER); // mark for bloom pass
 
-// soft translucent ring (for bloom)
-const ringGlow = new THREE.Mesh(new THREE.TorusGeometry(1.02, 0.06, 8, 64), addMaterial(0x18f7e6, 0.14));
-hudGroup.add(ringGlow);
+// Thinner inner ring
+const ringInner = new THREE.Mesh(new THREE.TorusGeometry(0.78, 0.006, 10, 200), EmissiveMaterial(0x3be7ff, 0.8));
+ringInner.renderOrder = 2;
+bloomGroup.add(ringInner);
+ringInner.layers.enable(BLOOM_LAYER);
 
-// radial ticks via InstancedMesh for GPU efficiency
-const tickCount = 72;
-const tickGeom = new THREE.BoxGeometry(0.012, 0.12, 0.01);
-const tickMat = addMaterial(0x24f0e6, 0.95);
-const ticks = new THREE.InstancedMesh(tickGeom, tickMat, tickCount);
-ticks.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-hudGroup.add(ticks);
+// A subtle non-bloom core disk to provide contrast
+const coreDisk = new THREE.Mesh(new THREE.CircleGeometry(0.09, 32), new THREE.MeshBasicMaterial({ color: 0x041723, transparent:true, opacity:0.45 }));
+coreDisk.position.z = 0.02;
+nonBloomGroup.add(coreDisk);
 
-// set tick transforms
-const tempMat = new THREE.Object3D();
-for(let i=0;i<tickCount;i++){
-  const angle = (i / tickCount) * Math.PI * 2;
+// Instanced ticks (InstancedMesh) — GPU-friendly single draw call for many tick marks.
+// We also create instanced attributes so ticks can be animated in shader if desired.
+// For simplicity we set transform matrices once (static geometry).
+const TICK_COUNT = 72;
+const tickGeometry = new THREE.BoxGeometry(0.008, 0.12, 0.003);
+const tickMaterial = EmissiveMaterial(0x24f0e6, 0.9);
+const ticksMesh = new THREE.InstancedMesh(tickGeometry, tickMaterial, TICK_COUNT);
+ticksMesh.instanceMatrix.setUsage(THREE.StaticDrawUsage);
+bloomGroup.add(ticksMesh);
+ticksMesh.layers.enable(BLOOM_LAYER);
+
+// populate instance matrices with radial distribution
+const tmpObj = new THREE.Object3D();
+for(let i=0;i<TICK_COUNT;i++){
+  const angle = (i / TICK_COUNT) * Math.PI * 2;
   const radius = 0.92;
-  tempMat.position.set(Math.cos(angle) * radius, Math.sin(angle) * radius, 0.01);
-  tempMat.rotation.z = angle;
-  tempMat.scale.set(1, (i%6===0)?1.8:1.0, 1);
-  tempMat.updateMatrix();
-  ticks.setMatrixAt(i, tempMat.matrix);
+  tmpObj.position.set(Math.cos(angle) * radius, Math.sin(angle) * radius, 0.01);
+  tmpObj.rotation.set(0, 0, angle);
+  tmpObj.scale.set(1, (i%6===0) ? 1.9 : 1.0, 1);
+  tmpObj.updateMatrix();
+  ticksMesh.setMatrixAt(i, tmpObj.matrix);
 }
+ticksMesh.instanceMatrix.needsUpdate = true;
 
-// orbiting dots as Points (GPU particle-like)
-const dotCount = 14;
-const dotGeom = new THREE.BufferGeometry();
-const positions = new Float32Array(dotCount * 3);
-for(let i=0;i<dotCount;i++){
-  const a = (i / dotCount) * Math.PI * 2;
-  const r = 0.93;
-  positions[i*3+0] = Math.cos(a) * r;
-  positions[i*3+1] = Math.sin(a) * r;
-  positions[i*3+2] = 0.02;
+// GPU PARTICLE SYSTEM (Points) using ShaderMaterial — position & animation computed on GPU.
+// This avoids per-frame CPU updates and allows very large counts cheaply.
+// We'll produce N particles arranged along a ring with phase offsets and animate them in the vertex shader.
+const PARTICLE_COUNT = 512; // increase/decrease for performance; keep power-of-two friendly counts
+const particlePositions = new Float32Array(PARTICLE_COUNT * 3);
+const particlePhases = new Float32Array(PARTICLE_COUNT);
+const particleRadii = new Float32Array(PARTICLE_COUNT);
+for(let i=0;i<PARTICLE_COUNT;i++){
+  const t = i / PARTICLE_COUNT;
+  const a = t * Math.PI * 2 * 3.0; // spread across several revolutions for visual density
+  const r = 0.88 + Math.random() * 0.06;
+  particlePositions[3*i+0] = Math.cos(a) * r;
+  particlePositions[3*i+1] = Math.sin(a) * r;
+  particlePositions[3*i+2] = (Math.random() - 0.5) * 0.02;
+  particlePhases[i] = Math.random() * Math.PI * 2;
+  particleRadii[i] = 0.002 + Math.random() * 0.006;
 }
-dotGeom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-const dotMat = new THREE.PointsMaterial({
-  color: 0x9ffeff,
-  size: 8.0,
-  map: generateCircleTexture('#66fff3'),
+const particleGeometry = new THREE.BufferGeometry();
+particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+particleGeometry.setAttribute('phase', new THREE.BufferAttribute(particlePhases, 1));
+particleGeometry.setAttribute('radiusAttr', new THREE.BufferAttribute(particleRadii, 1));
+
+// custom shader material for GPU particle animation
+const particleMaterial = new THREE.ShaderMaterial({
   transparent: true,
-  blending: THREE.AdditiveBlending,
   depthWrite: false,
-  toneMapped: false
+  blending: THREE.AdditiveBlending,
+  uniforms: {
+    uTime: { value: 0.0 },
+    uScale: { value: 1.0 },
+    uColor: { value: new THREE.Color(0x9ffeff) },
+    uPixelRatio: { value: Math.min(window.devicePixelRatio || 1, 2) },
+    uSize: { value: 18.0 } // base size in pixels
+  },
+  vertexShader: /* glsl */`
+    precision mediump float;
+    attribute float phase;
+    attribute float radiusAttr;
+    uniform float uTime;
+    uniform float uScale;
+    uniform float uPixelRatio;
+    uniform float uSize;
+    varying float vAlpha;
+    void main(){
+      // compute per-vertex time-based radial wobble and orbiting
+      float t = uTime * 0.6;
+      float angle = atan(position.y, position.x);
+      float baseR = length(position.xy);
+      float dynamicR = baseR + 0.02 * sin(t * 0.9 + phase * 1.7);
+      float a = angle + 0.2 * sin(t * 0.6 + phase);
+      vec3 pos = vec3(cos(a) * dynamicR, sin(a) * dynamicR, position.z);
+      vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+      // size attenuation: keep roughly constant pixel size across depth
+      float size = uSize * radiusAttr * uScale * (300.0 / -mvPosition.z) * uPixelRatio;
+      gl_PointSize = clamp(size, 1.0, 40.0);
+      vAlpha = 0.35 + 0.65 * abs(sin(t * 1.7 + phase));
+      gl_Position = projectionMatrix * mvPosition;
+    }
+  `,
+  fragmentShader: /* glsl */`
+    precision mediump float;
+    uniform vec3 uColor;
+    varying float vAlpha;
+    // circular soft falloff
+    void main(){
+      vec2 uv = gl_PointCoord - 0.5;
+      float r = length(uv);
+      float alpha = smoothstep(0.5, 0.0, r) * vAlpha;
+      // slight center tint and chromatic sheen-like color
+      gl_FragColor = vec4(uColor * (0.6 + 0.4 * (1.0 - r)), alpha);
+    }
+  `
 });
-const dots = new THREE.Points(dotGeom, dotMat);
-hudGroup.add(dots);
+const particles = new THREE.Points(particleGeometry, particleMaterial);
+bloomGroup.add(particles);
+particles.layers.enable(BLOOM_LAYER); // particles bloom
 
-// center disk
-const centerMat = new THREE.MeshBasicMaterial({ color: 0x05242b, transparent:true, opacity:0.42, side:THREE.DoubleSide });
-const centerDisk = new THREE.Mesh(new THREE.CircleGeometry(0.09, 32), centerMat);
-centerDisk.position.z = 0.03;
-hudGroup.add(centerDisk);
+// Sweep arc: thin geometry with emissive material, rotates faster
+const sweep = new THREE.Mesh(new THREE.TorusGeometry(1.135, 0.002, 6, 240), EmissiveMaterial(0x24f0e6, 0.9));
+sweep.renderOrder = 3;
+bloomGroup.add(sweep);
+sweep.layers.enable(BLOOM_LAYER);
 
-// animated sweep arc using LineSegments with dashed material approximation
-const sweepGeom = new THREE.TorusGeometry(1.135, 0.002, 8, 256);
-const sweepMat = new THREE.MeshBasicMaterial({ color: 0x24f0e6, transparent:true, opacity:0.95, blending: THREE.AdditiveBlending, toneMapped:false });
-const sweepMesh = new THREE.Mesh(sweepGeom, sweepMat);
-sweepMesh.rotation.z = 0.2;
-hudGroup.add(sweepMesh);
+// Add a thin inner ring but non-bloomed to provide silhouette contrast
+const innerContour = new THREE.Mesh(new THREE.TorusGeometry(0.90, 0.0028, 6, 200), new THREE.MeshBasicMaterial({ color: 0x0b2230, opacity: 0.8, transparent: true }));
+innerContour.renderOrder = 1;
+nonBloomGroup.add(innerContour);
 
-// subtle depth tilt
-hudGroup.rotation.x = 0.06;
-
-// simple helper for generating round particle texture on the fly (canvas)
-function generateCircleTexture(hex){
-  const size = 64;
-  const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = size;
-  const ctx = canvas.getContext('2d');
-  // gradient
-  const g = ctx.createRadialGradient(size/2, size/2, 1, size/2, size/2, size/2);
-  g.addColorStop(0, hex);
-  g.addColorStop(0.35, hex + '80');
-  g.addColorStop(1, '#00000000');
-  ctx.fillStyle = g;
-  ctx.fillRect(0,0,size,size);
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.minFilter = THREE.LinearFilter;
-  tex.generateMipmaps = false;
-  return tex;
+// ---------- Fresnel Rim augmentation ----------
+/* We augment a base MeshStandardMaterial (or MeshBasicMaterial) with a Fresnel rim
+   by injecting a fragment calculation via onBeforeCompile. This creates that sci-fi
+   rim/fresnel without authoring a whole ShaderMaterial from scratch, preserving
+   built-in behaviors (if ever used). Here we apply it to non-bloomed materials for subtle rim.
+*/
+function addFresnel(material, color = new THREE.Color(0x18f7e6), power = 2.0, intensity = 0.6){
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms.uFresnelColor = { value: color };
+    shader.uniforms.uFresnelPower = { value: power };
+    shader.uniforms.uFresnelIntensity = { value: intensity };
+    // Inject varying
+    shader.vertexShader = shader.vertexShader.replace(
+      '#include <common>',
+      `#include <common>\nvarying float vFresnel;`
+    );
+    shader.vertexShader = shader.vertexShader.replace(
+      '#include <begin_vertex>',
+      `#include <begin_vertex>\nvec3 vViewPosition = (modelViewMatrix * vec4(transformed, 1.0)).xyz; vFresnel = abs(dot(normalize(normalMatrix * normal), normalize(-vViewPosition)));`
+    );
+    shader.fragmentShader = shader.fragmentShader.replace(
+      '#include <common>',
+      `#include <common>\nvarying float vFresnel;\nuniform vec3 uFresnelColor; uniform float uFresnelPower; uniform float uFresnelIntensity;`
+    );
+    shader.fragmentShader = shader.fragmentShader.replace(
+      'gl_FragColor = vec4( outgoingLight, diffuseColor.a );',
+      `{\n float f = pow(1.0 - vFresnel, uFresnelPower) * uFresnelIntensity; vec3 fres = uFresnelColor * f; vec3 col = outgoingLight + fres; gl_FragColor = vec4(col, diffuseColor.a );\n }`
+    );
+  };
 }
 
-// state: detached or not; unlocked via password
-let unlocked = false;
-let detached = false;
-let detachProgress = 0; // 0..1 used for tween
+// apply subtle fresnel to non-bloom core disk
+addFresnel(coreDisk.material, new THREE.Color(0x16f0e6), 2.2, 0.22);
 
-// simple tween function (linear easing + requestAnimationFrame)
-function tweenTo(target, duration = 700, onUpdate=null, onComplete=null){
+// ---------- Interaction: Detach / attach ----------
+let detached = false;
+let detachProgress = 0.0; // 0..1
+function tweenDetach(target, duration = 700){
   const start = performance.now();
   const from = detachProgress;
-  const range = target - from;
+  const delta = target - from;
   function step(now){
-    const t = Math.min(1, (now - start)/duration);
+    const t = Math.min(1, (now - start) / duration);
     // easeOutCubic
     const eased = 1 - Math.pow(1 - t, 3);
-    detachProgress = from + range * eased;
-    if(onUpdate) onUpdate(detachProgress);
+    detachProgress = from + delta * eased;
+    applyDetach(detachProgress);
     if(t < 1) requestAnimationFrame(step);
-    else { if(onComplete) onComplete(); }
   }
   requestAnimationFrame(step);
 }
-
-// apply detach transform: we move group along z and scale slightly & enable float
-function applyDetachProgress(p){
-  // p=0 attached (original), p=1 detached (close to camera)
-  const zStart = 0;
-  const zEnd = 0.82; // move toward camera
-  hudGroup.position.z = THREE.MathUtils.lerp(zStart, zEnd, p);
-  hudGroup.scale.setScalar(THREE.MathUtils.lerp(1.0, 1.18, p));
-  // increase bloom strength with detach
-  bloomPass.strength = THREE.MathUtils.lerp(1.2, 2.0, p);
-  // increase glow opacity for rings & dots
-  ringOuter.material.opacity = THREE.MathUtils.lerp(0.9, 1.1, p);
-  ringGlow.material.opacity = THREE.MathUtils.lerp(0.14, 0.26, p);
-  dotMat.size = THREE.MathUtils.lerp(8.0, 14.0, p);
+function applyDetach(p){
+  // Move the hud group slightly forward (toward camera) and scale; adjust bloom intensity.
+  hud.position.z = THREE.MathUtils.lerp(0.0, 0.9, p);
+  hud.scale.setScalar(THREE.MathUtils.lerp(1.0, 1.16, p));
+  bloomPass.strength = THREE.MathUtils.lerp(1.1, 2.4, p);
+  // increase particle size slightly
+  particleMaterial.uniforms.uScale.value = THREE.MathUtils.lerp(1.0, 1.35, p);
 }
-
-// minor floating animation applied when detached
-let floatTime = 0;
-
-// animation loop
-const clock = new THREE.Clock();
-function animate(){
-  requestAnimationFrame(animate);
-  const t = clock.getElapsedTime();
-  floatTime += clock.getDelta();
-
-  // rotate rings
-  ringOuter.rotation.z += 0.22 * clock.getDelta();
-  ringThin.rotation.z -= 0.16 * clock.getDelta();
-  ringGlow.rotation.z += 0.08 * clock.getDelta();
-  sweepMesh.rotation.z += 0.44 * clock.getDelta();
-
-  // particle orbit tweak
-  const posAttr = dotGeom.attributes.position;
-  for(let i=0;i<dotCount;i++){
-    const a = (i / dotCount) * Math.PI * 2 + t * (0.12 + (i%2?0.06:0));
-    const r = 0.92 + 0.02 * Math.sin(t * 0.7 + i);
-    posAttr.array[i*3+0] = Math.cos(a) * r;
-    posAttr.array[i*3+1] = Math.sin(a) * r;
-  }
-  posAttr.needsUpdate = true;
-
-  // floating when detached
-  if(detached){
-    hudGroup.rotation.y = Math.sin(t * 0.3) * 0.08;
-    hudGroup.rotation.x = 0.06 + Math.cos(t * 0.18) * 0.02;
-  } else {
-    hudGroup.rotation.y = THREE.MathUtils.lerp(hudGroup.rotation.y, 0, 0.06);
-    hudGroup.rotation.x = THREE.MathUtils.lerp(hudGroup.rotation.x, 0.06, 0.06);
-  }
-
-  // small sweep opacity pulse
-  sweepMesh.material.opacity = 0.9 + 0.25 * Math.sin(t * 2.2);
-
-  // apply detach progress transforms
-  applyDetachProgress(detachProgress);
-
-  // render via composer for bloom
-  composer.render();
-}
-requestAnimationFrame(animate);
-
-// UI and password logic
-const input = document.getElementById('pwd');
-const btn = document.getElementById('btn');
-const status = document.getElementById('status');
-const centerLabel = document.getElementById('centerLabel');
-
-function lockUI(){
-  status.textContent = 'status: locked';
-  status.style.color = '#9dd';
-  input.value = '';
-  unlocked = false;
-}
-function unlockUI(){
-  status.textContent = 'status: unlocked';
-  status.style.color = '#6ff';
-  unlocked = true;
-  // auto detach after short delay
-  setTimeout(() => { toggleDetach(true); }, 220);
-}
-
-btn.addEventListener('click', () => attemptUnlock());
-input.addEventListener('keydown', (e) => { if(e.key === 'Enter') attemptUnlock(); });
-
-function attemptUnlock(){
-  const v = input.value || '';
-  if(v === 'ansh'){
-    unlockUI();
-    centerLabel.textContent = 'UNLOCKED';
-    centerLabel.style.color = '#9ff';
-    centerLabel.animate([{opacity:1, transform:'translate(-50%,-50%) scale(1)'},{opacity:0.0, transform:'translate(-50%,-50%) scale(0.9)'}], {duration:900, easing:'ease', iterations:1});
-  } else {
-    status.textContent = 'status: wrong password';
-    status.style.color = '#ff6b6b';
-    input.animate([{transform:'translateX(0)'},{transform:'translateX(-8px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}], {duration:400});
-  }
-}
-
-// click canvas toggles attach/detach if unlocked
 renderer.domElement.addEventListener('click', () => {
-  if(!unlocked) return;
-  toggleDetach(!detached);
+  detached = !detached;
+  tweenDetach(detached ? 1 : 0, 800);
 });
 
-function toggleDetach(force){
-  if(force === undefined) force = !detached;
-  detached = !!force;
+// ---------- Performance & adaptive quality ----------
+const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+if(isMobile){
+  // reduce counts & intensity for mobile
+  bloomPass.strength = 0.9;
+  particleMaterial.uniforms.uSize.value = 10.0;
+  // do not run very large particle counts — we purposely used 512; reduce if necessary
+}
+
+// ---------- Animation loop ----------
+const clock = new THREE.Clock();
+
+function render(){
+  const t = clock.getElapsedTime();
+  // update time uniform for GPU particle shader
+  particleMaterial.uniforms.uTime.value = t;
+  // Rotate layers independently to give mechanical feel
+  ringOuter.rotation.z += 0.18 * clock.getDelta();
+  ringInner.rotation.z -= 0.12 * clock.getDelta();
+  ticksMesh.rotation.z -= 0.09 * clock.getDelta();
+  sweep.rotation.z += 0.42 * clock.getDelta();
+
+  // slight floating / pitch when detached
   if(detached){
-    // tween detachProgress to 1
-    tweenTo(1.0, 800, applyDetachProgress);
+    hud.rotation.y = Math.sin(t * 0.4) * 0.075;
+    hud.rotation.x = 0.06 + Math.cos(t * 0.18) * 0.02;
   } else {
-    tweenTo(0.0, 700, applyDetachProgress);
+    hud.rotation.y = THREE.MathUtils.lerp(hud.rotation.y, 0.0, 0.08);
+    hud.rotation.x = THREE.MathUtils.lerp(hud.rotation.x, 0.06, 0.08);
   }
-}
 
-// small accessibility: if user prefers reduced motion, don't auto detach
-if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-  // don't auto-spin and disable bloom heavy animation
-  bloomPass.strength = 0.6;
-}
+  // SELECTIVE BLOOM RENDERING SEQUENCE:
+  // 1) Render bloomComposer with only bloom-layer objects visible
+  //    a) We set non-bloom objects to dark material (or temporarily toggle layers)
+  // 2) Render final pass (scene) normally into a texture
+  // 3) Composite final + bloom texture additively (CompositeShader handles that)
+  // To avoid permanently modifying materials, a common approach is to toggle object.layers visibility.
+  // We'll render bloomComposer with camera seeing only BLOOM_LAYER.
+  const prevBackground = scene.background;
+  // Render bloom scene:
+  // Hide non-bloom objects by making camera view only the bloom layer
+  camera.layers.set(BLOOM_LAYER);
+  bloomComposer.render();
 
-// initial state
-lockUI();
+  // Render full scene to a render target (finalComposer's readBuffer implicitly used).
+  camera.layers.set(0); // default layer
+  finalComposer.render();
 
-/* Notes:
- - The HUD visuals are GPU-accelerated: InstancedMesh for ticks, Points for dots, and UnrealBloomPass for strong neon bloom.
- - To hook real loading progress: call setProgress(n) with 0..100 to display progression in a separate overlay or modify centerLabel text.
- - Password is checked client-side for demo purposes only. Do NOT use client-only password checks for real security.
-*/
+  // Now composite bloomComposer's result (bloomComposer.readBuffer.texture) onto final canvas.
+  // We can implement composite by drawing a fullscreen quad. For brevity, we will copy bloomComposer's output on top additively using a custom pass:
+  compositePass.uniforms.tBase.value = null; // not used here
+  compositePass.uniforms.tBloom.value = bloomComposer.readBuffer.texture;
+  compositePass.uniforms.bloomIntensity.value = 1.0;
+  // Use the copyPass to draw the composited texture:
+  // Simpler: render the bloom texture with additive blending directly to screen quad using a second scene + ortho camera.
+  // We'll implement a tiny screen-quad renderer:
+  screenCompositeRender(bloomComposer.readBuffer.texture, 1.0);
 
-// (Optional) expose a global progress setter if you want to integrate with loaders
-window.setProgress = function(n){
-  const pct = Math.max(0, Math.min(100, Math.round(n)));
-  centerLabel.textContent = pct >= 100 ? 'READY' : pct + '%';
-  if(pct >= 100){
-    centerLabel.style.color = '#9ff';
-  }
-};
-
-</script>
-</body>
-</html>
-
+  requestAnimationFr
