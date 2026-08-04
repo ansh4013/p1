@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Advanced Weather Reporter (No APIs)</title>
+<style>
+  :root{
+    --bg1:#0f1724; --bg2:#102a43; --card:#0b1220; --accent:#ffb347;
+    --glass: rgba(255,255,255,0.06); --muted: rgba(255,255,255,0.65);
+    --glass-2: rgba(255,255,255,0.03);
+    --card-radius:18px;
+  }
+  *{box-sizing:border-box;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg1),var(--bg2)); color:#e6eef8;}
+  .app{max-width:1100px;margin:36px auto;padding:28px;border-radius:22px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); box-shadow:0 10px 40px rgba(2,6,23,0.6);}
+  header{display:flex;align-items:center;gap:18px;margin-bottom:18px;}
+  .title{font-size:20px;font-weight:700;letter-spacing:0.2px;}
+  .controls{margin-left:auto;display:flex;gap:10px;align-items:center;}
+  input[type="text"]{background:var(--glass);border:1px solid rgba(255,255,255,0.04);padding:10px 12px;border-radius:12px;color:inherit;min-width:200px;}
+  .btn{background:linear-gradient(90deg,#3a7bd5,#00d2ff);padding:10px 14px;border-radius:12px;border:none;color:#02132a;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(3,45,80,0.35);}
+  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);box-shadow:none;}
+  main{display:grid;grid-template-columns:360px 1fr;gap:20px;}
+  /* Current card */
+  .current-card{padding:20px;border-radius:var(--card-radius);background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));backdrop-filter: blur(6px);border:1px solid rgba(255,255,255,0.03);}
+  .location{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .loc-name{font-weight:700;font-size:18px;}
+  .meta{font-size:12px;color:var(--muted);}
+  .big-temp{display:flex;align-items:center;gap:14px;margin-top:8px}
+  .temp-val{font-size:64px;font-weight:800;line-height:1;color:#fff;}
+  .temp-unit{font-size:18px;color:var(--muted);margin-top:6px;}
+  .weather-graphic{width:120px;height:120px;position:relative;}
+  /* animated sun/cloud/rain */
+  .sun{width:60px;height:60px;border-radius:50%;background: radial-gradient(circle at 30% 30%, #fff3c4, #ffdd57 40%, #ffb347 70%);box-shadow:0 0 40px rgba(255,180,70,0.3);position:absolute;left:12px;top:8px;animation:spin 40s linear infinite;}
+  @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+  .cloud{position:absolute;left:10px;top:48px;width:100px;height:50px;background:linear-gradient(180deg,#f5f7fa,#dbe6f6);border-radius:30px;box-shadow:0 8px 30px rgba(3,15,30,0.25);opacity:0.95;filter:blur(0.2px);transform:translateX(0);animation:cloudmove 18s linear infinite;}
+  @keyframes cloudmove{0%{transform:translateX(0)}50%{transform:translateX(6px)}100%{transform:translateX(0)}}
+  .raindrop{position:absolute;left:66px;top:94px;width:4px;height:12px;background:linear-gradient(#cde6ff,#6fb9ff);border-radius:2px;box-shadow:0 4px 10px rgba(20,90,160,0.5);animation:raindrop 0.8s linear infinite;opacity:0;}
+  @keyframes raindrop{0%{transform:translateY(0);opacity:0}30%{opacity:1}100%{transform:translateY(18px);opacity:0}}
+  .humidity, .wind, .feels, .chance{display:flex;justify-content:space-between;padding:8px 10px;border-radius:10px;background:var(--glass-2);margin-top:10px;font-size:13px;}
+  /* forecast area */
+  .right-panel{display:flex;flex-direction:column;gap:12px;}
+  .summary{padding:14px;border-radius:16px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);}
+  .nl-summary{font-size:15px;color:#e9f0fb}
+  .hourly{display:flex;gap:8px;padding:10px;overflow:auto;}
+  .hour-card{min-width:90px;padding:10px;border-radius:12px;background:var(--glass);text-align:center;font-size:13px;}
+  .days{display:flex;gap:10px;margin-top:8px;}
+  .day-card{flex:1;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));text-align:center;font-size:13px;}
+  canvas#tempChart{width:100%;height:120px;border-radius:12px;background:linear-gradient(180deg, rgba(0,0,0,0.08), rgba(255,255,255,0.01));display:block;}
+  /* alerts */
+  .alert{margin-top:12px;padding:12px;border-radius:12px;background:linear-gradient(90deg,#ff4e50,#f9d423);color:#1b0b00;font-weight:700;}
+  footer{margin-top:14px;font-size:12px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;}
+  /* small responsive */
+  @media (max-width:940px){
+    main{grid-template-columns:1fr; }
+    .current-card{order:2}
+    .right-panel{order:1}
+  }
+</style>
+</head>
+<body>
+  <div class="app" role="application" aria-label="Advanced Weather Reporter (No APIs)">
+    <header>
+      <div class="title">Advanced Weather Reporter — Local Simulation</div>
+      <div class="controls">
+        <input id="locInput" type="text" placeholder="Location (e.g., Seattle, WA)" value="Springfield">
+        <select id="units" style="padding:10px;border-radius:12px;background:var(--glass);border:1px solid rgba(255,255,255,0.03);color:inherit;">
+          <option value="metric">Celsius</option>
+          <option value="imperial">Fahrenheit</option>
+        </select>
+        <button id="genBtn" class="btn">Generate</button>
+        <button id="randBtn" class="btn ghost">Randomize</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="current-card" aria-live="polite">
+        <div class="location"><div class="loc-name" id="locName">Springfield</div><div class="meta" id="locMeta">Simulated • No API</div></div>
+        <div class="big-temp">
+          <div>
+            <div class="temp-val" id="tempVal">--°</div>
+            <div class="temp-unit" id="tempUnit">Feels like -- • Humidity --</div>
+          </div>
+          <div class="weather-graphic" id="graphic">
+            <div class="sun" id="sun" style="display:none"></div>
+            <div class="cloud" id="cloud" style="display:none"></div>
+            <div class="raindrop" id="drop" style="display:none"></div>
+          </div>
+        </div>
+
+        <div class="humidity" id="humidity"><div>Humidity</div><div id="humVal">--%</div></div>
+        <div class="wind" id="wind"><div>Wind</div><div id="windVal">-- km/h</div></div>
+        <div class="feels" id="feels"><div>Feels Like</div><div id="feelsVal">--</div></div>
+        <div class="chance" id="chance"><div>Precip Chance</div><div id="precipVal">--%</div></div>
+
+        <div id="alertsContainer"></div>
+      </section>
+
+      <section class="right-panel">
+        <div class="summary">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <strong>Summary</strong>
+            <small id="summaryTime" style="color:var(--muted)">Now</small>
+          </div>
+          <div class="nl-summary" id="nlSummary">Press Generate to simulate weather. This app synthesizes realistic weather patterns locally using deterministic randomness.</div>
+        </div>
+
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <strong>Hourly (24h)</strong>
+            <small class="meta">scroll →</small>
+          </div>
+          <div class="hourly" id="hourlyList" aria-label="Hourly forecast"></div>
+        </div>
+
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin: '8px 0'">
+            <strong>7-Day Forecast</strong>
+            <small class="meta">daily highs & lows</small>
+          </div>
+          <div class="days" id="daysList"></div>
+        </div>
+
+        <canvas id="tempChart" width="800" height="160" aria-hidden="false"></canvas>
+
+        <footer>
+          <div>Deterministic generator • No network</div>
+          <div style="opacity:0.8">Tip: change location text or press Randomize for different climates</div>
+        </footer>
+      </section>
+    </main>
+  </div>
+
+<script>
+/*
+  Advanced Weather Reporter (no APIs)
+  - Deterministic seeded RNG by location string
+  - Generates current + hourly + 7-day forecasts
+  - Detects alerts locally
+  - Renders animated graphics and a temperature chart
+*/
+
+// Seeded RNG (Mulberry32)
+function mulberry32(a){
+  return function(){
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    var t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  }
+}
+
+// Hash string to 32-bit int
+function hashStr(str){
+  let h = 2166136261 >>> 0;
+  for(let i=0;i<str.length;i++){
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return h >>> 0;
+}
+
+// Climate profiles roughly (base temp ranges °C)
+const climates = [
+  {name:'Tropical', min:24, max:32, rainLikely:0.6, wind:3},
+  {name:'Temperate', min:5, max:24, rainLikely:0.35, wind:4},
+  {name:'Arid', min:15, max:38, rainLikely:0.08, wind:5},
+  {name:'Continental', min:-8, max:28, rainLikely:0.3, wind:6},
+  {name:'Polar', min:-40, max:5, rainLikely:0.02, wind:8}
+];
+
+// Utility: clamp
+const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+
+// Generate weather based on 'location' string and optional seed
+function generateWeather(location, extraSeed=0){
+  const h = hashStr(location.toLowerCase());
+  const rng = mulberry32(h ^ extraSeed);
+  // pick climate by hashed index but influenced by words
+  const climateIndex = Math.floor(rng()*climates.length);
+  const climate = climates[climateIndex];
+  // base daily temperature mid
+  const base = climate.min + rng()*(climate.max-climate.min);
+  // humidity baseline
+  const baseHum = clamp(40 + rng()*50 - (climate.rainLikely*20), 10, 98);
+  // wind baseline (km/h)
+  const baseWind = clamp(climate.wind*3 + rng()*20, 0, 90);
+
+  // generate 24 hourly entries (Celsius)
+  const hours = [];
+  const now = new Date();
+  const tzOffset = Math.floor((h % 24) - 12); // pseudo timezone offset
+  for(let i=0;i<24;i++){
+    // diurnal temp: sine wave peaking at 15:00 (hour=15)
+    const hourOfDay = (now.getHours() + i) % 24;
+    const diurnal = Math.sin(((hourOfDay-15)/24)*Math.PI*2);
+    const temp = base + diurnal*(6 + rng()*6) + (rng()-0.5)*2;
+    const cloud = clamp(20 + rng()*80 - (climate.rainLikely*30), 0, 100);
+    // precip chance depends on cloud and climate rainLikely and random storm factor
+    const precipChance = clamp((cloud/100)*climate.rainLikely*100 + rng()*20, 0, 100);
+    const precipType = (temp <= 0 && precipChance>20) ? 'snow' : (precipChance>30 ? 'rain' : 'none');
+    const wind = clamp(baseWind + (rng()-0.5)*10, 0, 140);
+    hours.push({
+      dt: new Date(now.getTime() + i*3600*1000 + tzOffset*3600*1000),
+      temp: Math.round(temp*10)/10,
+      cloud: Math.round(cloud),
+      precipChance: Math.round(precipChance),
+      precipType,
+      wind: Math.round(wind),
+      hum: Math.round(baseHum + (rng()-0.5)*20)
+    });
+  }
+
+  // generate 7-day forecast
+  const days = [];
+  for(let d=0;d<7;d++){
+    const dayBase = base + (rng()-0.5)*4 + (d-3)*((rng()-0.5)*1.8);
+    const high = Math.round((dayBase + 4 + rng()*5)*10)/10;
+    const low = Math.round((dayBase - 4 - rng()*3)*10)/10;
+    const cloud = clamp(20 + rng()*80 - (climate.rainLikely*30), 0, 100);
+    const precipChance = clamp((cloud/100)*climate.rainLikely*100 + rng()*30, 0, 100);
+    const precipType = (low <= 0 && precipChance>25) ? 'snow' : (precipChance>40 ? 'rain' : 'none');
+    const wind = Math.round(baseWind + (rng()-0.5)*18);
+    days.push({
+      dt: new Date(now.getTime() + d*86400*1000 + tzOffset*3600*1000),
+      high, low, cloud: Math.round(cloud),
+      precipChance: Math.round(precipChance),
+      precipType, wind, hum: Math.round(baseHum + (rng()-0.5)*15)
+    });
+  }
+
+  // current = first hour
+  const current = {...hours[0]};
+  // detect alerts locally
+  const alerts = [];
+  // high wind
+  if(current.wind >= 50) alerts.push({level:'warning',title:'High winds',desc:`Sustained winds around ${current.wind} km/h. Secure loose objects.`});
+  // heat/cold extremes
+  if(current.temp >= 40) alerts.push({level:'warning',title:'Extreme heat',desc:`Feels dangerously hot (${current.temp}°C). Stay hydrated and avoid sun.`});
+  if(current.temp <= -25) alerts.push({level:'warning',title:'Extreme cold',desc:`Severe cold at ${current.temp}°C. Risk of frostbite.`});
+  // heavy precipitation forthcoming in next 6 hours
+  if(hours.slice(0,6).some(h=>h.precipChance>70)) alerts.push({level:'alert',title:'Heavy precipitation',desc:'High chance of heavy rain/snow in the next few hours.'});
+  // snow drifts combo
+  if(days.some(d=>d.precipType==='snow' && d.low < -10)) alerts.push({level:'alert',title:'Snow risk',desc:'Accumulating snow expected over the coming days.'});
+
+  return {location, climate:climate.name, current, hours, days, alerts};
+}
+
+// Format helpers
+function fmtTemp(v, units){
+  if(units === 'imperial') return Math.round((v*9/5 + 32)) + '°F';
+  return Math.round(v) + '°C';
+}
+function fmtWind(v, units){
+  if(units === 'imperial') return Math.round(v*0.621371) + ' mph';
+  return Math.round(v) + ' km/h';
+}
+function formatHour(d){
+  return d.toLocaleTimeString([], {hour:'numeric',minute:false});
+}
+function formatDay(d){
+  return d.toLocaleDateString([], {weekday:'short',month:'short',day:'numeric'});
+}
+
+// Renderers
+const locInput = document.getElementById('locInput');
+const genBtn = document.getElementById('genBtn');
+const randBtn = document.getElementById('randBtn');
+const unitsSel = document.getElementById('units');
+
+const locName = document.getElementById('locName');
+const tempVal = document.getElementById('tempVal');
+const tempUnit = document.getElementById('tempUnit');
+const humVal = document.getElementById('humVal');
+const windVal = document.getElementById('windVal');
+const feelsVal = document.getElementById('feelsVal');
+const precipVal = document.getElementById('precipVal');
+const nlSummary = document.getElementById('nlSummary');
+const hourlyList = document.getElementById('hourlyList');
+const daysList = document.getElementById('daysList');
+const alertsContainer = document.getElementById('alertsContainer');
+const summaryTime = document.getElementById('summaryTime');
+
+const sunEl = document.getElementById('sun');
+const cloudEl = document.getElementById('cloud');
+const dropEl = document.getElementById('drop');
+const tempChart = document.getElementById('tempChart');
+
+function render(weather){
+  const units = unitsSel.value;
+  locName.textContent = weather.location + ' • ' + weather.climate;
+  const c = weather.current;
+  tempVal.textContent = units === 'imperial' ? Math.round(c.temp*9/5+32) + '°F' : Math.round(c.temp) + '°C';
+  tempUnit.textContent = `Feels like ${fmtTemp(c.temp + (c.hum>80? -1:1), units)} • Humidity ${c.hum}%`;
+  humVal.querySelector ? humVal.querySelector('#') : null;
+  document.getElementById('humVal').textContent = c.hum + '%';
+  document.getElementById('windVal').textContent = fmtWind(c.wind, units);
+  document.getElementById('feelsVal').textContent = fmtTemp(c.temp + (c.hum>75? -1:1), units);
+  document.getElementById('precipVal').textContent = c.precipChance + '%';
+
+  // Animated graphics: determine state
+  if(c.precipChance > 50){
+    sunEl.style.display = 'none';
+    cloudEl.style.display = 'block';
+    dropEl.style.display = 'block';
+    document.body.style.background = 'linear-gradient(180deg,#1b2a3a,#0f1724)';
+  } else if(c.cloud > 65){
+    sunEl.style.display = 'none';
+    cloudEl.style.display = 'block';
+    dropEl.style.display = 'none';
+    document.body.style.background = 'linear-gradient(180deg,#203647,#0b1b2c)';
+  } else {
+    sunEl.style.display = 'block';
+    cloudEl.style.display = 'none';
+    dropEl.style.display = 'none';
+    document.body.style.background = 'linear-gradient(180deg,#083358,#07223b)';
+  }
+
+  // Natural language summary
+  nlSummary.textContent = buildSummary(weather);
+  const now = new Date();
+  summaryTime.textContent = now.toLocaleString();
+
+  // Hourly list
+  hourlyList.innerHTML = '';
+  weather.hours.forEach(h=>{
+    const el = document.createElement('div');
+    el.className = 'hour-card';
+    el.innerHTML = `<div style="font-weight:700">${formatHour(h.dt)}</div>
+      <div style="font-size:20px;margin:6px 0">${fmtTemp(h.temp,units)}</div>
+      <div style="opacity:0.85">${h.precipChance}% ${h.precipType!=='none'? h.precipType:''}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px">${h.wind} km/h</div>`;
+    hourlyList.appendChild(el);
+  });
+
+  // 7-day list
+  daysList.innerHTML = '';
+  weather.days.forEach(d=>{
+    const el = document.createElement('div');
+    el.className = 'day-card';
+    el.innerHTML = `<div style="font-weight:700">${formatDay(d.dt)}</div>
+      <div style="margin:6px 0;font-size:18px">${fmtTemp(d.high,units)} / <span style="opacity:0.8">${fmtTemp(d.low,units)}</span></div>
+      <div style="color:var(--muted)">${d.precipChance}% ${d.precipType!=='none'? d.precipType:''}</div>`;
+    daysList.appendChild(el);
+  });
+
+  // Alerts
+  alertsContainer.innerHTML = '';
+  if(weather.alerts && weather.alerts.length){
+    weather.alerts.forEach(a=>{
+      const aEl = document.createElement('div');
+      aEl.className = 'alert';
+      aEl.innerHTML = `<div style="font-size:14px;font-weight:800">${a.title}</div><div style="font-size:13px;margin-top:6px">${a.desc}</div>`;
+      alertsContainer.appendChild(aEl);
+    });
+  }
+
+  // Chart draw: daily highs & lows sparkline
+  drawChart(weather.days.map(d=>d.high), weather.days.map(d=>d.low), units);
+}
+
+// Natural-language generator (simple templates)
+function buildSummary(w){
+  const cur = w.current;
+  const nearRain = w.hours.slice(0,6).some(h=>h.precipChance>60);
+  const highWind = cur.wind >= 45;
+  const tempAdj = cur.temp;
+  const tempPhrase = tempAdj >= 30 ? 'hot' : tempAdj >= 20 ? 'warm' : tempAdj >= 10 ? 'mild' : tempAdj >= 0 ? 'cool' : 'freezing';
+  let s = `Currently ${Math.round(cur.temp)}° with ${cur.cloud}% cloud cover. `;
+  s += `Conditions are ${tempPhrase} with ${cur.hum}% humidity and winds around ${cur.wind} km/h. `;
+  if(nearRain) s += `Expect rain/snow within a few hours. `;
+  if(highWind) s += `High winds are possible — exercise caution. `;
+  // add a short 3-day outlook
+  const next3 = w.days.slice(1,4);
+  s += 'Upcoming: ';
+  s += next3.map(d=>`${formatDay(d.dt)} ${d.precipType!=='none'? d.precipType : (d.high>25?'warm':'stable')}`).join(' • ');
+  return s;
+}
+
+// Chart drawing using Canvas API
+function drawChart(highs, lows, units){
+  const c = tempChart;
+  const ctx = c.getContext('2d');
+  const w = c.width = c.clientWidth * devicePixelRatio;
+  const h = c.height = c.clientHeight * devicePixelRatio;
+  ctx.clearRect(0,0,w,h);
+
+  // Convert units back to Celsius for consistent axis
+  const toC = (v)=> v;
+  if(units === 'imperial'){
+    // highs/lows are already in C in generator, but formatting displayed in F. So keep numbers as-is.
+  }
+  const data = highs.concat(lows);
+  const min = Math.min(...lows) - 3;
+  const max = Math.max(...highs) + 3;
+  const range = max - min;
+
+  // draw grid lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+  ctx.lineWidth = 1 * devicePixelRatio;
+  for(let i=0;i<=4;i++){
+    const y = h*(i/4);
+    ctx.beginPath();
+    ctx.moveTo(0,y);
+    ctx.lineTo(w,y);
+    ctx.stroke();
+  }
+
+  // function to map index/val
+  const x = (i) => (i+0.5)/highs.length * w;
+  const yMap = (v) => h - ((v - min)/range)*h;
+
+  // draw low poly gradient between highs
+  // draw highs (line)
+  ctx.beginPath();
+  ctx.lineWidth = 2*devicePixelRatio;
+  ctx.strokeStyle = '#ffd27f';
+  ctx.fillStyle = 'rgba(255,210,130,0.06)';
+  for(let i=0;i<highs.length;i++){
+    const xi = x(i);
+    const yi = yMap(highs[i]);
+    if(i===0) ctx.moveTo(xi, yi); else ctx.lineTo(xi, yi);
+  }
+  // close and fill to bottom
+  ctx.lineTo(w, h);
+  ctx.lineTo(0, h);
+  ctx.closePath();
+  ctx.fill();
+  // stroke highs curve
+  ctx.beginPa
