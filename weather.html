@@ -533,4 +533,29 @@ const randLoc = `$
 
 djectives.length)]} $
 
-{nouns [Math.floor( h.random()*nouns
+{nouns [Math.floor( h.random()*nouns.length)]}`;
+
+locInput.value = randLoc;
+
+doGenerate (randLoc,
+
+Math.floor(Math.random() *999999)); });
+
+unitsSel.addEventListener('change', ()⇒
+
+doGenerate (locInput.value));
+
+// generate on load
+
+doGenerate (locInput.value);
+// Make canvas responsive
+
+window.addEventListener('resize', ()⇒ {
+// small debounce
+clearTimeout(window._resizeTO);
+window._resizeTO = setTimeout(() ⇒ {
+drawChart([0,0,0,0,0,0,0], [0,0,0,0,0,0,0], unitsSel.value); doGenerate (locInput.value); },150);
+});
+</script>
+</body>
+</html>
