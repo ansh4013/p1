@@ -426,5 +426,111 @@ function drawChart(highs, lows, units){
   ctx.lineTo(0, h);
   ctx.closePath();
   ctx.fill();
-  // stroke highs curve
-  ctx.beginPa
+// stroke highs curve
+
+ctx.beginPath();
+
+for(let i = 0 i<highs.length;i++){
+
+const xi = x(i);
+
+const yi = yMap(highs[i]);
+
+if(i===0) ctx.moveTo(xi, yi); else
+
+ctx.lineTo(xi, yi);
+
+}
+
+ctx.stroke();
+
+// draw lows
+
+ctx.beginPath();
+
+ctx.lineWidth = 2*devicePixelRatio;
+
+ctx.strokeStyle = '#8fd3ff';
+
+for(let i = 0 i<lows.length;i++){
+
+const xi = x(i);
+
+const yi = yMap(lows[i]);
+
+if(i===0) ctx.moveTo(xi, yi); else
+
+ctx.lineTo(xi, yi);
+
+}
+
+ctx.stroke();
+// draw points and labels
+
+ctx.fillStyle = '#fff';
+
+ctx.font = '${12*devicePixelRatio}px Inter';
+
+ctx.textAlign = 'center';
+
+for(let i = 0 i<highs.length;i++){
+
+ctx.fillStyle = '#ffd27f';
+
+ctx.beginPath(); ctx.arc(x(i),
+
+yMap(highs[i]), 3*devicePixelRatio, 0, Math.PI*2); ctx.fill();
+
+ctx.fillStyle = '#8fd3ff';
+
+ctx.beginPath(); ctx.arc(x(i),
+
+yMap(lows[i]), 3*devicePixelRatio, 0, Math.PI*2); ctx.fill();
+
+ctx.fillStyle = 'rgba(255,255,255,0.8)';
+
+ctx.fillText(`${Math.round(highs[i])}/$
+
+{Math.round(lows[i])}`, x(i), h -4*device PixelRatio); }
+
+}// initial generate
+
+function doGenerate (location, seed=0){
+
+const w = generateWeather(location ||
+
+'Springfield', seed);
+
+render(w);
+
+}
+
+// Ul bindings
+
+genBtn.addEventListener('click', ()⇒
+
+doGenerate (locInput.value ||
+
+'Springfield'));
+
+randBtn.addEventListener('click', ()⇒{
+
+// randomize seed and location fun
+
+const adjectives =
+
+['North','East','Grand','Little','Upper','Old','G
+
+reen', 'Silver', 'Sunny','Frost'];
+
+const nouns =
+
+['Harbor','Grove','Valley','Heights','Bay','Fall s','Springs', 'Hollow','View','Point'];
+
+const randLoc = `$
+
+{adjectives [Math.floor(Math.random()*a
+
+djectives.length)]} $
+
+{nouns [Math.floor( h.random()*nouns
