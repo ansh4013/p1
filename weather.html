@@ -439,6 +439,158 @@ window.addEventListener('resize', ()=> {
     doGenerate(locInput.value);
   },150);
 });
+// 3D Parallax + Pointer-driven Tilt
+// Paste this near the end of the inline <script> in weather.html (just before the closing </script>)
+// — GitHub Copilot Chat Assistant
+
+(function(){
+  const root = document.querySelector('.app');
+  if (!root) return;
+
+  // Map selectors to depth (px). Larger depth = closer to viewer / moves more.
+  const layerDefs = [
+    {sel: '.current-card', depth: 40},
+    {sel: '.right-panel', depth: 26},
+    {sel: 'header', depth: 12},
+    {sel: '.weather-graphic', depth: 46},
+    {sel: '.sun', depth: 88},
+    {sel: '.cloud', depth: 20},
+    {sel: '.raindrop', depth: 68},
+    {sel: '#tempChart', depth: 8},
+    {sel: '.hourly', depth: 10}
+  ];
+
+  const layers = layerDefs
+    .map(ld => ({ el: document.querySelector(ld.sel), depth: ld.depth }))
+    .filter(x => x.el); // keep existing elements only
+
+  // Config
+  const maxTiltDeg = 10;    // max rotateX / rotateY applied to root
+  const maxTranslate = 22;  // max X/Y translation in px (parallax base)
+  const ease = 0.12;        // interpolation smoothing (0..1)
+
+  // State
+  let pointer = { x: 0, y: 0 }; // normalized -1..1
+  let target = { rx: 0, ry: 0, tx: 0, ty: 0 };
+  let current = { rx: 0, ry: 0, tx: 0, ty: 0 };
+  let raf = null;
+
+  function lerp(a,b,t){ return a + (b - a) * t; }
+  function rect(){ return root.getBoundingClientRect(); }
+
+  function updateTargetFromPointer(px, py){
+    // px/py are normalized -1..1 with center = 0
+    target.ry = -px * maxTiltDeg;   // rotateY opposite to pointer X
+    target.rx = py * maxTiltDeg;    // rotateX follows pointer Y
+    target.tx = -px * maxTranslate;
+    target.ty = -py * maxTranslate;
+  }
+
+  function onPointerMove(clientX, clientY){
+    const r = rect();
+    const cx = r.left + r.width/2;
+    const cy = r.top + r.height/2;
+    const dx = (clientX - cx) / (r.width/2);
+    const dy = (clientY - cy) / (r.height/2);
+    pointer.x = Math.max(-1, Math.min(1, dx));
+    pointer.y = Math.max(-1, Math.min(1, dy));
+    updateTargetFromPointer(pointer.x, pointer.y);
+
+    // kick off loop if not running
+    if (!raf) raf = requestAnimationFrame(renderFrame);
+  }
+
+  function resetTarget(){
+    target.rx = 0; target.ry = 0; target.tx = 0; target.ty = 0;
+  }
+
+  function renderFrame(){
+    // Interpolate current towards target
+    current.rx = lerp(current.rx, target.rx, ease);
+    current.ry = lerp(current.ry, target.ry, ease);
+    current.tx = lerp(current.tx, target.tx, ease);
+    current.ty = lerp(current.ty, target.ty, ease);
+
+    // Apply root tilt (camera rotation)
+    root.style.transform = `rotateX(${current.rx}deg) rotateY(${current.ry}deg) translateZ(0)`;
+
+    // Apply per-layer parallax based on depth
+    layers.forEach(item => {
+      const el = item.el;
+      const depth = item.depth || 0;
+      const depthFactor = depth / 100; // 0..~1
+
+      // Layers with larger depth move more/appear closer
+      const tx = current.tx * (1 + depthFactor * 1.8);
+      const ty = current.ty * (1 + depthFactor * 1.8);
+      const zw = depth * 0.45; // convert "depth units" to translateZ px
+      const rotY = current.ry * (0.45 + depthFactor * 0.65);
+      const rotX = current.rx * (0.45 + depthFactor * 0.65);
+
+      // Compose transform
+      el.style.transform = `translate3d(${tx}px, ${ty}px, ${zw}px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+      // tiny transition so sudden jumps feel smoother
+      el.style.transition = 'transform 100ms linear';
+      el.style.willChange = 'transform';
+    });
+
+    raf = requestAnimationFrame(renderFrame);
+  }
+
+  // Pointer handlers
+  window.addEventListener('pointermove', (ev) => {
+    onPointerMove(ev.clientX, ev.clientY);
+  }, {passive:true});
+
+  window.addEventListener('pointerenter', () => {
+    if (!raf) raf = requestAnimationFrame(renderFrame);
+  });
+
+  window.addEventListener('pointerleave', () => {
+    // smoothly return to neutral
+    resetTarget();
+  });
+
+  // Device orientation (mobile tilt) fallback
+  function handleOrientation(e){
+    // gamma: left-right [-90..90], beta: front-back [-180..180]
+    const gamma = e.gamma || 0;
+    const beta = e.beta || 0;
+    // map to -1..1 (tweak divisors to change sensitivity)
+    const nx = Math.max(-1, Math.min(1, gamma / 30));
+    const ny = Math.max(-1, Math.min(1, (beta - 10) / 30));
+    pointer.x = nx;
+    pointer.y = ny;
+    updateTargetFromPointer(pointer.x, pointer.y);
+    if (!raf) raf = requestAnimationFrame(renderFrame);
+  }
+
+  if ('DeviceOrientationEvent' in window) {
+    // On iOS 13+ apps need explicit permission; you can request it from UI if desired.
+    // Listen non-permissioned events for other platforms:
+    window.addEventListener('deviceorientation', handleOrientation, true);
+  }
+
+  // Subtle parallax nudge on scroll
+  let lastScroll = window.scrollY;
+  window.addEventListener('scroll', () => {
+    const sc = window.scrollY - lastScroll;
+    lastScroll = window.scrollY;
+    // small influence
+    target.ty += sc * 0.02;
+    if (!raf) raf = requestAnimationFrame(renderFrame);
+  }, {passive:true});
+
+  // Start loop once
+  raf = requestAnimationFrame(renderFrame);
+
+  // Cleanup when page hidden
+  window.addEventListener('pagehide', () => {
+    if (raf) cancelAnimationFrame(raf);
+    raf = null;
+  });
+
+})();
 </script>
 </body>
 </html>
