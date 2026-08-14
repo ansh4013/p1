@@ -1,0 +1,262 @@
+<!-- GitHub Copilot Chat Assistant -->
+<!-- Save this as feedback-portal.html and open in a browser (styles in styles.css) -->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Feedback Portal</title>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app" aria-labelledby="pageTitle">
+    <section class="card" aria-labelledby="formHeader">
+      <div class="header">
+        <div class="logo" aria-hidden="true">FB</div>
+        <div class="title">
+          <h1 id="formHeader">Feedback Portal</h1>
+          <p>We value concise, actionable feedback. Your response helps us iterate faster.</p>
+        </div>
+      </div>
+
+      <form id="feedbackForm" novalidate>
+        <div class="row">
+          <div class="field" id="fnField">
+            <input id="name" name="name" type="text" autocomplete="name" required />
+            <label class="floating" for="name">Full name</label>
+            <div class="help muted-small">Enter your display name or alias.</div>
+            <div class="error" id="nameError">Please enter your name.</div>
+          </div>
+
+          <div class="field" id="emField">
+            <input id="email" name="email" type="email" autocomplete="email" required />
+            <label class="floating" for="email">Email address</label>
+            <div class="help muted-small">We'll use this to follow up if necessary. Never shared publicly.</div>
+            <div class="error" id="emailError">Please enter a valid email.</div>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:6px;">
+          <textarea id="feedback" name="feedback" required></textarea>
+          <label class="floating" for="feedback">Your feedback</label>
+          <div class="help muted-small">What did you experience? What could we improve? (min 15 characters)</div>
+          <div class="error" id="feedbackError">Please provide feedback (min 15 characters).</div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" type="submit" id="submitBtn" aria-busy="false">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M2 12l20-8-8 20-4-9-8-3z" fill="white" opacity="0.9"/>
+            </svg>
+            Send Feedback
+          </button>
+
+          <button type="button" class="btn secondary" id="saveDraft" title="Save draft locally">Save draft</button>
+
+          <div style="margin-left:auto" class="muted-small">Press <span class="kbd">Ctrl</span> + <span class="kbd">Enter</span> to submit</div>
+        </div>
+
+        <!-- ARIA live region for success/error announcements -->
+        <div id="liveRegion" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+      </form>
+    </section>
+
+    <aside class="preview" aria-labelledby="previewTitle">
+      <h3 id="previewTitle">Technical preview</h3>
+      <div class="meta">
+        <span class="muted-small">JSON payload preview • auto-updates</span>
+        <span style="margin-left:auto" class="muted-small">Draft: <strong id="draftState">no</strong></span>
+      </div>
+      <pre class="code" id="jsonPreview">{ "name": "", "email": "", "feedback": "" }</pre>
+      <div class="muted-small">This pane shows the shape of the payload we would send to an API. Use this to copy or paste for internal tools.</div>
+    </aside>
+
+    <div class="toast" id="toast" role="status" aria-live="polite">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M20 6L9 17l-5-5" stroke="#042023" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Feedback sent — thanks!
+    </div>
+  </main>
+
+  <script>
+    // Simple client-side behavior: floating labels, validation, preview, draft save, and submission simulation.
+
+    const form = document.getElementById('feedbackForm');
+    const inputs = Array.from(form.querySelectorAll('input, textarea'));
+    const jsonPreview = document.getElementById('jsonPreview');
+    const draftState = document.getElementById('draftState');
+    const toast = document.getElementById('toast');
+    const liveRegion = document.getElementById('liveRegion');
+    const submitBtn = document.getElementById('submitBtn');
+    const saveDraftBtn = document.getElementById('saveDraft');
+
+    const DRAFT_KEY = 'feedback_portal_draft_v1';
+
+    // Initialize: restore draft if present
+    function loadDraft(){
+      try{
+        const raw = localStorage.getItem(DRAFT_KEY);
+        if(!raw) return;
+        const draft = JSON.parse(raw);
+        if(draft.name) document.getElementById('name').value = draft.name;
+        if(draft.email) document.getElementById('email').value = draft.email;
+        if(draft.feedback) document.getElementById('feedback').value = draft.feedback;
+        draftState.textContent = 'yes';
+      }catch(e){
+        console.warn('Could not load draft', e);
+      }
+    }
+
+    function saveDraft(){
+      const payload = { name: elVal('name'), email: elVal('email'), feedback: elVal('feedback') };
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(payload));
+      draftState.textContent = 'yes';
+      announce('Draft saved locally.');
+    }
+
+    function clearDraft(){
+      localStorage.removeItem(DRAFT_KEY);
+      draftState.textContent = 'no';
+    }
+
+    function elVal(id){ return document.getElementById(id).value.trim(); }
+
+    // Show field labels as "has-value" when element has content
+    function refreshFloating(){
+      inputs.forEach(el => {
+        const container = el.closest('.field');
+        if(el.value.trim() !== '') container.classList.add('has-value');
+        else container.classList.remove('has-value');
+      });
+    }
+
+    // Live JSON preview
+    function updatePreview(){
+      const payload = { name: elVal('name'), email: elVal('email'), feedback: elVal('feedback') };
+      jsonPreview.textContent = JSON.stringify(payload, null, 2);
+    }
+
+    // Validation
+    function validate(){
+      let ok = true;
+
+      const name = elVal('name');
+      const email = elVal('email');
+      const feedback = elVal('feedback');
+
+      const nameErr = document.getElementById('nameError');
+      const emailErr = document.getElementById('emailError');
+      const fbErr = document.getElementById('feedbackError');
+
+      nameErr.classList.remove('visible');
+      emailErr.classList.remove('visible');
+      fbErr.classList.remove('visible');
+
+      if(name.length === 0){ nameErr.classList.add('visible'); ok = false; }
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ emailErr.classList.add('visible'); ok=false; }
+      if(feedback.length < 15){ fbErr.classList.add('visible'); ok = false; }
+
+      return ok;
+    }
+
+    // Announcement helper for screen readers
+    function announce(message){
+      liveRegion.textContent = message;
+    }
+
+    // Simulate sending
+    async function sendFeedback(payload){
+      // Simulate network latency
+      submitBtn.setAttribute('aria-busy', 'true');
+      submitBtn.disabled = true;
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="white" stroke-opacity="0.15" stroke-width="3" fill="none"/><path d="M2 12a10 10 0 0 0 20 0" stroke="white" stroke-width="2" stroke-linecap="round" fill="none"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.9s" repeatCount="indefinite"/></path></svg> Sending...';
+
+      await new Promise(r => setTimeout(r, 950 + Math.random()*700));
+
+      submitBtn.removeAttribute('aria-busy');
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalText;
+
+      // Show toast
+      toast.classList.add('show');
+      announce('Feedback submitted successfully.');
+      setTimeout(()=> toast.classList.remove('show'), 2200);
+      clearDraft();
+    }
+
+    // Handle submit
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if(!validate()){
+        announce('Please fix the form errors before submitting.');
+        return;
+      }
+      const payload = { name: elVal('name'), email: elVal('email'), feedback: elVal('feedback') };
+      // In real usage, replace with fetch() to your backend endpoint.
+      await sendFeedback(payload);
+
+      // clear UI fields on success
+      form.reset();
+      refreshFloating();
+      updatePreview();
+    });
+
+    // Save draft button
+    saveDraftBtn.addEventListener('click', saveDraft);
+
+    // Keyboard shortcut ctrl/cmd + Enter
+    window.addEventListener('keydown', (e) => {
+      if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
+        e.preventDefault();
+        form.requestSubmit();
+      }
+    });
+
+    // Auto-update preview on input & autosave (throttled)
+    let autosaveTimer = null;
+    inputs.forEach(el => {
+      el.addEventListener('input', () => {
+        refreshFloating();
+        updatePreview();
+
+        if(autosaveTimer) clearTimeout(autosaveTimer);
+        autosaveTimer = setTimeout(() => {
+          // store small draft automatically
+          try{
+            const payload = { name: elVal('name'), email: elVal('email'), feedback: elVal('feedback') };
+            if(payload.name || payload.email || payload.feedback){
+              localStorage.setItem(DRAFT_KEY, JSON.stringify(payload));
+              draftState.textContent = 'yes';
+            } else {
+              // remove empty draft
+              clearDraft();
+            }
+          }catch(e){}
+        }, 800);
+      });
+    });
+
+    // Utility: clear error when focusing the field
+    inputs.forEach(el => {
+      el.addEventListener('focus', () => {
+        const err = el.closest('.field')?.querySelector('.error');
+        if(err) err.classList.remove('visible');
+      });
+    });
+
+    // Initial run
+    loadDraft();
+    refreshFloating();
+    updatePreview();
+
+    // Expose small helper for dev console if needed
+    window.__feedbackPortal = {
+      saveDraft, clearDraft, loadDraft, getDraft: () => JSON.parse(localStorage.getItem(DRAFT_KEY) || '{}')
+    };
+  </script>
+</body>
+</html>
