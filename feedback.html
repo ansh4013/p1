@@ -355,7 +355,32 @@ input:focus-visible, textarea:focus-visible { outline: 3px solid rgba(41,212,224
       const nameErr = document.getElementById('nameError');
       const emailErr = document.getElementById('emailError');
       const fbErr = document.getElementById('feedbackError');
+// Call this to check domain MX records without having a server API.
+// Returns: { ok:true, exists:true/false, raw:... } or { ok:false, error: '...' }
+async function verifyEmailNoApi(email) {
+  // simple syntax validation
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { ok: false, error: 'invalid_format' };
+  }
 
+  const domain = email.split('@').pop().toLowerCase();
+  // Google DNS-over-HTTPS endpoint (CORS allowed). You can use Cloudflare if you prefer:
+  // const dohUrl = `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=MX`;
+  const dohUrl = `https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=MX`;
+
+  try {
+    const res = await fetch(dohUrl, { headers: { Accept: 'application/dns-json' } });
+    if (!res.ok) return { ok: false, error: `doh_http_${res.status}` };
+
+    const json = await res.json();
+    // Google DOH returns an "Answer" array when records exist. MX type is 15.
+    const answers = Array.isArray(json.Answer) ? json.Answer : [];
+    const hasMx = answers.some(a => a.type === 15 || (typeof a.data === 'string' && /\s+/.test(a.data)));
+    return { ok: true, exists: hasMx, raw: json };
+  } catch (err) {
+    return { ok: false, error: err.message || 'network_error' };
+  }
+}
       nameErr.classList.remove('visible');
       emailErr.classList.remove('visible');
       fbErr.classList.remove('visible');
@@ -382,20 +407,53 @@ input:focus-visible, textarea:focus-visible { outline: 3px solid rgba(41,212,224
 
       await new Promise(r => setTimeout(r, 950 + Math.random()*700));
 
-      submitBtn.removeAttribute('aria-busy');
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = originalText;
+      form.addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-      // Show toast
-      toast.classList.add('show');
-      announce('Feedback submitted successfully.');
-      setTimeout(()=> toast.classList.remove('show'), 2200);
-      clearDraft();
-    }
+  // client-side format + content validation
+  if (!validate()) {
+    announce('Please fix the form errors before submitting.');
+    return;
+  }
 
-    // Handle submit
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+  const emailVal = elVal('email');
+
+  // show verifying UI
+  submitBtn.setAttribute('aria-busy', 'true');
+  submitBtn.disabled = true;
+  announce('Verifying email domain…');
+
+  const check = await verifyEmailNoApi(emailVal);
+
+  submitBtn.removeAttribute('aria-busy');
+  submitBtn.disabled = false;
+
+  if (!check.ok) {
+    // Could not perform DoH check (network or DoH error).
+    // Option A: block submission and show error
+    // const emailErr = document.getElementById('emailError'); emailErr.textContent = 'Could not verify email. Try again later.'; emailErr.classList.add('visible'); return;
+
+    // Option B (safer UX): warn user and let them proceed
+    const proceed = confirm('Could not verify the email domain (network/DoH error). Do you want to submit anyway?');
+    if (!proceed) return;
+  } else if (!check.exists) {
+    // Domain has no MX records — likely not able to receive email.
+    const emailErr = document.getElementById('emailError');
+    emailErr.textContent = 'Email domain does not appear to accept mail. Please check the address.';
+    emailErr.classList.add('visible');
+    announce('Email domain has no MX records.');
+    return;
+  }
+
+  // All good (or user chose to proceed). Send feedback as before.
+  const payload = { name: elVal('name'), email: emailVal, feedback: elVal('feedback') };
+  await sendFeedback(payload);
+
+  // clear UI fields on success (sendFeedback may already clear)
+  form.reset();
+  refreshFloating();
+  updatePreview();
+});
       if(!validate()){
         announce('Please fix the form errors before submitting.');
         return;
