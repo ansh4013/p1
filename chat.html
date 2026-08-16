@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot | TechQuest</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-robot"></i>
+                <span>AI</span>
+                <span class="logo-accent">CHAT</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#features" class="nav-link">Features</a></li>
+                <li><a href="#chatbot" class="nav-link">Chat</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="badge-text">• Advanced AI Technology</span>
+            </div>
+            <h1 class="hero-title">
+                Next Generation
+                <span class="gradient-text">AI Assistant</span>
+            </h1>
+            <p class="hero-subtitle">Powered by Google Gemini • Always Learning • Always Ready</p>
+            <div class="hero-buttons">
+                <a href="#chatbot" class="btn btn-primary">
+                    <i class="fas fa-comments"></i> Start Chat
+                </a>
+                <a href="#features" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right"></i> Learn More
+                </a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="floating-card">
+                <div class="card-inner">
+                    <i class="fas fa-brain"></i>
+                    <span>AI Powered</span>
+                </div>
+            </div>
+            <div class="floating-card" style="animation-delay: 1s;">
+                <div class="card-inner">
+                    <i class="fas fa-bolt"></i>
+                    <span>Lightning Fast</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="section-header">
+            <h2>Why Choose <span class="gradient-text">Our AI?</span></h2>
+            <p>Experience the future of conversational AI</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3>Advanced AI</h3>
+                <p>Powered by Google Gemini for intelligent responses</p>
+                <div class="card-glow"></div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-zap"></i>
+                </div>
+                <h3>Lightning Fast</h3>
+                <p>Real-time responses with minimal latency</p>
+                <div class="card-glow"></div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Secure</h3>
+                <p>Your conversations are encrypted and private</p>
+                <div class="card-glow"></div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Multi-Personality</h3>
+                <p>General, Coding, Tutor, or Creative modes</p>
+                <div class="card-glow"></div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>Responsive</h3>
+                <p>Works seamlessly on all devices</p>
+                <div class="card-glow"></div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-infinity"></i>
+                </div>
+                <h3>Always Available</h3>
+                <p>24/7 availability with instant support</p>
+                <div class="card-glow"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chatbot Section -->
+    <section id="chatbot" class="chatbot-section">
+        <div class="section-header">
+            <h2>Meet Your <span class="gradient-text">AI Assistant</span></h2>
+            <p>Start a conversation now</p>
+        </div>
+
+        <div class="chatbot-wrapper">
+            <!-- Chatbot Header -->
+            <div class="chatbot-header">
+                <div class="header-left">
+                    <div class="status-indicator"></div>
+                    <div class="header-info">
+                        <h2>AI Assistant</h2>
+                        <p>Online • Powered by Gemini</p>
+                    </div>
+                </div>
+                <button class="clear-btn" title="Clear chat">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+
+            <!-- Personality Selector -->
+            <div class="personality-selector">
+                <button class="personality-btn active" data-personality="general">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>General</span>
+                </button>
+                <button class="personality-btn" data-personality="coding">
+                    <i class="fas fa-code"></i>
+                    <span>Coding</span>
+                </button>
+                <button class="personality-btn" data-personality="tutor">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Tutor</span>
+                </button>
+                <button class="personality-btn" data-personality="creative">
+                    <i class="fas fa-palette"></i>
+                    <span>Creative</span>
+                </button>
+            </div>
+
+            <!-- Messages Container -->
+            <div class="messages-container" id="messagesContainer">
+                <div class="message ai-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <p>Hello, I'm your AI Assistant 👋</p>
+                        <p>Ask me anything - I'm ready to help with coding, learning, creative projects, or general questions!</p>
+                    </div>
+                    <small class="message-time">Just now</small>
+                </div>
+            </div>
+
+            <!-- Typing Indicator -->
+            <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+
+            <!-- Input Form -->
+            <form class="input-form" id="messageForm">
+                <input 
+                    type="text" 
+                    id="messageInput" 
+                    placeholder="Type your message..." 
+                    class="message-input"
+                    autocomplete="off"
+                >
+                <button type="submit" class="send-btn" title="Send message">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="section-header">
+            <h2>About <span class="gradient-text">This Platform</span></h2>
+            <p>Built with cutting-edge technology</p>
+        </div>
+        <div class="about-content">
+            <div class="about-card">
+                <div class="about-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <h3>Innovation First</h3>
+                <p>Built on the latest AI technologies and best practices in modern web development</p>
+            </div>
+            <div class="about-card">
+                <div class="about-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3>Privacy Focused</h3>
+                <p>Your data is secure. We respect your privacy and keep conversations confidential</p>
+            </div>
+            <div class="about-card">
+                <div class="about-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h3>User Experience</h3>
+                <p>Designed with you in mind - intuitive, responsive, and beautiful</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>AI Chat</h4>
+                <p>Your personal AI assistant powered by Google Gemini</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#chatbot">Chat</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Follow Us</h4>
+                <div class="social-links">
+                    <a href="#" title="GitHub"><i class="fab fa-github"></i></a>
+                    <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 AI Chat. All rights reserved.</p>
+            <p>Powered by <a href="https://ai.google.dev/">Google Gemini</a></p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
