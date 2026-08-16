@@ -1,5 +1,5 @@
 // ========== CONFIGURATION ==========
-const API_KEY = 'YOUR_GOOGLE_GEMINI_API_KEY'; // Replace with your API key
+const API_KEY = 'AQ.Ab8RN6pUN9F5tqOXHyRiGWkFDTxcFCIt0YrWHxpwguWNTqTnw'; // Replace with your API key
 const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
 
 // ========== PERSONALITIES ==========
