@@ -1,438 +1,270 @@
-Understood — I removed the password UI and replaced the demo with a more "extremely technical" GPU‑first Three.js HUD implementation. This single-file example focuses on performance and production‑grade techniques:
-
-- Selective bloom (bloom only applied to glow layers using layers + darkening)
-- GPU particle system via a custom Points shader (runs entirely on GPU)
-- Instanced ticks (InstancedMesh + InstancedBufferAttributes) for minimal draw calls
-- Fresnel rim implemented via onBeforeCompile to augment standard materials
-- Postprocessing pipeline: RenderPass -> UnrealBloomPass -> final composite with FXAA
-- Easy hooks for real loader progress (window.setProgress), and for hooking GLTF/image loaders
-- Lots of inline, technical comments explaining design choices and performance tradeoffs
-
-Run from a local server (do not open via file://). Example:
-- python3 -m http.server 8000
-- open http://localhost:8000/index.html
-
-Paste the following into index.html and open via a local server:
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Technical GPU HUD — Three.js (Selective Bloom + GPU Particles)</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg:#020612;
-    --accent:#18f7e6;
-    --accent-2:#3be7ff;
-  }
-  html,body{height:100%;margin:0;background:linear-gradient(180deg,#020613 0%,#021628 100%);font-family:Orbitron,system-ui,monospace;overflow:hidden;color:#9dd;}
-  #canvas-container{position:fixed;inset:0;display:block;}
-  .label{
-    position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:60;
-    color:var(--accent);font-size:18px;letter-spacing:0.18em;pointer-events:none;text-transform:uppercase;
-    mix-blend-mode:screen;text-shadow:0 6px 26px rgba(24,247,230,0.06)
-  }
-  .hint{position:fixed;left:14px;bottom:12px;color:#78b0a9;font-size:12px;opacity:0.9;z-index:60}
-  @media (prefers-reduced-motion: reduce){
-    *{animation:none!important;transition:none!important}
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-<div id="canvas-container"></div>
-<div class="label" id="centerLabel">SYSTEM HUD</div>
-<div class="hint">Click canvas to toggle detach / attach. Call window.setProgress(n) to show progress (0–100).</div>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-robot"></i>
+                <span>AI</span>
+                <span class="logo-accent">CHAT</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#features" class="nav-link">Features</a></li>
+                <li><a href="#chatbot" class="nav-link">Chat</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
 
-<script type="module">
-/* Extremely technical Three.js HUD
-   - Selective bloom via layers
-   - GPU particles using custom ShaderMaterial (no CPU updates)
-   - InstancedMesh for ticks (one draw call)
-   - Fresnel rim added via onBeforeCompile augmentation
-   - Post-processing: RenderPass -> Bloom -> FXAA
-   - Good defaults for desktop; degrade settings for mobile/low-GPU
-   - Hook: window.setProgress(percent)
-   Notes: run from a local server due to ES module imports.
-*/
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="badge-text">• Advanced AI Technology</span>
+            </div>
+            <h1 class="hero-title">
+                Next Generation
+                <span class="gradient-text">AI Assistant</span>
+            </h1>
+            <p class="hero-subtitle">Introduced by Ansh Katiyar• Always Learning • Always Ready</p>
+            <div class="hero-buttons">
+                <a href="#chatbot" class="btn btn-primary">
+                    <i class="fas fa-comments"></i> Start Chat
+                </a>
+                <a href="#features" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right"></i> Learn More
+                </a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="floating-card">
+                <div class="card-inner">
+                    <i class="fas fa-brain"></i>
+                    <span>AI Powered</span>
+                </div>
+            </div>
+            <div class="floating-card" style="animation-delay: 1s;">
+                <div class="card-inner">
+                    <i class="fas fa-bolt"></i>
+                    <span>Lightning Fast</span>
+                </div>
+            </div>
+        </div>
+    </section>
 
-import * as THREE from 'https://unpkg.com/three@0.152.0/build/three.module.js';
-import { EffectComposer } from 'https://unpkg.com/three@0.152.0/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from 'https://unpkg.com/three@0.152.0/examples/jsm/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'https://unpkg.com/three@0.152.0/examples/jsm/postprocessing/UnrealBloomPass.js';
-import { ShaderPass } from 'https://unpkg.com/three@0.152.0/examples/jsm/postprocessing/ShaderPass.js';
-import { FXAAShader } from 'https://unpkg.com/three@0.152.0/examples/jsm/shaders/FXAAShader.js';
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="section-header">
+            <h2>Why Choose <span class="gradient-text">Our AI?</span></h2>
+            <p>Experience the future of conversational AI</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3>Advanced AI</h3>
+                <p>Powered by next generation AI for intelligent responses</p>
+                <div class="card-glow"></div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-zap"></i>
+                </div>
+                <h3>Lightning Fast</h3>
+                <p>Real-time responses with minimal latency</p>
+                <div class="card-glow"></div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Secure</h3>
+                <p>Your conversations are encrypted and private</p>
+                <div class="card-glow"></div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Multi-Personality</h3>
+                <p>General, Coding, Tutor, or Creative modes</p>
+                <div class="card-glow"></div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>Responsive</h3>
+                <p>Works seamlessly on all devices</p>
+                <div class="card-glow"></div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-infinity"></i>
+                </div>
+                <h3>Always Available</h3>
+                <p>24/7 availability with instant support</p>
+                <div class="card-glow"></div>
+            </div>
+        </div>
+    </section>
 
-const container = document.getElementById('canvas-container');
-const centerLabel = document.getElementById('centerLabel');
+    <!-- Chatbot Section -->
+    <section id="chatbot" class="chatbot-section">
+        <div class="section-header">
+            <h2>Meet Your <span class="gradient-text">AI Assistant</span></h2>
+            <p>Start a conversation now</p>
+        </div>
 
-const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.outputEncoding = THREE.sRGBEncoding;
-renderer.toneMappingExposure = 1.0;
-container.appendChild(renderer.domElement);
+        <div class="chatbot-wrapper">
+            <!-- Chatbot Header -->
+            <div class="chatbot-header">
+                <div class="header-left">
+                    <div class="status-indicator"></div>
+                    <div class="header-info">
+                        <h2>AI Assistant</h2>
+                        <p>Online • Powered by ansh4013 Team</p>
+                    </div>
+                </div>
+                <button class="clear-btn" title="Clear chat">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
 
-// Scene & camera
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x020613);
-scene.fog = new THREE.FogExp2(0x020613, 0.08);
+            <!-- Personality Selector -->
+            <div class="personality-selector">
+                <button class="personality-btn active" data-personality="general">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>General</span>
+                </button>
+                <button class="personality-btn" data-personality="coding">
+                    <i class="fas fa-code"></i>
+                    <span>Coding</span>
+                </button>
+                <button class="personality-btn" data-personality="tutor">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Tutor</span>
+                </button>
+                <button class="personality-btn" data-personality="creative">
+                    <i class="fas fa-palette"></i>
+                    <span>Creative</span>
+                </button>
+            </div>
 
-const camera = new THREE.PerspectiveCamera(44, window.innerWidth / window.innerHeight, 0.05, 50);
-camera.position.set(0, 0, 3.4);
+            <!-- Messages Container -->
+            <div class="messages-container" id="messagesContainer">
+                <div class="message ai-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <p>Hello, I'm your AI Assistant 👋</p>
+                        <p>Ask me anything I am made by Ansh Katiyar- I'm ready to help with coding, learning, creative projects, or general questions!</p>
+                    </div>
+                    <small class="message-time">Just now</small>
+                </div>
+            </div>
 
-// LAYERS: we'll use layers to mark objects that should bloom.
-// Convention: bloomLayer = 1, default layer = 0
-const BLOOM_LAYER = 1;
+            <!-- Typing Indicator -->
+            <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
 
-// ---------- POSTPROCESSING / SELECTIVE BLOOM SETUP ----------
-// We render the scene twice: one pass with only bloom objects visible (and others darkened),
-// apply UnrealBloomPass -> bloomComposer. Then render the full scene and composite bloom on top.
-// This avoids blooming non-emissive geometry.
+            <!-- Input Form -->
+            <form class="input-form" id="messageForm">
+                <input 
+                    type="text" 
+                    id="messageInput" 
+                    placeholder="Type your message..." 
+                    class="message-input"
+                    autocomplete="off"
+                >
+                <button type="submit" class="send-btn" title="Send message">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </section>
 
-const renderScene = new RenderPass(scene, camera);
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="section-header">
+            <h2>About <span class="gradient-text">This Platform</span></h2>
+            <p>Built with cutting-edge technology</p>
+        </div>
+        <div class="about-content">
+            <div class="about-card">
+                <div class="about-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <h3>Innovation First</h3>
+                <p>Built on the latest AI technologies and best practices in modern web development</p>
+            </div>
+            <div class="about-card">
+                <div class="about-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3>Privacy Focused</h3>
+                <p>Your data is secure. We respect your privacy and keep conversations confidential</p>
+            </div>
+            <div class="about-card">
+                <div class="about-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h3>User Experience</h3>
+                <p>Designed with you in mind - intuitive, responsive, and beautiful</p>
+            </div>
+        </div>
+    </section>
 
-const bloomComposer = new EffectComposer(renderer);
-bloomComposer.addPass(renderScene);
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>AI Chat</h4>
+                <p>Your personal AI assistant powered by Itzmeansh</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#chatbot">Chat</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Follow Us</h4>
+                <div class="social-links">
+                    <a href="#" title="GitHub"><i class="fab fa-github"></i></a>
+                    <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 AI Chat. All rights reserved.</p>
+            <p>Powered by <a href="https://ai.google.dev/">Integrated next generation AI</a></p>
+        </div>
+    </footer>
 
-// Bloom params tuned for neon/HUD look - adjust for performance
-let bloomStrength = 1.6;
-const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), bloomStrength, 0.6, 0.1);
-bloomPass.threshold = 0.08;
-bloomComposer.addPass(bloomPass);
-
-// Final composer: render full scene then composite bloom via additive blending.
-// We do full render to screen with FXAA after compositing.
-const finalComposer = new EffectComposer(renderer);
-finalComposer.addPass(renderScene);
-
-const fxaaPass = new ShaderPass(FXAAShader);
-fxaaPass.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight);
-finalComposer.addPass(fxaaPass);
-
-// We'll composite bloom by rendering bloomComposer to a renderTarget and drawing it additively.
-// EffectComposer doesn't expose a built-in "additive composite" pass with two composers, so we'll do:
-// 1) Render scene normally (finalComposer) to screen
-// 2) Render bloomComposer renderTarget.texture as an additive screen-aligned quad via a ShaderPass
-// For clarity we will instead perform two-step rendering each frame (bloomComposer.render(), then finalComposer.render())
-// and then add bloomComposer's result to the canvas using an additive fullscreen quad.
-// To keep code short and robust, we'll reuse finalComposer + a custom ShaderPass to add bloom texture.
-
-import { CopyShader } from 'https://unpkg.com/three@0.152.0/examples/jsm/shaders/CopyShader.js';
-const copyPass = new ShaderPass(CopyShader);
-copyPass.renderToScreen = true; // This pass will output to screen when used alone
-
-// To composite bloom + scene: we'll render bloomComposer to an internal render target and pass that texture to a final composite shader.
-// Create a renderTarget to receive bloomComposer output:
-const bloomRenderTarget = bloomComposer.readBuffer; // EffectComposer exposes readBuffer for current setup
-
-// A simple additive composite shader (scene + bloom)
-const CompositeShader = {
-  uniforms: {
-    'tBase': { value: null },
-    'tBloom': { value: null },
-    'bloomIntensity': { value: 1.0 }
-  },
-  vertexShader: /* glsl */`
-    varying vec2 vUv;
-    void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }
-  `,
-  fragmentShader: /* glsl */`
-    uniform sampler2D tBase;
-    uniform sampler2D tBloom;
-    uniform float bloomIntensity;
-    varying vec2 vUv;
-    void main(){
-      vec3 base = texture2D(tBase, vUv).rgb;
-      vec3 bloom = texture2D(tBloom, vUv).rgb * bloomIntensity;
-      // additive composite; tone mapping already applied earlier
-      vec3 outc = base + bloom;
-      gl_FragColor = vec4(outc, 1.0);
-    }
-  `
-};
-const compositePass = new ShaderPass(CompositeShader);
-compositePass.material.depthTest = false;
-compositePass.material.depthWrite = false;
-compositePass.renderToScreen = true;
-
-// ---------- SCENE CONTENT (HUD) ----------
-
-// Group for the HUD; we will "detach" this group by changing its position/scale and enabling a gentle floating motion when detached.
-const hud = new THREE.Group();
-scene.add(hud);
-
-// We will place two root groups: one for bloom-emissive geometry, and one for non-bloom geometry.
-// Objects that should glow strongly: add them to bloomGroup and set object.layers.enable(BLOOM_LAYER).
-const bloomGroup = new THREE.Group();
-const nonBloomGroup = new THREE.Group();
-hud.add(nonBloomGroup);
-hud.add(bloomGroup);
-
-// Utility: additive mesh basic material for glow objects (no lights, additive blending)
-function EmissiveMaterial(hex=0x24f0e6, intensity=1.0){
-  return new THREE.MeshBasicMaterial({
-    color: hex,
-    transparent: true,
-    opacity: Math.min(1.0, intensity),
-    blending: THREE.AdditiveBlending,
-    depthWrite: false,
-    toneMapped: false, // keep colors for bloom pass
-    side: THREE.DoubleSide
-  });
-}
-
-// Add a bunch of layered rings (torus) — these are visually the HUD rings.
-// Outer geometry is bloom-enabled (gives the neon halo)
-const ringOuter = new THREE.Mesh(new THREE.TorusGeometry(1.06, 0.014, 16, 256), EmissiveMaterial(0x24f0e6, 0.95));
-ringOuter.renderOrder = 2;
-bloomGroup.add(ringOuter);
-ringOuter.layers.enable(BLOOM_LAYER); // mark for bloom pass
-
-// Thinner inner ring
-const ringInner = new THREE.Mesh(new THREE.TorusGeometry(0.78, 0.006, 10, 200), EmissiveMaterial(0x3be7ff, 0.8));
-ringInner.renderOrder = 2;
-bloomGroup.add(ringInner);
-ringInner.layers.enable(BLOOM_LAYER);
-
-// A subtle non-bloom core disk to provide contrast
-const coreDisk = new THREE.Mesh(new THREE.CircleGeometry(0.09, 32), new THREE.MeshBasicMaterial({ color: 0x041723, transparent:true, opacity:0.45 }));
-coreDisk.position.z = 0.02;
-nonBloomGroup.add(coreDisk);
-
-// Instanced ticks (InstancedMesh) — GPU-friendly single draw call for many tick marks.
-// We also create instanced attributes so ticks can be animated in shader if desired.
-// For simplicity we set transform matrices once (static geometry).
-const TICK_COUNT = 72;
-const tickGeometry = new THREE.BoxGeometry(0.008, 0.12, 0.003);
-const tickMaterial = EmissiveMaterial(0x24f0e6, 0.9);
-const ticksMesh = new THREE.InstancedMesh(tickGeometry, tickMaterial, TICK_COUNT);
-ticksMesh.instanceMatrix.setUsage(THREE.StaticDrawUsage);
-bloomGroup.add(ticksMesh);
-ticksMesh.layers.enable(BLOOM_LAYER);
-
-// populate instance matrices with radial distribution
-const tmpObj = new THREE.Object3D();
-for(let i=0;i<TICK_COUNT;i++){
-  const angle = (i / TICK_COUNT) * Math.PI * 2;
-  const radius = 0.92;
-  tmpObj.position.set(Math.cos(angle) * radius, Math.sin(angle) * radius, 0.01);
-  tmpObj.rotation.set(0, 0, angle);
-  tmpObj.scale.set(1, (i%6===0) ? 1.9 : 1.0, 1);
-  tmpObj.updateMatrix();
-  ticksMesh.setMatrixAt(i, tmpObj.matrix);
-}
-ticksMesh.instanceMatrix.needsUpdate = true;
-
-// GPU PARTICLE SYSTEM (Points) using ShaderMaterial — position & animation computed on GPU.
-// This avoids per-frame CPU updates and allows very large counts cheaply.
-// We'll produce N particles arranged along a ring with phase offsets and animate them in the vertex shader.
-const PARTICLE_COUNT = 512; // increase/decrease for performance; keep power-of-two friendly counts
-const particlePositions = new Float32Array(PARTICLE_COUNT * 3);
-const particlePhases = new Float32Array(PARTICLE_COUNT);
-const particleRadii = new Float32Array(PARTICLE_COUNT);
-for(let i=0;i<PARTICLE_COUNT;i++){
-  const t = i / PARTICLE_COUNT;
-  const a = t * Math.PI * 2 * 3.0; // spread across several revolutions for visual density
-  const r = 0.88 + Math.random() * 0.06;
-  particlePositions[3*i+0] = Math.cos(a) * r;
-  particlePositions[3*i+1] = Math.sin(a) * r;
-  particlePositions[3*i+2] = (Math.random() - 0.5) * 0.02;
-  particlePhases[i] = Math.random() * Math.PI * 2;
-  particleRadii[i] = 0.002 + Math.random() * 0.006;
-}
-const particleGeometry = new THREE.BufferGeometry();
-particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
-particleGeometry.setAttribute('phase', new THREE.BufferAttribute(particlePhases, 1));
-particleGeometry.setAttribute('radiusAttr', new THREE.BufferAttribute(particleRadii, 1));
-
-// custom shader material for GPU particle animation
-const particleMaterial = new THREE.ShaderMaterial({
-  transparent: true,
-  depthWrite: false,
-  blending: THREE.AdditiveBlending,
-  uniforms: {
-    uTime: { value: 0.0 },
-    uScale: { value: 1.0 },
-    uColor: { value: new THREE.Color(0x9ffeff) },
-    uPixelRatio: { value: Math.min(window.devicePixelRatio || 1, 2) },
-    uSize: { value: 18.0 } // base size in pixels
-  },
-  vertexShader: /* glsl */`
-    precision mediump float;
-    attribute float phase;
-    attribute float radiusAttr;
-    uniform float uTime;
-    uniform float uScale;
-    uniform float uPixelRatio;
-    uniform float uSize;
-    varying float vAlpha;
-    void main(){
-      // compute per-vertex time-based radial wobble and orbiting
-      float t = uTime * 0.6;
-      float angle = atan(position.y, position.x);
-      float baseR = length(position.xy);
-      float dynamicR = baseR + 0.02 * sin(t * 0.9 + phase * 1.7);
-      float a = angle + 0.2 * sin(t * 0.6 + phase);
-      vec3 pos = vec3(cos(a) * dynamicR, sin(a) * dynamicR, position.z);
-      vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-      // size attenuation: keep roughly constant pixel size across depth
-      float size = uSize * radiusAttr * uScale * (300.0 / -mvPosition.z) * uPixelRatio;
-      gl_PointSize = clamp(size, 1.0, 40.0);
-      vAlpha = 0.35 + 0.65 * abs(sin(t * 1.7 + phase));
-      gl_Position = projectionMatrix * mvPosition;
-    }
-  `,
-  fragmentShader: /* glsl */`
-    precision mediump float;
-    uniform vec3 uColor;
-    varying float vAlpha;
-    // circular soft falloff
-    void main(){
-      vec2 uv = gl_PointCoord - 0.5;
-      float r = length(uv);
-      float alpha = smoothstep(0.5, 0.0, r) * vAlpha;
-      // slight center tint and chromatic sheen-like color
-      gl_FragColor = vec4(uColor * (0.6 + 0.4 * (1.0 - r)), alpha);
-    }
-  `
-});
-const particles = new THREE.Points(particleGeometry, particleMaterial);
-bloomGroup.add(particles);
-particles.layers.enable(BLOOM_LAYER); // particles bloom
-
-// Sweep arc: thin geometry with emissive material, rotates faster
-const sweep = new THREE.Mesh(new THREE.TorusGeometry(1.135, 0.002, 6, 240), EmissiveMaterial(0x24f0e6, 0.9));
-sweep.renderOrder = 3;
-bloomGroup.add(sweep);
-sweep.layers.enable(BLOOM_LAYER);
-
-// Add a thin inner ring but non-bloomed to provide silhouette contrast
-const innerContour = new THREE.Mesh(new THREE.TorusGeometry(0.90, 0.0028, 6, 200), new THREE.MeshBasicMaterial({ color: 0x0b2230, opacity: 0.8, transparent: true }));
-innerContour.renderOrder = 1;
-nonBloomGroup.add(innerContour);
-
-// ---------- Fresnel Rim augmentation ----------
-/* We augment a base MeshStandardMaterial (or MeshBasicMaterial) with a Fresnel rim
-   by injecting a fragment calculation via onBeforeCompile. This creates that sci-fi
-   rim/fresnel without authoring a whole ShaderMaterial from scratch, preserving
-   built-in behaviors (if ever used). Here we apply it to non-bloomed materials for subtle rim.
-*/
-function addFresnel(material, color = new THREE.Color(0x18f7e6), power = 2.0, intensity = 0.6){
-  material.onBeforeCompile = (shader) => {
-    shader.uniforms.uFresnelColor = { value: color };
-    shader.uniforms.uFresnelPower = { value: power };
-    shader.uniforms.uFresnelIntensity = { value: intensity };
-    // Inject varying
-    shader.vertexShader = shader.vertexShader.replace(
-      '#include <common>',
-      `#include <common>\nvarying float vFresnel;`
-    );
-    shader.vertexShader = shader.vertexShader.replace(
-      '#include <begin_vertex>',
-      `#include <begin_vertex>\nvec3 vViewPosition = (modelViewMatrix * vec4(transformed, 1.0)).xyz; vFresnel = abs(dot(normalize(normalMatrix * normal), normalize(-vViewPosition)));`
-    );
-    shader.fragmentShader = shader.fragmentShader.replace(
-      '#include <common>',
-      `#include <common>\nvarying float vFresnel;\nuniform vec3 uFresnelColor; uniform float uFresnelPower; uniform float uFresnelIntensity;`
-    );
-    shader.fragmentShader = shader.fragmentShader.replace(
-      'gl_FragColor = vec4( outgoingLight, diffuseColor.a );',
-      `{\n float f = pow(1.0 - vFresnel, uFresnelPower) * uFresnelIntensity; vec3 fres = uFresnelColor * f; vec3 col = outgoingLight + fres; gl_FragColor = vec4(col, diffuseColor.a );\n }`
-    );
-  };
-}
-
-// apply subtle fresnel to non-bloom core disk
-addFresnel(coreDisk.material, new THREE.Color(0x16f0e6), 2.2, 0.22);
-
-// ---------- Interaction: Detach / attach ----------
-let detached = false;
-let detachProgress = 0.0; // 0..1
-function tweenDetach(target, duration = 700){
-  const start = performance.now();
-  const from = detachProgress;
-  const delta = target - from;
-  function step(now){
-    const t = Math.min(1, (now - start) / duration);
-    // easeOutCubic
-    const eased = 1 - Math.pow(1 - t, 3);
-    detachProgress = from + delta * eased;
-    applyDetach(detachProgress);
-    if(t < 1) requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
-function applyDetach(p){
-  // Move the hud group slightly forward (toward camera) and scale; adjust bloom intensity.
-  hud.position.z = THREE.MathUtils.lerp(0.0, 0.9, p);
-  hud.scale.setScalar(THREE.MathUtils.lerp(1.0, 1.16, p));
-  bloomPass.strength = THREE.MathUtils.lerp(1.1, 2.4, p);
-  // increase particle size slightly
-  particleMaterial.uniforms.uScale.value = THREE.MathUtils.lerp(1.0, 1.35, p);
-}
-renderer.domElement.addEventListener('click', () => {
-  detached = !detached;
-  tweenDetach(detached ? 1 : 0, 800);
-});
-
-// ---------- Performance & adaptive quality ----------
-const isMobile = /Mobi|Android/i.test(navigator.userAgent);
-if(isMobile){
-  // reduce counts & intensity for mobile
-  bloomPass.strength = 0.9;
-  particleMaterial.uniforms.uSize.value = 10.0;
-  // do not run very large particle counts — we purposely used 512; reduce if necessary
-}
-
-// ---------- Animation loop ----------
-const clock = new THREE.Clock();
-
-function render(){
-  const t = clock.getElapsedTime();
-  // update time uniform for GPU particle shader
-  particleMaterial.uniforms.uTime.value = t;
-  // Rotate layers independently to give mechanical feel
-  ringOuter.rotation.z += 0.18 * clock.getDelta();
-  ringInner.rotation.z -= 0.12 * clock.getDelta();
-  ticksMesh.rotation.z -= 0.09 * clock.getDelta();
-  sweep.rotation.z += 0.42 * clock.getDelta();
-
-  // slight floating / pitch when detached
-  if(detached){
-    hud.rotation.y = Math.sin(t * 0.4) * 0.075;
-    hud.rotation.x = 0.06 + Math.cos(t * 0.18) * 0.02;
-  } else {
-    hud.rotation.y = THREE.MathUtils.lerp(hud.rotation.y, 0.0, 0.08);
-    hud.rotation.x = THREE.MathUtils.lerp(hud.rotation.x, 0.06, 0.08);
-  }
-
-  // SELECTIVE BLOOM RENDERING SEQUENCE:
-  // 1) Render bloomComposer with only bloom-layer objects visible
-  //    a) We set non-bloom objects to dark material (or temporarily toggle layers)
-  // 2) Render final pass (scene) normally into a texture
-  // 3) Composite final + bloom texture additively (CompositeShader handles that)
-  // To avoid permanently modifying materials, a common approach is to toggle object.layers visibility.
-  // We'll render bloomComposer with camera seeing only BLOOM_LAYER.
-  const prevBackground = scene.background;
-  // Render bloom scene:
-  // Hide non-bloom objects by making camera view only the bloom layer
-  camera.layers.set(BLOOM_LAYER);
-  bloomComposer.render();
-
-  // Render full scene to a render target (finalComposer's readBuffer implicitly used).
-  camera.layers.set(0); // default layer
-  finalComposer.render();
-
-  // Now composite bloomComposer's result (bloomComposer.readBuffer.texture) onto final canvas.
-  // We can implement composite by drawing a fullscreen quad. For brevity, we will copy bloomComposer's output on top additively using a custom pass:
-  compositePass.uniforms.tBase.value = null; // not used here
-  compositePass.uniforms.tBloom.value = bloomComposer.readBuffer.texture;
-  compositePass.uniforms.bloomIntensity.value = 1.0;
-  // Use the copyPass to draw the composited texture:
-  // Simpler: render the bloom texture with additive blending directly to screen quad using a second scene + ortho camera.
-  // We'll implement a tiny screen-quad renderer:
-  screenCompositeRender(bloomComposer.readBuffer.texture, 1.0);
-
-  requestAnimationFr
+    <script src="script.js"></script>
+</body>
+</html>
