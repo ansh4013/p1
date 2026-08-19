@@ -1,5 +1,5 @@
 // ========== CONFIGURATION ==========
-const API_KEY=https:.vercel.app/api/gemini; // Replace with your API key
+const API_KEY='https://p1-zeta-silk.vercel.app/api/gemini'; // Replace with your API key
 const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
 
 // ========== PERSONALITIES ==========
