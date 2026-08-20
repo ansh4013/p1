@@ -1,688 +1,1057 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>NEXORA // AI COMMAND</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link rel="stylesheet" href="stylenew.css">
+    <meta
+        name="description"
+        content="NEXORA — A next-generation digital intelligence experience."
+    >
+
+    <title>NEXORA — Digital Intelligence</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 </head>
 
 <body>
 
-    <!-- BACKGROUND -->
-    <canvas id="particles"></canvas>
+    <!-- =====================================================
+         AMBIENT UI
+    ====================================================== -->
 
-    <div class="grid"></div>
-    <div class="scanlines"></div>
+    <div class="tech-grid"></div>
+    <div class="micro-grid"></div>
+    <div class="grain"></div>
+    <div class="scanline"></div>
 
-    <div class="glow glow-one"></div>
-    <div class="glow glow-two"></div>
+    <div
+        class="cursor-glow"
+        id="cursorGlow"
+    ></div>
 
 
-    <!-- NAVBAR -->
+    <!-- =====================================================
+         LOADER
+    ====================================================== -->
 
-    <nav class="navbar">
+    <div
+        class="loader"
+        id="loader"
+    >
 
-        <div class="logo">
+        <div class="loader-core">
+
+            <div class="loader-ring"></div>
+
+            <div class="loader-ring"></div>
+
+            <div class="loader-text">
+                NEXORA
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         NAVIGATION
+    ====================================================== -->
+
+    <header class="navbar">
+
+        <a
+            href="#home"
+            class="logo"
+        >
 
             <div class="logo-core">
-                <span>✦</span>
+                <span>NX</span>
             </div>
 
             <div class="logo-name">
-                NEXORA<span>.AI</span>
+                NE<span>X</span>ORA
             </div>
 
-        </div>
+        </a>
 
 
-        <div class="nav-links">
+        <nav class="nav-links">
 
-            <a href="#home">HOME</a>
-            <a href="#technology">TECHNOLOGY</a>
-            <a href="#command">COMMAND</a>
-            <a href="#ai">AI CORE</a>
+            <a href="#system">
+                SYSTEM
+            </a>
 
-        </div>
+            <a href="#intelligence">
+                INTELLIGENCE
+            </a>
+
+            <a href="#experience">
+                EXPERIENCE
+            </a>
+
+            <a href="#about">
+                ABOUT
+            </a>
+
+        </nav>
 
 
         <div class="status">
 
-            <div class="status-dot"></div>
+            <span class="status-dot"></span>
 
             SYSTEM ONLINE
 
         </div>
 
-    </nav>
+    </header>
 
 
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
 
-    <!-- HERO -->
+    <main>
 
-    <section class="hero" id="home">
+        <section
+            class="hero"
+            id="home"
+        >
 
-        <div class="hero-content">
+            <div class="hero-content reveal">
 
-            <div class="system-label">
-
-                NEXORA INTELLIGENCE SYSTEM // 2026
-
-            </div>
-
-
-            <h1>
-
-                <span class="line">
-                    BUILD THE
-                </span>
-
-                <span class="line gradient">
-                    INTELLIGENT
-                </span>
-
-                <span class="line">
-                    FUTURE.
-                </span>
-
-            </h1>
-
-
-            <p class="hero-description">
-
-                A next-generation digital intelligence platform
-                engineered for creators, developers and innovators.
-                Explore powerful interfaces, intelligent systems
-                and futuristic technology through one unified
-                command center.
-
-            </p>
-
-
-            <div class="hero-actions">
-
-                <button
-                    class="btn btn-primary"
-                    onclick="scrollToAI()">
-
-                    INITIALIZE AI →
-
-                </button>
-
-
-                <button
-                    class="btn btn-secondary"
-                    onclick="scrollToTechnology()">
-
-                    EXPLORE SYSTEM
-
-                </button>
-
-            </div>
-
-        </div>
-
-
-        <!-- AI HUD -->
-
-        <div class="hud">
-
-            <div class="hud-ring r1"></div>
-            <div class="hud-ring r2"></div>
-            <div class="hud-ring r3"></div>
-            <div class="hud-ring r4"></div>
-
-            <div class="core"></div>
-
-
-            <div class="hud-data data1">
-
-                NEURAL CORE
-
-                <strong>98.72%</strong>
-
-            </div>
-
-
-            <div class="hud-data data2">
-
-                PROCESSING
-
-                <strong>ONLINE</strong>
-
-            </div>
-
-
-            <div class="hud-data data3">
-
-                NETWORK
-
-                <strong>SECURE</strong>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-
-    <!-- TECHNOLOGY -->
-
-    <section class="section" id="technology">
-
-        <div class="section-heading">
-
-            <div class="eyebrow">
-                01 // CORE TECHNOLOGY
-            </div>
-
-            <h2>
-                Intelligence,
-                engineered.
-            </h2>
-
-            <p>
-                A modular technology environment designed to
-                connect artificial intelligence, automation,
-                analytics and next-generation interfaces.
-            </p>
-
-        </div>
-
-
-        <div class="features">
-
-
-            <div class="feature">
-
-                <div class="feature-number">
-                    MODULE_01
-                </div>
-
-                <div class="feature-icon">
-                    ◈
-                </div>
-
-                <h3>
-                    Neural Intelligence
-                </h3>
-
-                <p>
-                    Transform natural language into intelligent
-                    workflows, ideas and digital experiences.
-                </p>
-
-                <div class="feature-line"></div>
-
-            </div>
-
-
-            <div class="feature">
-
-                <div class="feature-number">
-                    MODULE_02
-                </div>
-
-                <div class="feature-icon">
-                    ◉
-                </div>
-
-                <h3>
-                    Real-Time Systems
-                </h3>
-
-                <p>
-                    Monitor live processes through a unified
-                    technical command interface.
-                </p>
-
-                <div class="feature-line"></div>
-
-            </div>
-
-
-            <div class="feature">
-
-                <div class="feature-number">
-                    MODULE_03
-                </div>
-
-                <div class="feature-icon">
-                    ⬡
-                </div>
-
-                <h3>
-                    Smart Automation
-                </h3>
-
-                <p>
-                    Automate repetitive workflows and allow
-                    intelligent systems to handle complex tasks.
-                </p>
-
-                <div class="feature-line"></div>
-
-            </div>
-
-
-            <div class="feature">
-
-                <div class="feature-number">
-                    MODULE_04
-                </div>
-
-                <div class="feature-icon">
-                    ⌁
-                </div>
-
-                <h3>
-                    Futuristic UX
-                </h3>
-
-                <p>
-                    Combine immersive visual systems with clear
-                    interaction patterns for an advanced user experience.
-                </p>
-
-                <div class="feature-line"></div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-
-    <!-- COMMAND CENTER -->
-
-    <section class="section" id="command">
-
-        <div class="section-heading">
-
-            <div class="eyebrow">
-                02 // SYSTEM COMMAND
-            </div>
-
-            <h2>
-                Inside the
-                command center.
-            </h2>
-
-        </div>
-
-
-        <div class="command">
-
-
-            <!-- TERMINAL -->
-
-            <div class="panel">
-
-                <div class="panel-head">
-
-                    <div>
-                        SYSTEM TERMINAL
-                    </div>
-
-                    <div class="panel-dots">
-
-                        <span></span>
-                        <span></span>
-                        <span></span>
-
-                    </div>
-
+                <div class="system-tag">
+                    NEXT GENERATION DIGITAL INTELLIGENCE
                 </div>
 
 
-                <div class="console">
+                <h1>
 
-                    <div class="console-line">
-                        <span class="blue">
-                            [SYSTEM]
-                        </span>
-
-                        Initializing Nexora core...
-                    </div>
-
-
-                    <div class="console-line">
-                        <span class="green">
-                            [OK]
-                        </span>
-
-                        Neural engine online
-                    </div>
-
-
-                    <div class="console-line">
-                        <span class="green">
-                            [OK]
-                        </span>
-
-                        Security layer active
-                    </div>
-
-
-                    <div class="console-line">
-                        <span class="green">
-                            [OK]
-                        </span>
-
-                        Interface modules loaded
-                    </div>
-
-
-                    <br>
-
-
-                    <div class="console-line">
-
-                        <span class="purple">
-                            [NEXORA]
-                        </span>
-
-                        Intelligence systems ready.
-
-                    </div>
-
-
-                    <div class="console-line">
-
-                        <span class="blue">
-                            [NETWORK]
-                        </span>
-
-                        Connection established.
-
-                    </div>
-
-
-                    <div class="console-line">
-
-                        <span class="green">
-                            [STATUS]
-                        </span>
-
-                        ALL SYSTEMS NOMINAL
-
-                    </div>
-
-
-                    <br>
-
-
-                    <div class="console-line">
-
-                        <span class="blue">
-                            user@nexora:
-                        </span>
-
-                        ~$ 
-
-                        <span class="cursor"></span>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- TELEMETRY -->
-
-            <div class="panel">
-
-                <div class="panel-head">
-
-                    SYSTEM TELEMETRY
-
-                    <span>
-                        LIVE
+                    <span class="line">
+                        THINK
                     </span>
 
+                    <span class="line gradient-text">
+                        BEYOND.
+                    </span>
+
+                    <span class="line outline">
+                        LIMITS.
+                    </span>
+
+                </h1>
+
+
+                <p class="hero-description">
+
+                    <strong>NEXORA</strong>
+                    is an immersive digital intelligence
+                    ecosystem designed to help you
+                    <strong>think, create, explore and build</strong>
+                    the future.
+
+                </p>
+
+
+                <div class="hero-actions">
+
+                    <a
+                        href="#intelligence"
+                        class="btn btn-primary magnetic"
+                    >
+                        ENTER NEXORA
+                        <span>↗</span>
+                    </a>
+
+                    <a
+                        href="#system"
+                        class="btn btn-secondary magnetic"
+                    >
+                        EXPLORE SYSTEM
+                    </a>
+
                 </div>
 
 
-                <div class="metrics">
+                <div class="hero-meta">
+
+                    <div class="meta-item">
+
+                        <span class="meta-label">
+                            CORE
+                        </span>
+
+                        <span class="meta-value">
+                            NX-01
+                        </span>
+
+                    </div>
 
 
-                    <div class="metric">
+                    <div class="meta-item">
 
-                        <div class="metric-top">
+                        <span class="meta-label">
+                            STATUS
+                        </span>
 
-                            <span>
-                                NEURAL PROCESSING
-                            </span>
+                        <span class="meta-value">
+                            ACTIVE
+                        </span>
 
-                            <span>
-                                87%
-                            </span>
+                    </div>
 
-                        </div>
 
-                        <div class="bar">
-                            <span style="width:87%"></span>
+                    <div class="meta-item">
+
+                        <span class="meta-label">
+                            NETWORK
+                        </span>
+
+                        <span class="meta-value">
+                            GLOBAL
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 HERO VISUAL
+            ================================================== -->
+
+            <div class="hero-visual">
+
+                <div class="orbit one">
+
+                    <span class="node n1"></span>
+
+                </div>
+
+
+                <div class="orbit two">
+
+                    <span class="node n2"></span>
+
+                </div>
+
+
+                <div class="orbit three">
+
+                    <span class="node n3"></span>
+
+                </div>
+
+
+                <div class="nexora-core"></div>
+
+
+                <div class="visual-label v1">
+
+                    CORE STATUS
+
+                    <strong>99.98%</strong>
+
+                </div>
+
+
+                <div class="visual-label v2">
+
+                    PROCESSING
+
+                    <strong>∞ DATA</strong>
+
+                </div>
+
+
+                <div class="visual-label v3">
+
+                    NETWORK
+
+                    <strong>CONNECTED</strong>
+
+                </div>
+
+            </div>
+
+        </section>
+        <!-- =====================================================
+             SYSTEM SECTION
+        ====================================================== -->
+
+        <section
+            class="section"
+            id="system"
+        >
+
+            <span class="section-number">
+                NEXORA / 01
+            </span>
+
+
+            <div class="section-heading reveal">
+
+                <div class="eyebrow">
+                    THE SYSTEM
+                </div>
+
+                <h2>
+                    ONE PLATFORM.
+                    <br>
+                    <span>ENDLESS POSSIBILITY.</span>
+                </h2>
+
+                <p>
+                    NEXORA connects intelligence, creativity,
+                    automation and discovery into one
+                    evolving digital environment.
+                </p>
+
+            </div>
+
+
+            <!-- FEATURE CARDS -->
+
+            <div class="feature-grid">
+
+
+                <article
+                    class="feature-card large reveal"
+                >
+
+                    <div class="card-top">
+
+                        <span class="card-index">
+                            01 / INTELLIGENCE
+                        </span>
+
+                        <div class="card-icon">
+                            ◉
                         </div>
 
                     </div>
 
 
-                    <div class="metric">
+                    <div class="card-content">
 
-                        <div class="metric-top">
-
-                            <span>
-                                MEMORY
+                        <h3>
+                            Think
+                            <span class="gradient-text">
+                                Smarter.
                             </span>
-
-                            <span>
-                                64%
-                            </span>
-
-                        </div>
-
-                        <div class="bar">
-                            <span style="width:64%"></span>
-                        </div>
-
-                    </div>
-
-
-                    <div class="metric">
-
-                        <div class="metric-top">
-
-                            <span>
-                                NETWORK
-                            </span>
-
-                            <span>
-                                94%
-                            </span>
-
-                        </div>
-
-                        <div class="bar">
-                            <span style="width:94%"></span>
-                        </div>
-
-                    </div>
-
-
-                    <div class="metric">
-
-                        <div class="metric-top">
-
-                            <span>
-                                SECURITY
-                            </span>
-
-                            <span>
-                                99%
-                            </span>
-
-                        </div>
-
-                        <div class="bar">
-                            <span style="width:99%"></span>
-                        </div>
-
-                    </div>
-
-
-                    <div class="system-box">
-
-                        <strong>
-                            ● SYSTEM SECURE
-                        </strong>
+                        </h3>
 
                         <p>
-                            All monitored subsystems are operating
-                            within nominal parameters.
+                            Turn complex ideas into
+                            understandable insights using
+                            an intelligent digital interface
+                            built around your workflow.
                         </p>
 
                     </div>
 
+
+                    <div class="card-footer">
+
+                        <span class="card-link">
+                            EXPLORE INTELLIGENCE →
+                        </span>
+
+                        <span class="card-index">
+                            NX-101
+                        </span>
+
+                    </div>
+
+                </article>
+
+
+                <article
+                    class="feature-card medium reveal delay-1"
+                >
+
+                    <div class="card-top">
+
+                        <span class="card-index">
+                            02 / CREATION
+                        </span>
+
+                        <div class="card-icon">
+                            ✦
+                        </div>
+
+                    </div>
+
+
+                    <div class="card-content">
+
+                        <h3>
+                            Create.
+                        </h3>
+
+                        <p>
+                            Transform imagination into
+                            digital experiences.
+                        </p>
+
+                    </div>
+
+
+                    <div class="card-footer">
+
+                        <span class="card-link">
+                            BUILD →
+                        </span>
+
+                    </div>
+
+                </article>
+
+
+                <article
+                    class="feature-card medium reveal delay-2"
+                >
+
+                    <div class="card-top">
+
+                        <span class="card-index">
+                            03 / AUTOMATION
+                        </span>
+
+                        <div class="card-icon">
+                            ⌁
+                        </div>
+
+                    </div>
+
+
+                    <div class="card-content">
+
+                        <h3>
+                            Automate.
+                        </h3>
+
+                        <p>
+                            Remove repetitive work and
+                            focus your energy where it matters.
+                        </p>
+
+                    </div>
+
+
+                    <div class="card-footer">
+
+                        <span class="card-link">
+                            DISCOVER →
+                        </span>
+
+                    </div>
+
+                </article>
+
+
+                <article
+                    class="feature-card small reveal delay-1"
+                >
+
+                    <div class="card-top">
+
+                        <span class="card-index">
+                            04 / DISCOVERY
+                        </span>
+
+                        <div class="card-icon">
+                            +
+                        </div>
+
+                    </div>
+
+
+                    <div class="card-content">
+
+                        <h3>
+                            Explore.
+                        </h3>
+
+                        <p>
+                            Discover new possibilities
+                            through technology.
+                        </p>
+
+                    </div>
+
+                </article>
+
+
+                <article
+                    class="feature-card small reveal delay-2"
+                >
+
+                    <div class="card-top">
+
+                        <span class="card-index">
+                            05 / CONNECT
+                        </span>
+
+                        <div class="card-icon">
+                            ∞
+                        </div>
+
+                    </div>
+
+
+                    <div class="card-content">
+
+                        <h3>
+                            Connect.
+                        </h3>
+
+                        <p>
+                            Bring ideas, people and
+                            intelligence together.
+                        </p>
+
+                    </div>
+
+                </article>
+
+
+                <article
+                    class="feature-card small reveal delay-3"
+                >
+
+                    <div class="card-top">
+
+                        <span class="card-index">
+                            06 / FUTURE
+                        </span>
+
+                        <div class="card-icon">
+                            ◇
+                        </div>
+
+                    </div>
+
+
+                    <div class="card-content">
+
+                        <h3>
+                            Evolve.
+                        </h3>
+
+                        <p>
+                            Keep moving toward
+                            what's next.
+                        </p>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             MARQUEE
+        ====================================================== -->
+
+        <div class="marquee">
+
+            <div class="marquee-track">
+
+                <span>
+                    INTELLIGENCE
+                </span>
+
+                <span class="highlight">
+                    NEXORA
+                </span>
+
+                <span>
+                    CREATE
+                </span>
+
+                <span>
+                    AUTOMATE
+                </span>
+
+                <span class="highlight">
+                    EXPLORE
+                </span>
+
+                <span>
+                    INTELLIGENCE
+                </span>
+
+                <span class="highlight">
+                    NEXORA
+                </span>
+
+                <span>
+                    CREATE
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             AI INTELLIGENCE
+        ====================================================== -->
+
+        <section
+            class="section ai-section"
+            id="intelligence"
+        >
+
+            <span class="section-number">
+                NEXORA / 02
+            </span>
+
+
+            <div class="section-heading reveal">
+
+                <div class="eyebrow">
+                    INTELLIGENCE CORE
                 </div>
 
-            </div>
+                <h2>
+                    MEET YOUR
+                    <br>
+                    <span>DIGITAL CORE.</span>
+                </h2>
 
-        </div>
-
-    </section>
-
-
-
-    <!-- AI CORE -->
-
-    <section class="section" id="ai">
-
-        <div class="section-heading">
-
-            <div class="eyebrow">
-                03 // AI CORE
-            </div>
-
-            <h2>
-                Talk to the
-                intelligence layer.
-            </h2>
-
-            <p>
-                Interactive AI command terminal.
-            </p>
-
-        </div>
-
-
-        <div class="ai-terminal">
-
-            <div class="terminal-head">
-
-                NEXORA_AI_CORE // INTERACTIVE TERMINAL
+                <p>
+                    A futuristic interface for interacting
+                    with the NEXORA intelligence layer.
+                </p>
 
             </div>
 
 
             <div
-                class="chat"
-                id="chat">
+                class="ai-terminal reveal"
+                id="aiTerminal"
+            >
 
-                <div class="message bot">
+                <div class="terminal-header">
 
-                    <strong>
-                        NEXORA
-                    </strong>
+                    <div class="terminal-dots">
 
+                        <span></span>
+                        <span></span>
+                        <span></span>
+
+                    </div>
+
+                    <div class="terminal-title">
+                        NEXORA / INTELLIGENCE CORE
+                    </div>
+
+                    <div class="terminal-status">
+                        ● ONLINE
+                    </div>
+
+                </div>
+
+
+                <div class="terminal-body">
+
+                    <div class="terminal-copy">
+
+                        <div class="small">
+                            NX-AI / SYSTEM READY
+                        </div>
+
+                        <h3>
+                            Ask.
+                            <br>
+                            Explore.
+                            <br>
+                            <span class="gradient-text">
+                                Create.
+                            </span>
+                        </h3>
+
+                        <p>
+                            Interact with the NEXORA
+                            intelligence layer through a
+                            clean, futuristic conversational
+                            interface.
+                        </p>
+
+                    </div>
+
+
+                    <div class="ai-core-panel">
+
+                        <div class="ai-ring"></div>
+
+                        <div class="ai-core-center"></div>
+
+                    </div>
+
+                </div>
+
+
+                <form
+                    class="ai-input"
+                    id="aiForm"
+                >
+
+                    <span>
+                        &gt;_
+                    </span>
+
+                    <input
+                        id="aiInput"
+                        type="text"
+                        autocomplete="off"
+                        placeholder="Ask NEXORA anything..."
+                    >
+
+                </form>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             EXPERIENCE
+        ====================================================== -->
+
+        <section
+            class="section"
+            id="experience"
+        >
+
+            <span class="section-number">
+                NEXORA / 03
+            </span>
+
+
+            <div class="section-heading reveal">
+
+                <div class="eyebrow">
+                    SYSTEM METRICS
+                </div>
+
+                <h2>
+                    BUILT FOR
                     <br>
+                    <span>THE NEXT.</span>
+                </h2>
 
-                    Intelligence core initialized.
-                    How can I assist you?
+            </div>
+
+
+            <div class="metrics">
+
+                <div class="metric reveal">
+
+                    <div class="metric-number">
+                        01<span>×</span>
+                    </div>
+
+                    <div class="metric-label">
+                        Unified Core
+                    </div>
+
+                </div>
+
+
+                <div class="metric reveal delay-1">
+
+                    <div class="metric-number">
+                        ∞
+                    </div>
+
+                    <div class="metric-label">
+                        Possibilities
+                    </div>
+
+                </div>
+
+
+                <div class="metric reveal delay-2">
+
+                    <div class="metric-number">
+                        24<span>/7</span>
+                    </div>
+
+                    <div class="metric-label">
+                        Availability
+                    </div>
+
+                </div>
+
+
+                <div class="metric reveal delay-3">
+
+                    <div class="metric-number">
+                        NX
+                    </div>
+
+                    <div class="metric-label">
+                        Intelligence
+                    </div>
 
                 </div>
 
             </div>
 
 
-            <div class="chat-input">
+            <div class="data-visual reveal">
 
-                <input
-                    id="userInput"
-                    type="text"
-                    placeholder="Enter command..."
-                    autocomplete="off"
-                >
+                <div class="data-lines"></div>
 
-                <button
-                    onclick="sendMessage()">
+                <div class="energy-wave"></div>
 
-                    SEND
+            </div>
 
-                </button>
+        </section>
+
+
+        <!-- =====================================================
+             ABOUT
+        ====================================================== -->
+
+        <section
+            class="section"
+            id="about"
+        >
+
+            <span class="section-number">
+                NEXORA / 04
+            </span>
+
+
+            <div class="section-heading reveal">
+
+                <div class="eyebrow">
+                    THE EVOLUTION
+                </div>
+
+                <h2>
+                    FROM IDEA
+                    <br>
+                    <span>TO INTELLIGENCE.</span>
+                </h2>
+
+            </div>
+
+
+            <div class="timeline">
+
+                <div class="timeline-item reveal">
+
+                    <div class="timeline-number">
+                        01 / IMAGINE
+                    </div>
+
+                    <h3>
+                        Imagine.
+                    </h3>
+
+                    <p>
+                        Every breakthrough starts
+                        as an idea.
+                    </p>
+
+                </div>
+
+
+                <div class="timeline-item reveal delay-1">
+
+                    <div class="timeline-number">
+                        02 / BUILD
+                    </div>
+
+                    <h3>
+                        Build.
+                    </h3>
+
+                    <p>
+                        Turn ideas into systems,
+                        experiences and products.
+                    </p>
+
+                </div>
+
+
+                <div class="timeline-item reveal delay-2">
+
+                    <div class="timeline-number">
+                        03 / EVOLVE
+                    </div>
+
+                    <h3>
+                        Evolve.
+                    </h3>
+
+                    <p>
+                        Continuously improve,
+                        learn and move forward.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             CTA
+        ====================================================== -->
+
+        <section class="section">
+
+            <div class="cta reveal">
+
+                <div class="cta-content">
+
+                    <div class="eyebrow">
+                        ENTER THE FUTURE
+                    </div>
+
+                    <h2>
+                        READY TO
+                        <span class="gradient-text">
+                            EVOLVE?
+                        </span>
+                    </h2>
+
+                    <p>
+                        NEXORA is only the beginning.
+                        Explore the system and discover
+                        what you can build next.
+                    </p>
+
+                    <a
+                        href="#home"
+                        class="btn btn-primary magnetic"
+                    >
+                        START EXPERIENCE
+                        <span>↗</span>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer class="footer">
+
+        <div class="footer-top">
+
+            <div class="footer-brand">
+
+                <h3>
+                    NEXORA
+                </h3>
+
+                <p>
+                    Digital intelligence for people
+                    building the future.
+                </p>
+
+            </div>
+
+
+            <div class="footer-links">
+
+                <div class="footer-column">
+
+                    <span>
+                        SYSTEM
+                    </span>
+
+                    <a href="#system">
+                        Intelligence
+                    </a>
+
+                    <a href="#experience">
+                        Experience
+                    </a>
+
+                    <a href="#about">
+                        Evolution
+                    </a>
+
+                </div>
+
+
+                <div class="footer-column">
+
+                    <span>
+                        CONNECT
+                    </span>
+
+                    <a href="#">
+                        Contact
+                    </a>
+
+                    <a href="#">
+                        Community
+                    </a>
+
+                    <a href="#">
+                        Updates
+                    </a>
+
+                </div>
 
             </div>
 
         </div>
 
-    </section>
 
+        <div class="footer-bottom">
 
+            <span>
+                NEXORA SYSTEM © 2026
+            </span>
 
-    <!-- CTA -->
+            <span>
+                DIGITAL INTELLIGENCE / NX-01
+            </span>
 
-    <section class="cta">
-
-        <h2>
-            DON'T FOLLOW
-            THE FUTURE.
-        </h2>
-
-        <h2 class="gradient">
-            BUILD IT.
-        </h2>
-
-        <p>
-            Your next digital system starts here.
-        </p>
-
-        <button
-            class="btn btn-primary"
-            onclick="scrollToAI()">
-
-            ENTER NEXORA →
-
-        </button>
-
-    </section>
-
-
-
-    <!-- FOOTER -->
-
-    <footer>
-
-        <div>
-            NEXORA // INTELLIGENCE SYSTEM
-        </div>
-
-        <div>
-            BUILD • CREATE • INNOVATE
-        </div>
-
-        <div>
-            © 2026
         </div>
 
     </footer>
 
 
-    <script src="scriptnew.js"></script>
+    <!-- =====================================================
+         SCRIPT
+    ====================================================== -->
+
+    <script src="script.js"></script>
 
 </body>
+
 </html>
