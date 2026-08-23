@@ -78,75 +78,24 @@
   <!-- =====================================================
        LOADER
        ===================================================== -->
+<div id="loader">
 
+<div class="loader-core">
 
-<div class="scene" id="scene">
-  <!-- Anchor representing where the HUD originates (e.g., world position) -->
-  <div class="anchor" id="anchor" title="Click to detach the HUD">
-    <div class="hud" id="hud">
-      <!-- subtle glass -->
-      <div class="hud-layer hud-glass"></div>
+<div class="loading-dots">
 
-      <!-- background scan overlay -->
-      <div class="hud-layer scan"></div>
+<i></i>
 
-      <!-- SVG layers for rings, arcs, and details -->
-      <svg class="hud-layer hud-svg" viewBox="-200 -200 400 400" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-        <!-- soft outer ring glow (thick, low opacity) -->
-        <g class="rot-slow" style="transform-origin:50% 50%;">
-          <circle cx="0" cy="0" r="155" fill="none" stroke="rgba(36,240,230,0.045)" stroke-width="26"></circle>
-        </g>
+<i></i>
 
-        <!-- segmented outer arc -->
-        <g class="rot-med" style="transform-origin:50% 50%;">
-          <!-- create segments with stroke-dasharray -->
-          <circle cx="0" cy="0" r="120" fill="none" stroke="url(#gradA)" stroke-width="6"
-            stroke-dasharray="18 14" stroke-linecap="round" opacity="0.98"></circle>
-        </g>
+<i></i>
 
-        <!-- inner mechanical ring -->
-        <g class="rot-fast" style="transform-origin:50% 50%;">
-          <circle cx="0" cy="0" r="85" fill="none" stroke="rgba(59,231,255,0.18)" stroke-width="12"></circle>
-          <circle cx="0" cy="0" r="68" fill="none" stroke="rgba(36,240,230,0.06)" stroke-width="2"></circle>
-        </g>
+</div>
 
-        <!-- gradient defs -->
-        <defs>
-          <linearGradient id="gradA" x1="0" x2="1">
-            <stop offset="0%" stop-color="#24f0e6" stop-opacity="0.98"/>
-            <stop offset="60%" stop-color="#3be7ff" stop-opacity="0.65"/>
-            <stop offset="100%" stop-color="#24f0e6" stop-opacity="0.04"/>
-          </linearGradient>
-        </defs>
+<span>NEXORA // INITIALIZING</span>
 
-        <!-- animated sweeping arc (stroke-dashoffset animated via JS for smoother control) -->
-        <circle id="sweepArc" cx="0" cy="0" r="135" fill="none"
-                stroke="#24f0e6" stroke-width="3" stroke-linecap="round" stroke-opacity="0.95"
-                stroke-dasharray="10 380"></circle>
+</div>
 
-        <!-- small rotating ticks (rendered as paths to look crisp) -->
-        <g id="ticks" opacity="0.95" transform="rotate(12)">
-          <!-- JS will populate ticks where needed -->
-        </g>
-      </svg>
-
-      <!-- center content -->
-      <div class="hud-layer hud-center" aria-hidden="false" role="status">
-        <div class="label">SYSTEM</div>
-        <div class="value" id="progressValue">0%</div>
-      </div>
-
-      <!-- readouts -->
-      <div class="hud-layer hud-info" aria-hidden="true">
-        <div class="readout">NEXORA</div>
-        <div class="readout">ARTIFICIAL INTELLIGENCE</div>
-        <div class="readout">Entering int world </div>
-      </div>
-
-      <!-- ticks and small segments created in DOM for CSS control (placed via JS) -->
-      <div id="tickContainer" aria-hidden="true"></div>
-    </div>
-  </div>
 </div>
 
   <!-- =====================================================
@@ -515,6 +464,45 @@
             </b>
 
           </div>
+</div>
+<div class="system-line">
+
+            <span>
+             🔎 AI Research Mode
+            </span>
+
+            <b>
+              Organizes information and produces structured insights.
+            </b>
+
+          </div>
+
+</div>
+<div class="system-line">
+
+            <span>
+              🧠 Deep Reasoning Engine
+            </span>
+
+            <b>
+              Breaks complicated problems into logical steps.
+            </b>
+
+          </div>
+</div>
+<div class="system-line">
+
+            <span>
+              💻 AI Coding Studio
+            </span>
+
+            <b>
+              Generate, explain, debug, and improve code.
+Build projects with intelligent AI assistance.
+Code smarter. Build beyond.
+            </b>
+
+          </div>
           <div class="system-line">
 
             <span>
@@ -870,10 +858,7 @@ Nexora's vision is to build a future where AI is not just a tool, but an intelli
 
           <h2>
 
-            YOUR NEXT
-
-            <span class="shimmer">
-              CONVERSATION
+            YOUR NEXT CONVERSATION
             </span>
 
             STARTS HERE.
@@ -986,10 +971,7 @@ Nexora's vision is to build a future where AI is not just a tool, but an intelli
 
         <h2>
 
-          YOUR INPUT
-
-          <span class="shimmer">
-            SHAPES
+          WE RESPECT YOUR EXPERIENCES
           </span>
 
           THE NEXT SYSTEM.
