@@ -301,7 +301,7 @@ if(canvas && window.THREE){
   /* ================= PARTICLES ================= */
 
   const count =
-    innerWidth < 700 ? 1800 : 3500;
+    innerWidth < 700 ? 500: 1400;
 
   const positions =
     new Float32Array(count*3);
