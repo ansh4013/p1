@@ -181,7 +181,6 @@ window.addEventListener("resize",()=>{
   NX.height=innerHeight;
 
 });
-  - 
 /* ================= INITIAL STATE ================= */
 
 NX.width=innerWidth;
