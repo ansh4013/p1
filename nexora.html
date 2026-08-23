@@ -1,1148 +1,447 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#050816">
+<meta name="description" content="NEXORA — Digital Intelligence Reimagined. AI, 3D, WebGL, Motion and Creative Technology.">
+<title>NEXORA // Digital Intelligence</title>
 
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <meta name="theme-color" content="#050816">
+<link rel="stylesheet" href="./css/style.css">
 
-  <meta name="description"
-        content="NEXORA — Digital Intelligence Reimagined. AI, 3D, WebGL, Motion and Creative Technology.">
-
-  <title>  NEXORA // Digital Intelligence</title>
-
-
-  <!-- =====================================================
-       FONTS
-       ===================================================== -->
-
-  <link rel="preconnect"
-        href="https://fonts.googleapis.com">
-
-  <link rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin>
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
-
-
-  <!-- =====================================================
-       MAIN CSS
-       ===================================================== -->
-
-  <link rel="stylesheet"
-        href="stylenew.css">
-
-
-  <!-- =====================================================
-       EXTERNAL ENGINES
-       DEFERRED LOADING
-       ===================================================== -->
-
-  <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
-    defer>
-  </script>
-
-  <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
-    defer>
-  </script>
-
-  <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"
-    defer>
-  </script>
-
-  <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"
-    defer>
-  </script>
-
-  <!-- NEXORA ENGINE -->
-  <script
-    src="scriptnew.js"
-    defer>
-  </script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js" defer></script>
+<script src="./js/script.js" defer></script>
 </head>
-
 
 <body>
 
-
-  <!-- =====================================================
-       LOADER
-       ===================================================== -->
 <div id="loader">
-
-<div class="loader-core">
-
-<div class="loading-dots">
-
-<i></i>
-
-<i></i>
-
-<i></i>
-
+  <div class="loader-core">
+    <div class="loading-dots">
+      <i></i><i></i><i></i>
+    </div>
+    <span>NEXORA // INITIALIZING</span>
+  </div>
 </div>
 
-<span>NEXORA // INITIALIZING</span>
+<div class="cursor"></div>
+<div class="cursor-ring"></div>
 
+<header class="nav">
+
+<a href="#home" class="logo magnetic" aria-label="NEXORA Home">
+NEXORA <span>/01</span>
+</a>
+
+<nav aria-label="Main navigation">
+<a href="#home">HOME</a>
+<a href="#intelligence">INTELLIGENCE</a>
+<a href="#immersion">IMMERSION</a>
+<a href="#creations">CREATIONS</a>
+<a href="#technology">TECHNOLOGY</a>
+<a href="#feedback">FEEDBACK</a>
+</nav>
+
+<a href="https://ansh4013.github.io/p1/index.html"
+class="nav-ai-btn magnetic energy-border"
+target="_blank"
+rel="noopener noreferrer">
+<span class="ai-pulse"></span>
+<span>VISIT NEXORA AI CHATBOT</span>
+<strong>↗</strong>
+</a>
+
+<button class="menu" type="button" aria-label="Open navigation">
+<i></i><i></i>
+</button>
+
+</header>
+
+<main>
+
+<section class="hero" id="home">
+
+<canvas id="heroCanvas" aria-hidden="true"></canvas>
+<div class="grid" aria-hidden="true"></div>
+<div class="ambient" aria-hidden="true"></div>
+<div class="ambient violet" aria-hidden="true"></div>
+
+<div class="hero-content">
+
+<div class="eyebrow">
+NEXORA / 001
+<span>DIGITAL INTELLIGENCE</span>
 </div>
 
+<h1 class="glitch" data-text="NEXORA">
+NEXORA
+</h1>
+
+<div class="hero-title">
+DIGITAL
+<span>INTELLIGENCE</span>
+REIMAGINED.
 </div>
 
-  <!-- =====================================================
-       CUSTOM CURSOR
-       ===================================================== -->
-
-  <div class="cursor"></div>
-
-  <div class="cursor-ring"></div>
-
-
-  <!-- =====================================================
-       HEADER / NAVIGATION
-       ===================================================== -->
-
-  <header class="nav">
-
-    <!-- LOGO -->
-
-    <a>
-      href="#home"
-      class="logo magnetic"
-      aria-label="NEXORA Home"
-    
-
-      NEXORA
-
-      <span>/01</span>
-
-    </a>
-
-
-    <!-- MAIN NAVIGATION -->
-
-    <nav aria-label="Main navigation">
-
-      <a href="#home">
-        HOME
-      </a>
-
-      <a href="#intelligence">
-        INTELLIGENCE
-      </a>
-
-      <a href="#immersion">
-        IMMERSION
-      </a>
-
-      <a href="#creations">
-        CREATIONS
-      </a>
-
-      <a href="#technology">
-        TECHNOLOGY
-      </a>
-
-      <a href="#feedback">
-        FEEDBACK
-      </a>
-
-    </nav>
-
-
-    <!-- =================================================
-         LARGE AI CHATBOT BUTTON
-         ================================================= -->
-
-    <a
-      href="https://ansh4013.github.io/p1/index.html"
-      class="nav-ai-btn magnetic energy-border"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-
-      <span class="ai-pulse"></span>
-
-      <span>
-        VISIT NEXORA AI CHATBOT
-      </span>
-
-      <strong>
-        ↗
-      </strong>
-
-    </a>
-
-
-    <!-- MOBILE MENU -->
-
-    <button
-      class="menu"
-      type="button"
-      aria-label="Open navigation"
-    >
-
-      <i></i>
-      <i></i>
-
-    </button>
-
-  </header>
-
-
-  <!-- =====================================================
-       MAIN EXPERIENCE
-       ===================================================== -->
-
-  <main>
-
-
-    <!-- ===================================================
-         HERO
-         =================================================== -->
-
-    <section
-      class="hero"
-      id="home"
-    >
-
-      <!-- THREE.JS CANVAS -->
-
-      <canvas
-        id="heroCanvas"
-        aria-hidden="true">
-      </canvas>
-
-
-      <!-- GRID -->
-
-      <div
-        class="grid"
-        aria-hidden="true">
-      </div>
-
-
-      <!-- AMBIENT LIGHT -->
-
-      <div
-        class="ambient"
-        aria-hidden="true">
-      </div>
-
-      <div
-        class="ambient violet"
-        aria-hidden="true">
-      </div>
-
-
-      <!-- HERO CONTENT -->
-
-      <div class="hero-content">
-
-
-        <div class="eyebrow">
-
-          NEXORA / 001
-
-      <span>
-            DIGITAL INTELLIGENCE WITH AI
-       </span>
-
-        </div>
-
-
-        <h1
-          class="glitch"
-          data-text="NEXORA"
-        >
-
-          NEXORA AI
-
-        </h1>
-
-
-        <div class="hero-title">
-
-          DIGITAL
-
-          <span>
-            INTELLIGENCE
-          </span>
-
-          REIMAGINED.
-
-        </div>
-
-
-     <p class="hero-text">
-
-            Think Beyond. Create Beyond.
+<p class="hero-text">
+AI. 3D. WEB. MOTION.
 <br>
-             Next Generation AI
-        Powered by intelligence.Driven by innovation. Built for the future.
-            
-
-<br>
-        Nexora is a next-generation      artificial intelligence platform designed to make technology smarter, faster, and more accessible. It combines intelligent assistance, creative capabilities, and powerful AI-driven solutions in one modern platform.
+A new generation of digital experiences
+engineered for the future.
 </p>
 
-
-        <!-- ACTIONS -->
-
-        <div class="actions">
-
-
-          <a
-            href="#intelligence"
-            class="btn magnetic"
-          >
-
-            ENTER NEXORA AI 
-
-            <strong>↓</strong>
-
-          </a>
-
-
-          <a
-            href="https://ansh4013.github.io/p1/index.html"
-            class="btn magnetic"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-
-            AI CHATBOT
-
-            <strong>↗</strong>
-
-          </a>
-
-
-        </div>
-
-
-      </div>
-
-
-      <!-- HERO SYSTEM DATA -->
-
-      <div class="hero-info">
-
-        <span>
-          SYS.001
-        </span>
-
-        <span>
-          AI / 3D / WEB
-        </span>
-
-        <span>
-          <i></i>
-          SYSTEM ONLINE
-        </span>
-
-      </div>
-
-
-      <!-- SCROLL INDICATOR -->
-
-      <div class="scroll-indicator">
-
-        <span>
-          SCROLL TO EXPLORE
-        </span>
-
-        <b>
-          ↓
-        </b>
-
-      </div>
-
-    </section>
-
-
-
-    <!-- ===================================================
-         INTELLIGENCE
-         =================================================== -->
-
-    <section
-      class="section intelligence"
-      id="intelligence"
-    >
-
-      <div class="number">
-        01
-      </div>
-
-
-      <div class="label">
-        NEXORA / INTELLIGENCE
-      </div>
-
-
-      <div class="section-grid">
-
-
-        <div class="section-heading">
-
-          <h2>
-
-            WE DON'T JUST BUILD SOFTWARE.
-
-          </h2>
-
-        </div>
-
-
-        <div class="section-copy">
-
-          <p class="description">
-
-            we help <br> enginner to create
-<br>People to interact 
- <br>Teachers to explore the world.          
-            systems designed to interact,
-            adapt and evolve.
-
-          </p>
-
-
-          <div class="system-line">
-
-            <span>
-              🤖 Intelligent AI Assistant
-            </span>
-
-            <b>
-              Get fast, contextual, and helpful responses to your questions and tasks.
-            </b>
-
-          </div>
-
-
-          <div class="system-line">
-
-            <span>
-              💡 Smart Problem Solving
-            </span>
-
-            <b>
-              Turn complex problems into simple, actionable solutions.
-            </b>
-
-          </div>
-
-<div class="system-line">
-
-            <span>
-               ✍️ AI Content Creation
-            </span>
-
-            <b>
-            Generate ideas, articles, scripts, presentations, captions, and more.
-            </b>
-
-          </div>
-<div class="system-line">
-
-            <span>
-              📚 AI-Powered Learning
-            </span>
-
-            <b>
-              Understand difficult topics, simplify concepts, and learn at your own pace.
-            </b>
-
-          </div>
-</div>
-<div class="system-line">
-
-            <span>
-             🔎 AI Research Mode
-            </span>
-
-            <b>
-              Organizes information and produces structured insights.
-            </b>
-
-          </div>
+<div class="actions">
+
+<a href="#intelligence" class="btn magnetic">
+ENTER NEXORA <strong>↓</strong>
+</a>
+
+<a href="https://ansh4013.github.io/p1/index.html"
+class="btn magnetic"
+target="_blank"
+rel="noopener noreferrer">
+AI CHATBOT <strong>↗</strong>
+</a>
 
 </div>
-<div class="system-line">
-
-            <span>
-              🧠 Deep Reasoning Engine
-            </span>
-
-            <b>
-              Breaks complicated problems into logical steps.
-            </b>
-
-          </div>
 </div>
+
+<div class="hero-info">
+<span>SYS.001</span>
+<span>AI / 3D / WEB</span>
+<span><i></i>SYSTEM ONLINE</span>
+</div>
+
+<div class="scroll-indicator">
+<span>SCROLL TO EXPLORE</span>
+<b>↓</b>
+</div>
+
+</section>
+
+<section class="section intelligence" id="intelligence">
+
+<div class="number">01</div>
+<div class="label">NEXORA / INTELLIGENCE</div>
+
+<div class="section-grid">
+
+<div class="section-heading">
+<h2>
+WE DON'T JUST
+<span class="shimmer">BUILD SOFTWARE.</span>
+</h2>
+</div>
+
+<div class="section-copy">
+
+<p class="description">
+We engineer intelligent digital systems
+designed to interact, adapt and evolve.
+</p>
+
 <div class="system-line">
+<span>NEURAL CORE</span>
+<b>ACTIVE</b>
+</div>
+
+<div class="system-line">
+<span>AI ENGINE</span>
+<b>ONLINE</b>
+</div>
+
+<div class="system-line">
+<span>AUTOMATION</span>
+<b>READY</b>
+</div>
+
+</div>
+</div>
+
+<div class="cards">
+
+<article class="card hover-light magnetic">
+<small>SYSTEM / 001</small>
+<h3>AI</h3>
+<p>INTELLIGENT<br>INTERACTION</p>
+<span>NEURAL</span>
+</article>
+
+<article class="card hover-light magnetic">
+<small>SYSTEM / 002</small>
+<h3>DATA</h3>
+<p>INFORMATION<br>INTELLIGENCE</p>
+<span>SIGNAL</span>
+</article>
+
+<article class="card hover-light magnetic">
+<small>SYSTEM / 003</small>
+<h3>AUTO</h3>
+<p>SMART<br>AUTOMATION</p>
+<span>FLOW</span>
+</article>
+
+</div>
+</section>
+
+<section class="section world" id="immersion">
+
+<div class="number">02</div>
+<div class="label">NEXORA / IMMERSION</div>
+
+<div class="immersion-content">
+
+<div>
+
+<h2 class="neon">
+ENTER THE
+<span>UNKNOWN.</span>
+</h2>
+
+<p class="description">
+Realtime 3D environments, procedural worlds
+and motion systems designed to transform
+the way users experience the web.
+</p>
+
+<div class="tech-tags">
+<span>WEBGL</span>
+<span>THREE.JS</span>
+<span>GPU</span>
+<span>REALTIME</span>
+</div>
+
+</div>
+
+<div id="particles" class="particles" aria-hidden="true"></div>
+
+</div>
+</section>
+
+<section class="section projects" id="creations">
+
+<div class="number">03</div>
+<div class="label">NEXORA / CREATIONS</div>
+
+<h2>
+DIGITAL
+<span class="shimmer">EXPERIENCES.</span>
+</h2>
+
+<div class="creation-intro">
+<p class="description">
+Experiments, interfaces and intelligent systems
+built at the intersection of technology
+and imagination.
+</p>
+</div>
+
+<div class="cards project-grid">
+
+<article class="card project-card hover-light magnetic">
+<small>PROJECT / 001</small>
+<h3>NEXORA AI</h3>
+<p>INTELLIGENT CONVERSATIONAL EXPERIENCE</p>
+<strong>AI ↗</strong>
+</article>
 
-            <span>
-              💻 AI Coding Studio
-            </span>
+<article class="card project-card hover-light magnetic">
+<small>PROJECT / 002</small>
+<h3>DIGITAL WORLD</h3>
+<p>IMMERSIVE WEBGL ENVIRONMENT</p>
+<strong>3D ↗</strong>
+</article>
 
-            <b>
-              Generate, explain, debug, and improve code.
-Build projects with intelligent AI assistance.
-Code smarter. Build beyond.
-            </b>
+<article class="card project-card hover-light magnetic">
+<small>PROJECT / 003</small>
+<h3>CREATIVE ENGINE</h3>
+<p>MOTION-DRIVEN USER EXPERIENCE</p>
+<strong>UX ↗</strong>
+</article>
 
-          </div>
-          <div class="system-line">
+</div>
+</section>
 
-            <span>
-              ⚡ Fast & User-Friendly
-            </span>
+<section class="section tech" id="technology">
 
-            <b>
-              A clean, modern experience designed to make AI easy for everyone.
-            </b>
+<div class="number">04</div>
+<div class="label">NEXORA / TECHNOLOGY</div>
 
-          </div>
+<div class="technology-header">
 
+<h2>
+POWERED BY
+<span>THE FUTURE.</span>
+</h2>
 
-        </div>
+<p class="description">
+A modular technology stack combining
+intelligent systems, realtime graphics
+and cinematic interaction.
+</p>
 
-      </div>
+</div>
 
+<div class="tech-list">
+<span>01 / AI</span>
+<span>02 / THREE.JS</span>
+<span>03 / WEBGL</span>
+<span>04 / GSAP</span>
+<span>05 / REALTIME</span>
+<span>06 / MOTION</span>
+<span>07 / JAVASCRIPT</span>
+<span>08 / CREATIVE CODE</span>
+</div>
 
-      <!-- INTELLIGENCE CARDS -->
+<div class="diagnostics">
 
-      <div class="cards">
+<div><span>RENDER</span><b>WEBGL</b></div>
+<div><span>MOTION</span><b>GSAP</b></div>
+<div><span>STATUS</span><b>ONLINE</b></div>
 
+</div>
+</section>
 
-        <article
-          class="card hover-light magnetic"
-        >
+<section class="section ai-lab" id="ai-lab">
 
-          <small>
-            NEXORA / 001
-          </small>
+<div class="number">05</div>
+<div class="label">NEXORA / AI LAB</div>
 
-          <h3>
-            AI
-          </h3>
+<div class="ai-lab-content">
 
-          <p>
-           INFORMATION 
-          </p>
+<div>
 
-          <span>
-            ABOUT 
-          </span>
+<h2>
+YOUR NEXT
+<span class="shimmer">CONVERSATION</span>
+STARTS HERE.
+</h2>
 
-        </article>
+<p class="description">
+Connect with the NEXORA AI chatbot and
+explore intelligent interaction through
+a futuristic conversational interface.
+</p>
 
+<a href="https://ansh4013.github.io/p1/index.html"
+class="feedback-btn magnetic energy-border"
+target="_blank"
+rel="noopener noreferrer">
 
-        <article
-          class="card hover-light magnetic"
-        >
+<span class="feedback-dot"></span>
+VISIT NEXORA AI CHATBOT
+<strong>↗</strong>
 
-          <small>
-            AI WORLD/ 002
-          </small>
+</a>
 
-          <h3>
-            DATA
-          </h3>
+</div>
 
-          <p>
-            INFORMATION
-            INTELLIGENCE
-          </p>
+<div class="ai-status">
 
-          <span>
-            SIGNAL
-          </span>
+<div><span>NEURAL ENGINE</span><b>● ONLINE</b></div>
+<div><span>RESPONSE</span><b>● READY</b></div>
+<div><span>SYSTEM</span><b>● ACTIVE</b></div>
 
-        </article>
+</div>
+</div>
+</section>
 
+<section class="section feedback-portal" id="feedback">
 
-        <article
-          class="card hover-light magnetic"
-        >
+<div class="number">06</div>
 
-          <small>
-            SYSTEM / 003
-          </small>
+<div class="feedback-content">
 
-          <h3>
-            Above all 
-          </h3>
+<div class="label">NEXORA / USER SIGNAL</div>
 
-          <p>
-            SMART
-            AUTOMATION
-          </p>
+<h2>
+YOUR INPUT
+<span class="shimmer">SHAPES</span>
+THE NEXT SYSTEM.
+</h2>
 
-          <span>
-            WEBFLOW
-          </span>
+<p class="description">
+Share your ideas, suggestions, discoveries
+or problems. Your feedback helps evolve NEXORA.
+</p>
 
-        </article>
+<a href="https://ansh4013.github.io/p1/feedback.html"
+class="feedback-btn magnetic energy-border"
+target="_blank"
+rel="noopener noreferrer">
 
+<span class="feedback-dot"></span>
+FEEDBACK
+<strong>↗</strong>
 
-      </div>
+</a>
 
-    </section>
+<div class="feedback-types">
+<span>01 — IDEA</span>
+<span>02 — BUG</span>
+<span>03 — SUGGESTION</span>
+<span>04 — EXPERIENCE</span>
+</div>
 
+</div>
 
+<div class="feedback-orbit" aria-hidden="true">
+<div class="feedback-ring ring-one"></div>
+<div class="feedback-ring ring-two"></div>
+<div class="feedback-ring ring-three"></div>
+<span>USER SIGNAL</span>
+</div>
 
-    <!-- ===================================================
-         IMMERSION
-         =================================================== -->
+</section>
 
-    <section
-      class="section world"
-      id="immersion"
-    >
+<section class="final" id="contact">
 
-      <div class="number">
-        02
-      </div>
+<p>THE NEXT INTERFACE IS ALREADY HERE</p>
 
+<h2>
+BUILD <span>BEYOND.</span>
+</h2>
 
-      <div class="label">
-        NEXORA / AI WORLD 
-      </div>
+<div class="final-actions">
 
+<a href="https://ansh4013.github.io/p1/index.html"
+class="btn magnetic energy-border"
+target="_blank"
+rel="noopener noreferrer">
+VISIT AI CHATBOT ↗
+</a>
 
-      <div class="immersion-content">
+<a href="https://ansh4013.github.io/p1/feedback.html"
+class="btn magnetic"
+target="_blank"
+rel="noopener noreferrer">
+SEND FEEDBACK ↗
+</a>
 
+</div>
+</section>
 
-        <div>
+</main>
 
-          <h2 class="neon">
+<footer>
 
-          ENTER THE
+<strong>NEXORA</strong>
+<span>DIGITAL EXPERIENCE ENGINE</span>
+<span class="system-status">SYSTEM ONLINE</span>
+<span>AI / 3D / WEB / MOTION</span>
 
-            <span>
-             UNKNOWN AI WORLD 
-            </span>
+</footer>
 
-          </h2>
-
-
-          <p class="description">
-
-            🌐 Our Vision
-<br>
-
-Nexora's vision is to build a future where AI is not just a tool, but an intelligent partner that helps people think bigger, work smarter, and create without limits.
-
-          </p>
-
-
-          <div class="tech-tags">
-
-            <span>
-              NEXORA 
-            </span>
-
-            <span>
-              THE FUTURISTIC 
-            </span>
-
-            <span>
-              GENERATION 
-            </span>
-
-            <span>
-              (WITH ALL)
-            </span>
-
-          </div>
-
-        </div>
-
-
-        <!-- PARTICLE FIELD -->
-
-        <div
-          id="particles"
-          class="particles"
-          aria-hidden="true"
-        ></div>
-
-
-      </div>
-
-    </section>
-
-
-
-    <!-- ===================================================
-         CREATIONS
-         =================================================== -->
-
-    <section
-      class="section projects"
-      id="creations"
-    >
-
-      <div class="number">
-        03
-      </div>
-
-
-      <div class="label">
-        NEXORA / CREATIONS
-      </div>
-
-
-      <h2>
-
-        DIGITAL EXPERIENCES WITH NEXORA  
-        </span>
-
-      </h2>
-
-
-      <div class="creation-intro">
-
-        <p class="description">
-
-          Experiments, interfaces and
-          intelligent systems built at
-          the intersection of technology
-          and imagination.
-
-        </p>
-
-      </div>
-
-
-      <div class="cards project-grid">
-
-
-        <article
-          class="card project-card hover-light magnetic"
-        >
-
-          <small>
-            PROJECT / 001
-          </small>
-
-          <h3>
-            NEXORA AI
-          </h3>
-
-          <p>
-            INTELLIGENT CONVERSATIONAL
-            EXPERIENCE
-          </p>
-
-          <strong>
-            AI ↗
-          </strong>
-
-        </article>
-
-
-        <article
-          class="card project-card hover-light magnetic"
-        >
-
-          <small>
-            PROJECT / 002
-          </small>
-
-          <h3>
-            DIGITAL WORLD
-          </h3>
-
-          <p>
-            IMMERSIVE USER INTERFACE 
-            ENVIRONMENT
-          </p>
-
-          <strong>
-            3D ↗
-          </strong>
-
-        </article>
-
-
-        <article
-          class="card project-card hover-light magnetic"
-        >
-
-          <small>
-            PROJECT / 003
-          </small>
-
-          <h3>
-            CREATIVE DESIGNING 
-          </h3>
-
-          <p>
-            MOTION-DRIVEN
-            USER EXPERIENCE
-          </p>
-
-          <strong>
-            UX ↗
-          </strong>
-
-        </article>
-
-
-      </div>
-
-    </section>
-
-
-
-    <!-- ===================================================
-         TECHNOLOGY
-         =================================================== -->
-
-    <section>
-      class="section tech"
-      id="technology"
-    
-
-      <div class="number">
-        04
-      </div>
-
-
-      <div class="label">
-        NEXORA / TECHNOLOGY
-      </div>
-
-        
-
-    </section>
-
-
-
-    <!-- ===================================================
-         AI LAB
-         =================================================== -->
-
-    <section
-      class="section ai-lab"
-      id="ai-lab"
-    >
-
-      <div class="number">
-        05
-      </div>
-
-
-      <div class="label">
-        NEXORA / AI LAB
-      </div>
-
-
-      <div class="ai-lab-content">
-
-
-        <div>
-
-          <h2>
-
-            YOUR NEXT CONVERSATION
-            </span>
-
-            STARTS HERE.
-
-          </h2>
-
-
-          <p class="description">
-
-            Connect with the NEXORA AI
-            chatbot and explore intelligent
-            interaction through a futuristic
-            conversational interface.
-
-          </p>
-
-
-          <a
-            href="https://ansh4013.github.io/p1/index.html"
-            class="feedback-btn magnetic energy-border"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-
-            <span class="feedback-dot"></span>
-
-            VISIT NEXORA AI CHATBOT
-
-            <strong>
-              ↗
-            </strong>
-
-          </a>
-
-        </div>
-
-
-        <!-- AI STATUS -->
-
-        <div class="ai-status">
-
-          <div>
-
-            <span>
-              NEURAL ENGINE
-            </span>
-
-            <b>
-              ● ONLINE
-            </b>
-
-          </div>
-
-
-          <div>
-
-            <span>
-              RESPONSE
-            </span>
-
-            <b>
-              ● READY
-            </b>
-
-          </div>
-
-
-          <div>
-
-            <span>
-              SYSTEM
-            </span>
-
-            <b>
-              ● ACTIVE
-            </b>
-
-          </div>
-
-        </div>
-
-
-      </div>
-
-    </section>
-
-
-
-    <!-- ===================================================
-         FEEDBACK PORTAL
-         =================================================== -->
-
-    <section
-      class="section feedback-portal"
-      id="feedback"
-    >
-
-      <div class="number">
-        06
-      </div>
-
-
-      <div class="feedback-content">
-
-
-        <div class="label">
-          NEXORA / USER SIGNAL
-        </div>
-
-
-        <h2>
-
-          WE RESPECT YOUR EXPERIENCES
-          </span>
-
-          THE NEXT SYSTEM.
-
-        </h2>
-
-
-        <p class="description">
-
-          Share your ideas, suggestions,
-          discoveries or problems. Your
-          feedback helps evolve NEXORA.
-
-        </p>
-
-
-        <a
-          href="https://ansh4013.github.io/p1/feedback.html"
-          class="feedback-btn magnetic energy-border"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-
-          <span class="feedback-dot"></span>
-
-          FEEDBACK
-
-          <strong>
-            ↗
-          </strong>
-
-        </a>
-
-
-        <div class="feedback-types">
-
-          <span>
-            01 — IDEA
-          </span>
-
-          <span>
-            02 — BUG
-          </span>
-
-          <span>
-            03 — SUGGESTION
-          </span>
-
-          <span>
-            04 — EXPERIENCE
-          </span>
-
-        </div>
-
-      </div>
-
-
-      <!-- ORBIT -->
-
-      <div
-        class="feedback-orbit"
-        aria-hidden="true"
-      >
-
-        <div class="feedback-ring ring-one"></div>
-
-        <div class="feedback-ring ring-two"></div>
-
-        <div class="feedback-ring ring-three"></div>
-
-        <span>
-          USER SIGNAL
-        </span>
-
-      </div>
-
-    </section>
-
-
-
-    <!-- ===================================================
-         FINAL CTA
-         =================================================== -->
-
-    <section
-      class="final"
-      id="contact"
-    >
-
-      <p>
-        THE NEXT INTERFACE IS ALREADY HERE
-      </p>
-
-
-      <h2>
-
-        BUILD
-
-        <span>
-          BEYOND.
-        </span>
-
-      </h2>
-
-
-      <div class="final-actions">
-
-
-        <a
-          href="https://ansh4013.github.io/p1/index.html"
-          class="btn magnetic energy-border"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-
-          VISIT AI CHATBOT ↗
-
-        </a>
-
-
-        <a
-          href="https://ansh4013.github.io/p1/feedback.html"
-          class="btn magnetic"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-
-          SEND FEEDBACK ↗
-
-        </a>
-
-
-      </div>
-
-    </section>
-
-
-  </main>
-
-
-
-  <!-- =====================================================
-       FOOTER
-       ===================================================== -->
-
-  <footer>
-
-
-    <strong>
-      NEXORA
-    </strong>
-
-
-    <span>
-      DIGITAL EXPERIENCE ENGINE
-    </span>
-
-
-    <span class="system-status">
-      SYSTEM ONLINE
-    </span>
-
-
-    <span>
-      AI / 3D / WEB / MOTION
-    </span>
-
-
-  </footer>
-
+<noscript>
+NEXORA requires JavaScript for its interactive 3D experience.
+</noscript>
 
 </body>
-
 </html>
