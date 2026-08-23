@@ -1,617 +1,788 @@
-<!DOCTYPE html>
-<html lang="en">
+/* =====================================================
+   NEXORA // TECHNICAL EVENT UI
+   ===================================================== */
+
+:root{
+  --nx-bg:#07101b;
+  --nx-panel:#0b1724;
+  --nx-line:rgba(90,220,255,.18);
+  --nx-cyan:#55e8ff;
+  --nx-blue:#3d8bff;
+  --nx-purple:#8d65ff;
+  --nx-white:#edf7ff;
+  --nx-muted:#71859b;
+}
+
+/* GLOBAL TECHNICAL SURFACE */
+
+body{
+  background:
+    radial-gradient(
+      circle at 50% -10%,
+      rgba(61,139,255,.13),
+      transparent 35%
+    ),
+    var(--nx-bg);
+
+  color:var(--nx-white);
+}
 
-<head>
-  <meta charset="UTF-8">
+body::before{
+  content:"";
+
+  position:fixed;
+  inset:0;
+
+  pointer-events:none;
+  z-index:9990;
+
+  background-image:
+    linear-gradient(
+      rgba(85,232,255,.025) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(85,232,255,.025) 1px,
+      transparent 1px
+    );
+
+  background-size:50px 50px;
+
+  mask-image:
+    linear-gradient(
+      to bottom,
+      black,
+      transparent 90%
+    );
+}
+
+/* =====================================================
+   HEADER
+   ===================================================== */
 
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
+.nav{
+  height:78px;
 
-  <meta name="theme-color" content="#050816">
+  padding:0 4vw;
 
-  <meta name="description"
-        content="NEXORA — A next-generation digital technology experience by Ansh Katiyar">
+  border-bottom:
+    1px solid var(--nx-line);
 
-  <title>NEXORA — Digital Experience</title>
+  background:
+    rgba(5,12,21,.78);
 
-  <!-- ================= FONTS ================= -->
+  backdrop-filter:
+    blur(18px);
 
-  <link rel="preconnect"
-        href="https://fonts.googleapis.com">
+  z-index:1000;
+}
 
-  <link rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin>
+.logo{
+  font-family:"Space Grotesk",sans-serif;
+  font-weight:800;
+  letter-spacing:-.06em;
+}
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
-  <!-- ================= MAIN CSS ================= -->
+.logo span{
+  color:var(--nx-cyan);
+  font-size:9px;
+  letter-spacing:.15em;
+}
 
-  <link rel="stylesheet" href="stylenew.css">
+.nav nav{
+  gap:26px;
+}
 
-  <!-- ================= THREE.JS ================= -->
+.nav nav a{
+  position:relative;
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.16em;
 
-  <!-- ================= GSAP ================= -->
+  color:#91a5b8;
 
-  
+  transition:.3s ease;
+}
 
-</head>
+.nav nav a::before{
+  content:"";
 
+  position:absolute;
 
-<body>
+  left:0;
+  bottom:-8px;
 
-  <!-- =================================================
-       LOADER
-       ================================================= -->
+  width:0;
+  height:1px;
 
-  <div id="loader">
+  background:var(--nx-cyan);
 
-    <div class="loader-core">
+  transition:.3s ease;
+}
 
-      <div class="loading-dots">
-        <i></i>
-        <i></i>
-        <i></i>
-      </div>
+.nav nav a:hover{
+  color:white;
+}
 
-      <span>NEXORA // INITIALIZING</span>
+.nav nav a:hover::before{
+  width:100%;
+}
 
-    </div>
+/* =====================================================
+   AI BUTTON
+   ===================================================== */
 
-  </div>
+.nav-ai-btn{
+  border:
+    1px solid rgba(85,232,255,.35);
 
+  background:
+    linear-gradient(
+      135deg,
+      rgba(85,232,255,.08),
+      rgba(141,101,255,.09)
+    );
 
-  <!-- =================================================
-       CUSTOM CURSOR
-       ================================================= -->
+  box-shadow:
+    inset 0 0 20px rgba(85,232,255,.025);
+}
 
-  <div class="cursor"></div>
-  <div class="cursor-ring"></div>
+.nav-ai-btn::before{
+  content:"AI";
 
+  position:absolute;
 
-  <!-- =================================================
-       HEADER
-       ================================================= -->
+  top:-8px;
+  left:12px;
 
-  <header class="nav">
+  padding:2px 5px;
 
-    <a href="#home"
-       class="logo magnetic">
+  font-size:6px;
 
-      NEXORA
-      <span>/01</span>
+  color:var(--nx-cyan);
 
-    </a>
+  background:var(--nx-bg);
 
+  border:1px solid var(--nx-line);
+}
 
-    <nav>
+/* =====================================================
+   HERO
+   ===================================================== */
 
-      <a href="#home">
-        HOME
-      </a>
+.hero{
+  min-height:100vh;
 
-      <a href="#about">
-        ABOUT
-      </a>
+  border-bottom:
+    1px solid var(--nx-line);
+}
 
-      <a href="#world">
-        WORLD
-      </a>
+.hero::after{
+  content:"NEXORA // 2026";
 
-      <a href="#projects">
-        PROJECTS
-      </a>
+  position:absolute;
 
-      <a href="#technology">
-        TECHNOLOGY
-      </a>
+  right:4vw;
+  bottom:28px;
 
-      <a href="#feedback">
-        FEEDBACK
-      </a>
+  color:#526a80;
 
-    </nav>
+  font-size:7px;
+  letter-spacing:.3em;
+}
 
+.hero-content{
+  max-width:1100px;
+}
 
-    <!-- ================= AI CHATBOT ================= -->
+.eyebrow{
+  display:flex;
+  align-items:center;
+  gap:14px;
 
-    <a
-      href="https://ansh4013.github.io/p1/index.html"
-      class="nav-ai-btn magnetic energy-border"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
+  color:var(--nx-cyan);
 
-      <span class="ai-pulse"></span>
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.22em;
+}
 
-      <span>
-        VISIT NEXORA AI CHATBOT
-      </span>
+.eyebrow::before{
+  content:"";
 
-      <strong>↗</strong>
+  width:35px;
+  height:1px;
 
-    </a>
+  background:var(--nx-cyan);
 
+  box-shadow:
+    0 0 10px var(--nx-cyan);
+}
 
-    <!-- MOBILE MENU -->
+.hero h1{
+  font-size:
+    clamp(5rem,15vw,15rem);
 
-    <button
-      class="menu"
-      aria-label="Open navigation"
-      type="button"
-    >
+  line-height:.75;
 
-      <i></i>
-      <i></i>
+  letter-spacing:-.09em;
+}
 
-    </button>
+.hero-title{
+  max-width:800px;
 
-  </header>
+  margin-top:35px;
 
+  font-family:"Space Grotesk",sans-serif;
 
-  <!-- =================================================
-       MAIN
-       ================================================= -->
+  font-size:
+    clamp(2rem,5vw,5rem);
 
-  <main id="home">
+  font-weight:700;
 
+  line-height:.95;
 
-    <!-- =================================================
-         HERO
-         ================================================= -->
+  letter-spacing:-.06em;
+}
 
-    <section class="hero">
+.hero-title span{
+  display:block;
 
-      <canvas id="heroCanvas"></canvas>
+  color:transparent;
 
-      <div class="grid"></div>
+  -webkit-text-stroke:
+    1px rgba(237,247,255,.35);
+}
 
-      <div class="ambient"></div>
+.hero-text{
+  max-width:550px;
 
-      <div class="ambient violet"></div>
+  margin-top:28px;
 
+  color:#8498ac;
 
-      <div class="hero-content">
+  font-size:11px;
 
-        <div class="eyebrow">
-          NEXT GENERATION / DIGITAL INTELLIGENCE
-        </div>
+  line-height:1.9;
 
+  letter-spacing:.04em;
+}
 
-        <h1
-          class="glitch"
-          data-text="NEXORA"
-        >
-          NEXORA
-        </h1>
+/* =====================================================
+   TECHNICAL SECTION SYSTEM
+   ===================================================== */
 
+.section{
+  position:relative;
 
-        <p class="hero-text">
+  border-bottom:
+    1px solid var(--nx-line);
 
-          ENTER THE NEXT DIGITAL FRONTIER.
-          INTELLIGENT SYSTEMS. IMMERSIVE
-          EXPERIENCES. LIMITLESS POSSIBILITIES.
+  overflow:hidden;
+}
 
-        </p>
+.section::before{
+  content:"";
 
+  position:absolute;
 
-        <div class="actions">
+  left:0;
+  top:0;
 
-          <a
-            href="#world"
-            class="btn magnetic"
-          >
-            EXPLORE NEXORA
-          </a>
+  width:100%;
+  height:1px;
 
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      var(--nx-cyan),
+      transparent
+    );
 
-          <a
-            href="https://ansh4013.github.io/p1/index.html"
-            class="btn magnetic"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            AI CHATBOT ↗
-          </a>
+  opacity:.35;
+}
 
-        </div>
+.number{
+  position:absolute;
 
-      </div>
+  top:45px;
+  left:4vw;
 
+  color:var(--nx-cyan);
 
-      <div class="hero-info">
+  font-family:"Space Grotesk",sans-serif;
 
-        <span>SYS.001</span>
+  font-size:10px;
+  font-weight:700;
 
-        <span>
-          AI / 3D / WEB
-        </span>
+  letter-spacing:.2em;
+}
 
-      </div>
+.label{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
 
-    </section>
+  color:#647d94;
 
+  font-size:8px;
+  font-weight:800;
 
-    <!-- =================================================
-         ABOUT
-         ================================================= -->
+  letter-spacing:.22em;
+}
 
-    <section
-      class="section about reveal"
-      id="about"
-    >
+.label::before{
+  content:"//";
 
-      <div class="number">
-        01
-      </div>
+  color:var(--nx-cyan);
+}
 
-      <div>
+/* =====================================================
+   SECTION HEADINGS
+   ===================================================== */
 
-        <div class="label">
-          ABOUT NEXORA
-        </div>
+.section h2{
+  font-family:"Space Grotesk",sans-serif;
 
-        <h2>
+  font-size:
+    clamp(3.5rem,8vw,9rem);
 
-          BUILDING
+  line-height:.85;
 
-          <span class="shimmer">
-            DIGITAL FUTURES.
-          </span>
+  letter-spacing:-.08em;
+}
 
-        </h2>
+.section h2 span{
+  color:var(--nx-cyan);
 
-        <p class="description">
+  text-shadow:
+    0 0 30px rgba(85,232,255,.15);
+}
 
-          NEXORA combines advanced interface
-          engineering, artificial intelligence,
-          immersive 3D environments and
-          cinematic interaction into one
-          unified digital experience.
+/* =====================================================
+   SYSTEM LINES
+   ===================================================== */
 
-        </p>
+.system-line{
+  display:flex;
 
-      </div>
+  justify-content:space-between;
 
-    </section>
+  width:min(500px,100%);
 
+  padding:16px 0;
 
-    <!-- =================================================
-         WORLD
-         ================================================= -->
+  border-bottom:
+    1px solid var(--nx-line);
 
-    <section
-      class="section world"
-      id="world"
-    >
+  font-size:8px;
 
-      <div class="number">
-        02
-      </div>
+  letter-spacing:.16em;
+}
 
-      <div>
+.system-line span{
+  color:#637a90;
+}
 
-        <div class="label">
-          DIGITAL WORLD
-        </div>
+.system-line b{
+  color:var(--nx-cyan);
+}
 
-        <h2 class="neon">
+/* =====================================================
+   TECH CARDS
+   ===================================================== */
 
-          ENTER THE
+.cards{
+  gap:12px;
+}
 
-          <span>
-            UNKNOWN.
-          </span>
+.card{
+  position:relative;
 
-        </h2>
+  min-height:330px;
 
+  padding:28px;
 
-        <div
-          id="particles"
-          class="particles"
-        ></div>
+  border:
+    1px solid var(--nx-line);
 
-      </div>
+  background:
+    linear-gradient(
+      145deg,
+      rgba(13,30,47,.8),
+      rgba(7,15,26,.65)
+    );
 
-    </section>
+  overflow:hidden;
 
+  transition:
+    transform .5s ease,
+    border-color .4s ease,
+    box-shadow .4s ease;
+}
 
-    <!-- =================================================
-         PROJECTS
-         ================================================= -->
+.card::before{
+  content:"";
 
-    <section
-      class="section projects"
-      id="projects"
-    >
+  position:absolute;
 
-      <div class="number">
-        03
-      </div>
+  left:0;
+  top:0;
 
-      <div class="label">
-        SELECTED SYSTEMS
-      </div>
+  width:3px;
+  height:0;
 
+  background:var(--nx-cyan);
 
-      <h2>
+  box-shadow:
+    0 0 20px var(--nx-cyan);
 
-        DIGITAL
+  transition:.5s ease;
+}
 
-        <span class="shimmer">
-          EXPERIENCES.
-        </span>
+.card:hover{
+  border-color:
+    rgba(85,232,255,.45);
 
-      </h2>
+  box-shadow:
+    0 20px 70px rgba(0,0,0,.3);
+}
 
+.card:hover::before{
+  height:100%;
+}
 
-      <div class="cards">
+.card small{
+  color:#5d7389;
 
+  font-size:7px;
 
-        <article
-          class="card hover-light magnetic"
-        >
+  letter-spacing:.2em;
+}
 
-          <small>
-            SYSTEM / 001
-          </small>
+.card h3{
+  margin-top:80px;
 
-          <h3>
-            AI
-          </h3>
+  font-family:"Space Grotesk",sans-serif;
 
-          <p>
-            INTELLIGENT INTERACTION
-          </p>
+  font-size:clamp(3rem,6vw,6rem);
 
-        </article>
+  letter-spacing:-.08em;
+}
 
+.card p{
+  color:#70879c;
 
-        <article
-          class="card hover-light magnetic"
-        >
+  font-size:8px;
 
-          <small>
-            SYSTEM / 002
-          </small>
+  letter-spacing:.18em;
+}
 
-          <h3>
-            3D
-          </h3>
+.card > span,
+.card strong{
+  position:absolute;
 
-          <p>
-            IMMERSIVE ENVIRONMENTS
-          </p>
+  right:24px;
+  bottom:22px;
 
-        </article>
+  color:var(--nx-cyan);
 
+  font-size:7px;
 
-        <article
-          class="card hover-light magnetic"
-        >
+  letter-spacing:.2em;
+}
 
-          <small>
-            SYSTEM / 003
-          </small>
+/* =====================================================
+   TECHNOLOGY LIST
+   ===================================================== */
 
-          <h3>
-            WEB
-          </h3>
+.tech-list{
+  display:grid;
 
-          <p>
-            NEXT-GENERATION INTERFACES
-          </p>
+  grid-template-columns:
+    repeat(4,1fr);
 
-        </article>
+  border-top:
+    1px solid var(--nx-line);
 
+  border-left:
+    1px solid var(--nx-line);
 
-      </div>
+  margin-top:70px;
+}
 
-    </section>
+.tech-list span{
+  min-height:110px;
 
+  padding:22px;
 
-    <!-- =================================================
-         TECHNOLOGY
-         ================================================= -->
+  display:flex;
+  align-items:flex-end;
 
-    <section
-      class="section tech"
-      id="technology"
-    >
+  border-right:
+    1px solid var(--nx-line);
 
-      <div class="number">
-        04
-      </div>
+  border-bottom:
+    1px solid var(--nx-line);
 
-      <div class="label">
-        TECHNOLOGY STACK
-      </div>
+  color:#7890a6;
 
+  font-size:8px;
+  font-weight:700;
 
-      <h2>
+  letter-spacing:.16em;
 
-        POWERED BY
+  transition:.35s ease;
+}
 
-        <span>
-          THE FUTURE.
-        </span>
+.tech-list span:hover{
+  color:var(--nx-cyan);
 
-      </h2>
+  background:
+    rgba(85,232,255,.035);
+}
 
+/* =====================================================
+   DIAGNOSTICS
+   ===================================================== */
 
-      <div class="tech-list">
+.diagnostics{
+  display:grid;
 
-        <span>01 / AI</span>
+  grid-template-columns:
+    repeat(3,1fr);
 
-        <span>02 / 3D</span>
+  margin-top:30px;
 
-        <span>03 / REALTIME</span>
+  border:
+    1px solid var(--nx-line);
+}
 
-        <span>04 / WEBGL</span>
+.diagnostics div{
+  display:flex;
 
-        <span>05 / MOTION</span>
+  justify-content:space-between;
 
-        <span>06 / UX</span>
+  padding:18px;
 
-        <span>07 / JAVASCRIPT</span>
+  border-right:
+    1px solid var(--nx-line);
 
-        <span>08 / CREATIVE CODE</span>
+  font-size:8px;
 
-      </div>
+  letter-spacing:.14em;
+}
 
-    </section>
+.diagnostics span{
+  color:#60778d;
+}
 
+.diagnostics b{
+  color:var(--nx-cyan);
+}
 
-    <!-- =================================================
-         FEEDBACK PORTAL
-         ================================================= -->
+/* =====================================================
+   FEEDBACK
+   ===================================================== */
 
-    <section
-      class="section feedback-portal"
-      id="feedback"
-    >
+.feedback-types{
+  display:flex;
 
-      <div class="number">
-        05
-      </div>
+  flex-wrap:wrap;
 
+  gap:8px;
 
-      <div class="feedback-content">
+  margin-top:30px;
+}
 
-        <div class="label">
-          NEXORA / USER VOICE
-        </div>
+.feedback-types span{
+  padding:10px 14px;
 
+  border:
+    1px solid var(--nx-line);
 
-        <h2>
+  color:#72899f;
 
-          SHAPE THE
+  font-size:7px;
 
-          <span class="shimmer">
-            NEXT VERSION.
-          </span>
+  letter-spacing:.15em;
+}
 
-        </h2>
+/* =====================================================
+   BUTTONS
+   ===================================================== */
 
+.btn,
+.feedback-btn{
+  border-radius:0;
 
-        <p class="description">
+  text-transform:uppercase;
 
-          Your ideas, suggestions and experience
-          help us evolve NEXORA. Enter the feedback
-          portal and tell us what you think.
+  letter-spacing:.17em;
 
-        </p>
+  transition:
+    transform .4s ease,
+    border-color .4s ease,
+    box-shadow .4s ease;
+}
 
+.btn:hover,
+.feedback-btn:hover{
+  border-color:var(--nx-cyan);
 
-        <a
-          href="https://ansh4013.github.io/p1/feedback.html"
-          class="feedback-btn magnetic energy-border"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+  box-shadow:
+    0 0 30px rgba(85,232,255,.12);
+}
 
-          <span class="feedback-dot"></span>
+/* =====================================================
+   FINAL
+   ===================================================== */
 
-          FEEDBACK
+.final{
+  position:relative;
 
-          <strong>↗</strong>
+  border-bottom:
+    1px solid var(--nx-line);
 
-        </a>
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(61,139,255,.1),
+      transparent 45%
+    );
+}
 
+.final p{
+  color:#647c92;
 
-      </div>
+  font-size:8px;
 
+  letter-spacing:.25em;
+}
 
-      <div class="feedback-orbit">
+.final h2{
+  font-family:"Space Grotesk",sans-serif;
 
-        <div class="feedback-ring ring-one"></div>
+  font-size:
+    clamp(5rem,14vw,14rem);
 
-        <div class="feedback-ring ring-two"></div>
+  line-height:.75;
 
-        <div class="feedback-ring ring-three"></div>
+  letter-spacing:-.1em;
+}
 
-        <span>FEEDBACK // PORTAL</span>
+.final h2 span{
+  display:block;
 
-      </div>
+  color:transparent;
 
-    </section>
+  -webkit-text-stroke:
+    1px rgba(85,232,255,.5);
+}
 
+/* =====================================================
+   FOOTER
+   ===================================================== */
 
-    <!-- =================================================
-         FINAL CTA
-         ================================================= -->
+footer{
+  min-height:100px;
 
-    <section
-      class="final"
-      id="contact"
-    >
+  padding:30px 4vw;
 
-      <p>
-        THE NEXT INTERFACE IS ALREADY HERE
-      </p>
+  display:grid;
 
+  grid-template-columns:
+    1fr 1fr 1fr 1fr;
 
-      <h2>
+  align-items:center;
 
-        BUILD
+  gap:20px;
 
-        <span>
-          BEYOND.
-        </span>
+  border-top:
+    1px solid var(--nx-line);
 
-      </h2>
+  background:#050c15;
 
+  color:#526a80;
 
-      <a
-        href="https://ansh4013.github.io/p1/index.html"
-        class="btn magnetic energy-border"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
+  font-size:7px;
 
-        VISIT NEXORA AI CHATBOT ↗
+  letter-spacing:.17em;
+}
 
-      </a>
+footer strong{
+  color:white;
 
-    </section>
+  font-family:"Space Grotesk",sans-serif;
 
+  font-size:16px;
+}
 
-  </main>
+.system-status{
+  color:var(--nx-cyan);
+}
 
+/* =====================================================
+   MOBILE
+   ===================================================== */
 
-  <!-- =================================================
-       FOOTER
-       ================================================= -->
+@media(max-width:900px){
 
-  <footer>
+  .nav nav{
+    display:none;
+  }
 
-    <strong>
-      NEXORA
-    </strong>
+  .nav-ai-btn{
+    margin-left:auto;
+  }
 
-    <span>
-      DIGITAL EXPERIENCE ENGINE
-    </span>
+  .tech-list{
+    grid-template-columns:
+      repeat(2,1fr);
+  }
 
-    <span class="system-status">
-      SYSTEM ONLINE
-    </span>
+  .diagnostics{
+    grid-template-columns:1fr;
+  }
 
-  </footer>
+  .diagnostics div{
+    border-right:0;
+    border-bottom:
+      1px solid var(--nx-line);
+  }
 
+  footer{
+    grid-template-columns:
+      1fr 1fr;
+  }
 
-  <!-- =================================================
-       JAVASCRIPT
-       ================================================= -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+}
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+@media(max-width:600px){
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+  .hero h1{
+    font-size:27vw;
+  }
 
-  <script src="scriptnew.js"></script>
+  .hero-title{
+    font-size:12vw;
+  }
 
-</body>
+  .cards{
+    grid-template-columns:1fr;
+  }
 
-</html>
+  .tech-list{
+    grid-template-columns:1fr;
+  }
+
+  footer{
+    grid-template-columns:1fr;
+
+    text-align:left;
+  }
+
+}
