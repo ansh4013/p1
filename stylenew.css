@@ -1,3 +1,214 @@
+  :root{
+    --bg:#040912;
+    --hud-accent:#24f0e6;
+    --hud-accent-2:#3be7ff;
+    --hud-muted:#0f2430;
+    --hud-glow: 0 0 18px rgba(36,240,230,0.14), 0 0 42px rgba(36,240,230,0.06);
+  }
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,#02060b 0%,#061423 100%);font-family:Orbitron,system-ui,monospace;overflow:hidden;color:#9dd;}
+
+/* Scene & perspective */
+.scene{
+  position:relative;
+  width:100%;
+  height:100%;
+  perspective:1200px; /* stronger perspective for 3D feel */
+  -webkit-perspective:1200px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* Anchor point simulating "from its place" (start left-bottom) */
+.anchor{
+  position:absolute;
+  left:10%;
+  bottom:12%;
+  width:260px;
+  height:260px;
+  transform-origin:center;
+  transition: transform 0.9s cubic-bezier(.2,.9,.3,1), left 0.9s, bottom 0.9s;
+  will-change:transform,left,bottom;
+  pointer-events:auto;
+}
+
+/* HUD root (preserve 3d) */
+.hud{
+  width:100%;
+  height:100%;
+  transform-style:preserve-3d;
+  -webkit-transform-style:preserve-3d;
+  position:relative;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.65));
+  cursor:pointer;
+}
+
+/* When detached: center & float, larger and more frontal */
+.anchor.detached{
+  left:50%;
+  bottom:50%;
+  transform:translate(-50%,50%); /* move anchor to center visually */
+  width:420px;
+  height:420px;
+  transition: transform 1.05s cubic-bezier(.2,.9,.25,1), left 1.05s, bottom 1.05s, width 0.8s, height 0.8s;
+  z-index:40;
+}
+
+/* Float animation applied once detached */
+.anchor.detached .hud{
+  animation: floatPitch 6s ease-in-out infinite;
+}
+
+/* slight group rotation to read 3D */
+.hud-layer{
+  position:absolute; inset:0;
+  transform-origin:center;
+  transform:translateZ(0px);
+  pointer-events:none;
+}
+
+/* center glass plate (backdrop filter if supported) */
+.hud-glass{
+  position:absolute; left:50%; top:50%;
+  width:58%; height:58%;
+  transform:translate(-50%,-50%) translateZ(30px);
+  background:linear-gradient(180deg, rgba(20,40,45,0.18), rgba(3,10,15,0.12));
+  border-radius:50%;
+  border: 1px solid rgba(60,230,210,0.12);
+  box-shadow: var(--hud-glow);
+  backdrop-filter: blur(4px) saturate(1.2);
+  -webkit-backdrop-filter: blur(4px) saturate(1.2);
+}
+
+/* concentric ring container (SVG will render rings) */
+.hud-svg{
+  position:absolute; left:50%; top:50%;
+  transform:translate(-50%,-50%) translateZ(40px);
+  width:96%; height:96%;
+  pointer-events:none;
+  mix-blend-mode:screen;
+}
+
+/* center UI text */
+.hud-center{
+  position:absolute; left:50%; top:50%;
+  transform:translate(-50%,-50%) translateZ(42px);
+  text-align:center;
+  color:var(--hud-accent);
+  user-select:none;
+  pointer-events:none;
+}
+.hud-center .label{font-size:12px; color:rgba(60,240,220,0.82); letter-spacing:0.22em; text-transform:uppercase; opacity:0.9;}
+.hud-center .value{font-size:36px; margin-top:6px; color:white; filter:drop-shadow(0 8px 18px rgba(36,240,230,0.12));}
+
+/* details overlay (readouts & bars) */
+.hud-info{
+  position:absolute;
+  width:100%;
+  bottom:6%;
+  transform:translateZ(26px);
+  display:flex;
+  justify-content:center;
+  gap:18px;
+  pointer-events:none;
+}
+.readout{
+  padding:8px 12px;
+  background:linear-gradient(180deg, rgba(3,10,15,0.25), rgba(10,20,24,0.09));
+  border-radius:8px;
+  border:1px solid rgba(60,230,210,0.06);
+  color:rgba(180,230,230,0.92);
+  font-size:12px;
+  min-width:80px;
+  text-align:center;
+  box-shadow:0 6px 18px rgba(2,7,10,0.6);
+  backdrop-filter: blur(2px);
+}
+
+/* Hover/press visual feedback */
+.anchor:hover .hud{ transform: translateZ(18px) rotateX(8deg); transition: transform 0.35s; }
+.anchor.detached:hover .hud{ transform: translateZ(28px) rotateX(6deg) rotateY(-4deg); }
+
+/* SVG animations (rotate groups) */
+.rot-slow { animation: rotA 18s linear infinite; transform-origin:center; }
+.rot-med  { animation: rotA -9s linear infinite; transform-origin:center; }
+.rot-fast { animation: rotA 5s linear infinite; transform-origin:center; }
+@keyframes rotA { from{transform:rotateZ(0deg)} to{transform:rotateZ(360deg)} }
+
+/* pulse / scan sweep */
+.scan{
+  position:absolute; inset:0; pointer-events:none;
+  background: radial-gradient(circle at 50% 18%, rgba(60,230,210,0.18), rgba(60,230,210,0.02) 12%, transparent 30%);
+  mix-blend-mode:overlay; opacity:0.9; transform:translateZ(50px);
+  transition:opacity 0.5s;
+}
+.anchor.detached .scan{ animation: sweep 6s linear infinite; opacity:1; }
+@keyframes sweep{
+  0%{ filter: hue-rotate(0deg) brightness(1); transform: translateZ(50px) rotate(0deg); opacity:0.95 }
+  50%{ transform: translateZ(50px) rotate(180deg); opacity:1 }
+  100%{ transform: translateZ(50px) rotate(360deg); opacity:0.95 }
+}
+
+/* glow ring behind for soft bloom using pseudo element */
+.hud::before{
+  content:"";
+  position:absolute; inset:0;
+  border-radius:50%;
+  box-shadow: 0 0 60px 14px rgba(36,240,230,0.035), 0 0 36px 8px rgba(59,231,255,0.02);
+  pointer-events:none;
+  transform:translateZ(10px);
+}
+
+/* small HUD pieces (ticks, arcs) created in HTML for easier CSS control */
+.tick{
+  position:absolute; left:50%; top:50%;
+  width:2px; height:48px;
+  background:linear-gradient(180deg, rgba(60,240,220,1), rgba(60,240,220,0.2));
+  transform-origin:center bottom;
+  border-radius:1px;
+  opacity:0.9;
+  mix-blend-mode:screen;
+  filter:blur(0.15px);
+}
+
+/* segmented arc accents */
+.segment{
+  position:absolute; left:50%; top:50%;
+  width:10px; height:4px; border-radius:2px;
+  background:linear-gradient(90deg, rgba(60,240,220,1), rgba(59,231,255,0.35));
+  transform-origin:left center;
+  mix-blend-mode:screen;
+  opacity:0.95;
+  filter:drop-shadow(0 6px 14px rgba(36,240,230,0.06));
+}
+
+/* keyframe for subtle pulsing on some segments */
+.pulse{ animation: pulseGlow 1.6s ease-in-out infinite; }
+@keyframes pulseGlow {
+  0%{ transform:scale(1); opacity:0.85; filter:blur(0.1px) }
+  50%{ transform:scale(1.18); opacity:1; filter:blur(1px) }
+  100%{ transform:scale(1); opacity:0.85; filter:blur(0.1px) }
+}
+
+/* floating keyframe slightly tilting/bobbing */
+@keyframes floatPitch{
+  0%{ transform: translateZ(0) rotateX(0.06rad) rotateY(0.02rad) translateY(0) }
+  50%{ transform: translateZ(6px) rotateX(0.09rad) rotateY(-0.02rad) translateY(-10px) }
+  100%{ transform: translateZ(0) rotateX(0.06rad) rotateY(0.02rad) translateY(0) }
+}
+
+/* subtle entrance for detached state */
+.anchor.detached{ animation: popin 0.9s cubic-bezier(.2,.9,.25,1) both; }
+@keyframes popin{
+  0%{ transform: translate(-30%,50%) scale(0.75); opacity:0.0 }
+  60%{ transform: translate(-48%,50%) scale(1.03); opacity:1.0 }
+  100%{ transform: translate(-50%,50%) scale(1.0); opacity:1.0 }
+}
+
+/* Accessibility: reduce motion */
+@media (prefers-reduced-motion: reduce){
+  .rot-slow,.rot-med,.rot-fast,.scan,.pulse,.anchor.detached .hud{ animation:none !important; }
+}
 body{
 background:
 radial-gradient(circle at 75% 20%,#123c4f55,transparent 35%),
