@@ -1,4 +1,4 @@
-/* =======================================================
+/* =========================================================
    NEXORA // DIGITAL MOTION ENGINE
    PART 01 — CORE / LOADER / NAV / CURSOR
    ========================================================= */
@@ -181,6 +181,7 @@ window.addEventListener("resize",()=>{
   NX.height=innerHeight;
 
 });
+
 /* ================= INITIAL STATE ================= */
 
 NX.width=innerWidth;
@@ -300,7 +301,7 @@ if(canvas && window.THREE){
   /* ================= PARTICLES ================= */
 
   const count =
-    innerWidth < 700 ? 500: 1400;
+    innerWidth < 700 ? 600 : 1400;
 
   const positions =
     new Float32Array(count*3);
