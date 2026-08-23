@@ -1,788 +1,1210 @@
-/* =====================================================
-   NEXORA // TECHNICAL EVENT UI
-   ===================================================== */
-
-:root{
-  --nx-bg:#07101b;
-  --nx-panel:#0b1724;
-  --nx-line:rgba(90,220,255,.18);
-  --nx-cyan:#55e8ff;
-  --nx-blue:#3d8bff;
-  --nx-purple:#8d65ff;
-  --nx-white:#edf7ff;
-  --nx-muted:#71859b;
-}
-
-/* GLOBAL TECHNICAL SURFACE */
-
-body{
-  background:
-    radial-gradient(
-      circle at 50% -10%,
-      rgba(61,139,255,.13),
-      transparent 35%
-    ),
-    var(--nx-bg);
-
-  color:var(--nx-white);
-}
+<!DOCTYPE html>
+<html lang="en">
 
-body::before{
-  content:"";
-
-  position:fixed;
-  inset:0;
-
-  pointer-events:none;
-  z-index:9990;
-
-  background-image:
-    linear-gradient(
-      rgba(85,232,255,.025) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      90deg,
-      rgba(85,232,255,.025) 1px,
-      transparent 1px
-    );
-
-  background-size:50px 50px;
-
-  mask-image:
-    linear-gradient(
-      to bottom,
-      black,
-      transparent 90%
-    );
-}
-
-/* =====================================================
-   HEADER
-   ===================================================== */
+<head>
+  <meta charset="UTF-8">
 
-.nav{
-  height:78px;
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-  padding:0 4vw;
+  <meta name="theme-color" content="#050816">
 
-  border-bottom:
-    1px solid var(--nx-line);
+  <meta name="description"
+        content="NEXORA — Digital Intelligence Reimagined. AI, 3D, WebGL, Motion and Creative Technology.">
 
-  background:
-    rgba(5,12,21,.78);
+  <title>NEXORA // Digital Intelligence</title>
 
-  backdrop-filter:
-    blur(18px);
 
-  z-index:1000;
-}
+  <!-- =====================================================
+       FONTS
+       ===================================================== -->
 
-.logo{
-  font-family:"Space Grotesk",sans-serif;
-  font-weight:800;
-  letter-spacing:-.06em;
-}
+  <link rel="preconnect"
+        href="https://fonts.googleapis.com">
 
-.logo span{
-  color:var(--nx-cyan);
-  font-size:9px;
-  letter-spacing:.15em;
-}
+  <link rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin>
 
-.nav nav{
-  gap:26px;
-}
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
 
-.nav nav a{
-  position:relative;
 
-  font-size:8px;
-  font-weight:700;
-  letter-spacing:.16em;
+  <!-- =====================================================
+       MAIN CSS
+       ===================================================== -->
 
-  color:#91a5b8;
+  <link rel="stylesheet"
+        href="./css/style.css">
 
-  transition:.3s ease;
-}
 
-.nav nav a::before{
-  content:"";
+  <!-- =====================================================
+       EXTERNAL ENGINES
+       DEFERRED LOADING
+       ===================================================== -->
 
-  position:absolute;
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
+    defer>
+  </script>
 
-  left:0;
-  bottom:-8px;
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
+    defer>
+  </script>
 
-  width:0;
-  height:1px;
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"
+    defer>
+  </script>
 
-  background:var(--nx-cyan);
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"
+    defer>
+  </script>
 
-  transition:.3s ease;
-}
+  <!-- NEXORA ENGINE -->
+  <script
+    src="./js/script.js"
+    defer>
+  </script>
 
-.nav nav a:hover{
-  color:white;
-}
+</head>
 
-.nav nav a:hover::before{
-  width:100%;
-}
 
-/* =====================================================
-   AI BUTTON
-   ===================================================== */
+<body>
 
-.nav-ai-btn{
-  border:
-    1px solid rgba(85,232,255,.35);
 
-  background:
-    linear-gradient(
-      135deg,
-      rgba(85,232,255,.08),
-      rgba(141,101,255,.09)
-    );
+  <!-- =====================================================
+       LOADER
+       ===================================================== -->
 
-  box-shadow:
-    inset 0 0 20px rgba(85,232,255,.025);
-}
+  <div id="loader">
 
-.nav-ai-btn::before{
-  content:"AI";
+    <div class="loader-core">
 
-  position:absolute;
+      <div class="loading-dots">
 
-  top:-8px;
-  left:12px;
+        <i></i>
+        <i></i>
+        <i></i>
 
-  padding:2px 5px;
+      </div>
 
-  font-size:6px;
+      <span>
+        NEXORA // INITIALIZING
+      </span>
 
-  color:var(--nx-cyan);
+    </div>
 
-  background:var(--nx-bg);
+  </div>
 
-  border:1px solid var(--nx-line);
-}
 
-/* =====================================================
-   HERO
-   ===================================================== */
+  <!-- =====================================================
+       CUSTOM CURSOR
+       ===================================================== -->
 
-.hero{
-  min-height:100vh;
+  <div class="cursor"></div>
 
-  border-bottom:
-    1px solid var(--nx-line);
-}
+  <div class="cursor-ring"></div>
 
-.hero::after{
-  content:"NEXORA // 2026";
 
-  position:absolute;
+  <!-- =====================================================
+       HEADER / NAVIGATION
+       ===================================================== -->
 
-  right:4vw;
-  bottom:28px;
+  <header class="nav">
 
-  color:#526a80;
+    <!-- LOGO -->
 
-  font-size:7px;
-  letter-spacing:.3em;
-}
+    <a
+      href="#home"
+      class="logo magnetic"
+      aria-label="NEXORA Home"
+    >
 
-.hero-content{
-  max-width:1100px;
-}
+      NEXORA
 
-.eyebrow{
-  display:flex;
-  align-items:center;
-  gap:14px;
+      <span>/01</span>
 
-  color:var(--nx-cyan);
+    </a>
 
-  font-size:8px;
-  font-weight:700;
-  letter-spacing:.22em;
-}
 
-.eyebrow::before{
-  content:"";
+    <!-- MAIN NAVIGATION -->
 
-  width:35px;
-  height:1px;
+    <nav aria-label="Main navigation">
 
-  background:var(--nx-cyan);
+      <a href="#home">
+        HOME
+      </a>
 
-  box-shadow:
-    0 0 10px var(--nx-cyan);
-}
+      <a href="#intelligence">
+        INTELLIGENCE
+      </a>
 
-.hero h1{
-  font-size:
-    clamp(5rem,15vw,15rem);
+      <a href="#immersion">
+        IMMERSION
+      </a>
 
-  line-height:.75;
+      <a href="#creations">
+        CREATIONS
+      </a>
 
-  letter-spacing:-.09em;
-}
+      <a href="#technology">
+        TECHNOLOGY
+      </a>
 
-.hero-title{
-  max-width:800px;
+      <a href="#feedback">
+        FEEDBACK
+      </a>
 
-  margin-top:35px;
+    </nav>
 
-  font-family:"Space Grotesk",sans-serif;
 
-  font-size:
-    clamp(2rem,5vw,5rem);
+    <!-- =================================================
+         LARGE AI CHATBOT BUTTON
+         ================================================= -->
 
-  font-weight:700;
+    <a
+      href="https://ansh4013.github.io/p1/index.html"
+      class="nav-ai-btn magnetic energy-border"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
 
-  line-height:.95;
+      <span class="ai-pulse"></span>
 
-  letter-spacing:-.06em;
-}
+      <span>
+        VISIT NEXORA AI CHATBOT
+      </span>
 
-.hero-title span{
-  display:block;
+      <strong>
+        ↗
+      </strong>
 
-  color:transparent;
+    </a>
 
-  -webkit-text-stroke:
-    1px rgba(237,247,255,.35);
-}
 
-.hero-text{
-  max-width:550px;
+    <!-- MOBILE MENU -->
 
-  margin-top:28px;
+    <button
+      class="menu"
+      type="button"
+      aria-label="Open navigation"
+    >
 
-  color:#8498ac;
+      <i></i>
+      <i></i>
 
-  font-size:11px;
+    </button>
 
-  line-height:1.9;
+  </header>
 
-  letter-spacing:.04em;
-}
 
-/* =====================================================
-   TECHNICAL SECTION SYSTEM
-   ===================================================== */
+  <!-- =====================================================
+       MAIN EXPERIENCE
+       ===================================================== -->
 
-.section{
-  position:relative;
+  <main>
 
-  border-bottom:
-    1px solid var(--nx-line);
 
-  overflow:hidden;
-}
+    <!-- ===================================================
+         HERO
+         =================================================== -->
 
-.section::before{
-  content:"";
+    <section
+      class="hero"
+      id="home"
+    >
 
-  position:absolute;
+      <!-- THREE.JS CANVAS -->
 
-  left:0;
-  top:0;
+      <canvas
+        id="heroCanvas"
+        aria-hidden="true">
+      </canvas>
 
-  width:100%;
-  height:1px;
 
-  background:
-    linear-gradient(
-      90deg,
-      transparent,
-      var(--nx-cyan),
-      transparent
-    );
+      <!-- GRID -->
 
-  opacity:.35;
-}
+      <div
+        class="grid"
+        aria-hidden="true">
+      </div>
 
-.number{
-  position:absolute;
 
-  top:45px;
-  left:4vw;
+      <!-- AMBIENT LIGHT -->
 
-  color:var(--nx-cyan);
+      <div
+        class="ambient"
+        aria-hidden="true">
+      </div>
 
-  font-family:"Space Grotesk",sans-serif;
+      <div
+        class="ambient violet"
+        aria-hidden="true">
+      </div>
 
-  font-size:10px;
-  font-weight:700;
 
-  letter-spacing:.2em;
-}
+      <!-- HERO CONTENT -->
 
-.label{
-  display:inline-flex;
-  align-items:center;
-  gap:10px;
+      <div class="hero-content">
 
-  color:#647d94;
 
-  font-size:8px;
-  font-weight:800;
+        <div class="eyebrow">
 
-  letter-spacing:.22em;
-}
+          NEXORA / 001
 
-.label::before{
-  content:"//";
+          <span>
+            DIGITAL INTELLIGENCE
+          </span>
 
-  color:var(--nx-cyan);
-}
+        </div>
 
-/* =====================================================
-   SECTION HEADINGS
-   ===================================================== */
 
-.section h2{
-  font-family:"Space Grotesk",sans-serif;
+        <h1
+          class="glitch"
+          data-text="NEXORA"
+        >
 
-  font-size:
-    clamp(3.5rem,8vw,9rem);
+          NEXORA
 
-  line-height:.85;
+        </h1>
 
-  letter-spacing:-.08em;
-}
 
-.section h2 span{
-  color:var(--nx-cyan);
+        <div class="hero-title">
 
-  text-shadow:
-    0 0 30px rgba(85,232,255,.15);
-}
+          DIGITAL
 
-/* =====================================================
-   SYSTEM LINES
-   ===================================================== */
+          <span>
+            INTELLIGENCE
+          </span>
 
-.system-line{
-  display:flex;
+          REIMAGINED.
 
-  justify-content:space-between;
+        </div>
 
-  width:min(500px,100%);
 
-  padding:16px 0;
+        <p class="hero-text">
 
-  border-bottom:
-    1px solid var(--nx-line);
+          AI.
+          3D.
+          WEB.
+          MOTION.
 
-  font-size:8px;
+          <br>
 
-  letter-spacing:.16em;
-}
+          A new generation of digital
+          experiences engineered for
+          the future.
 
-.system-line span{
-  color:#637a90;
-}
+        </p>
 
-.system-line b{
-  color:var(--nx-cyan);
-}
 
-/* =====================================================
-   TECH CARDS
-   ===================================================== */
+        <!-- ACTIONS -->
 
-.cards{
-  gap:12px;
-}
+        <div class="actions">
 
-.card{
-  position:relative;
 
-  min-height:330px;
+          <a
+            href="#intelligence"
+            class="btn magnetic"
+          >
 
-  padding:28px;
+            ENTER NEXORA
 
-  border:
-    1px solid var(--nx-line);
+            <strong>↓</strong>
 
-  background:
-    linear-gradient(
-      145deg,
-      rgba(13,30,47,.8),
-      rgba(7,15,26,.65)
-    );
+          </a>
 
-  overflow:hidden;
 
-  transition:
-    transform .5s ease,
-    border-color .4s ease,
-    box-shadow .4s ease;
-}
+          <a
+            href="https://ansh4013.github.io/p1/index.html"
+            class="btn magnetic"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
 
-.card::before{
-  content:"";
+            AI CHATBOT
 
-  position:absolute;
+            <strong>↗</strong>
 
-  left:0;
-  top:0;
+          </a>
 
-  width:3px;
-  height:0;
 
-  background:var(--nx-cyan);
+        </div>
 
-  box-shadow:
-    0 0 20px var(--nx-cyan);
 
-  transition:.5s ease;
-}
+      </div>
 
-.card:hover{
-  border-color:
-    rgba(85,232,255,.45);
 
-  box-shadow:
-    0 20px 70px rgba(0,0,0,.3);
-}
+      <!-- HERO SYSTEM DATA -->
 
-.card:hover::before{
-  height:100%;
-}
+      <div class="hero-info">
 
-.card small{
-  color:#5d7389;
+        <span>
+          SYS.001
+        </span>
 
-  font-size:7px;
+        <span>
+          AI / 3D / WEB
+        </span>
 
-  letter-spacing:.2em;
-}
+        <span>
+          <i></i>
+          SYSTEM ONLINE
+        </span>
 
-.card h3{
-  margin-top:80px;
+      </div>
 
-  font-family:"Space Grotesk",sans-serif;
 
-  font-size:clamp(3rem,6vw,6rem);
+      <!-- SCROLL INDICATOR -->
 
-  letter-spacing:-.08em;
-}
+      <div class="scroll-indicator">
 
-.card p{
-  color:#70879c;
+        <span>
+          SCROLL TO EXPLORE
+        </span>
 
-  font-size:8px;
+        <b>
+          ↓
+        </b>
 
-  letter-spacing:.18em;
-}
+      </div>
 
-.card > span,
-.card strong{
-  position:absolute;
+    </section>
 
-  right:24px;
-  bottom:22px;
 
-  color:var(--nx-cyan);
 
-  font-size:7px;
+    <!-- ===================================================
+         INTELLIGENCE
+         =================================================== -->
 
-  letter-spacing:.2em;
-}
+    <section
+      class="section intelligence"
+      id="intelligence"
+    >
 
-/* =====================================================
-   TECHNOLOGY LIST
-   ===================================================== */
+      <div class="number">
+        01
+      </div>
 
-.tech-list{
-  display:grid;
 
-  grid-template-columns:
-    repeat(4,1fr);
+      <div class="label">
+        NEXORA / INTELLIGENCE
+      </div>
 
-  border-top:
-    1px solid var(--nx-line);
 
-  border-left:
-    1px solid var(--nx-line);
+      <div class="section-grid">
 
-  margin-top:70px;
-}
 
-.tech-list span{
-  min-height:110px;
+        <div class="section-heading">
 
-  padding:22px;
+          <h2>
 
-  display:flex;
-  align-items:flex-end;
+            WE DON'T JUST
 
-  border-right:
-    1px solid var(--nx-line);
+            <span class="shimmer">
+              BUILD SOFTWARE.
+            </span>
 
-  border-bottom:
-    1px solid var(--nx-line);
+          </h2>
 
-  color:#7890a6;
+        </div>
 
-  font-size:8px;
-  font-weight:700;
 
-  letter-spacing:.16em;
+        <div class="section-copy">
 
-  transition:.35s ease;
-}
+          <p class="description">
 
-.tech-list span:hover{
-  color:var(--nx-cyan);
+            We engineer intelligent digital
+            systems designed to interact,
+            adapt and evolve.
 
-  background:
-    rgba(85,232,255,.035);
-}
+          </p>
 
-/* =====================================================
-   DIAGNOSTICS
-   ===================================================== */
 
-.diagnostics{
-  display:grid;
+          <div class="system-line">
 
-  grid-template-columns:
-    repeat(3,1fr);
+            <span>
+              NEURAL CORE
+            </span>
 
-  margin-top:30px;
+            <b>
+              ACTIVE
+            </b>
 
-  border:
-    1px solid var(--nx-line);
-}
+          </div>
 
-.diagnostics div{
-  display:flex;
 
-  justify-content:space-between;
+          <div class="system-line">
 
-  padding:18px;
+            <span>
+              AI ENGINE
+            </span>
 
-  border-right:
-    1px solid var(--nx-line);
+            <b>
+              ONLINE
+            </b>
 
-  font-size:8px;
+          </div>
 
-  letter-spacing:.14em;
-}
 
-.diagnostics span{
-  color:#60778d;
-}
+          <div class="system-line">
 
-.diagnostics b{
-  color:var(--nx-cyan);
-}
+            <span>
+              AUTOMATION
+            </span>
 
-/* =====================================================
-   FEEDBACK
-   ===================================================== */
+            <b>
+              READY
+            </b>
 
-.feedback-types{
-  display:flex;
+          </div>
 
-  flex-wrap:wrap;
 
-  gap:8px;
+        </div>
 
-  margin-top:30px;
-}
+      </div>
 
-.feedback-types span{
-  padding:10px 14px;
 
-  border:
-    1px solid var(--nx-line);
+      <!-- INTELLIGENCE CARDS -->
 
-  color:#72899f;
+      <div class="cards">
 
-  font-size:7px;
 
-  letter-spacing:.15em;
-}
+        <article
+          class="card hover-light magnetic"
+        >
 
-/* =====================================================
-   BUTTONS
-   ===================================================== */
+          <small>
+            SYSTEM / 001
+          </small>
 
-.btn,
-.feedback-btn{
-  border-radius:0;
+          <h3>
+            AI
+          </h3>
 
-  text-transform:uppercase;
+          <p>
+            INTELLIGENT
+            INTERACTION
+          </p>
 
-  letter-spacing:.17em;
+          <span>
+            NEURAL
+          </span>
 
-  transition:
-    transform .4s ease,
-    border-color .4s ease,
-    box-shadow .4s ease;
-}
+        </article>
 
-.btn:hover,
-.feedback-btn:hover{
-  border-color:var(--nx-cyan);
 
-  box-shadow:
-    0 0 30px rgba(85,232,255,.12);
-}
+        <article
+          class="card hover-light magnetic"
+        >
 
-/* =====================================================
-   FINAL
-   ===================================================== */
+          <small>
+            SYSTEM / 002
+          </small>
 
-.final{
-  position:relative;
+          <h3>
+            DATA
+          </h3>
 
-  border-bottom:
-    1px solid var(--nx-line);
+          <p>
+            INFORMATION
+            INTELLIGENCE
+          </p>
 
-  background:
-    radial-gradient(
-      circle at 50% 50%,
-      rgba(61,139,255,.1),
-      transparent 45%
-    );
-}
+          <span>
+            SIGNAL
+          </span>
 
-.final p{
-  color:#647c92;
+        </article>
 
-  font-size:8px;
 
-  letter-spacing:.25em;
-}
+        <article
+          class="card hover-light magnetic"
+        >
 
-.final h2{
-  font-family:"Space Grotesk",sans-serif;
+          <small>
+            SYSTEM / 003
+          </small>
 
-  font-size:
-    clamp(5rem,14vw,14rem);
+          <h3>
+            AUTO
+          </h3>
 
-  line-height:.75;
+          <p>
+            SMART
+            AUTOMATION
+          </p>
 
-  letter-spacing:-.1em;
-}
+          <span>
+            FLOW
+          </span>
 
-.final h2 span{
-  display:block;
+        </article>
 
-  color:transparent;
 
-  -webkit-text-stroke:
-    1px rgba(85,232,255,.5);
-}
+      </div>
 
-/* =====================================================
-   FOOTER
-   ===================================================== */
+    </section>
 
-footer{
-  min-height:100px;
 
-  padding:30px 4vw;
 
-  display:grid;
+    <!-- ===================================================
+         IMMERSION
+         =================================================== -->
 
-  grid-template-columns:
-    1fr 1fr 1fr 1fr;
+    <section
+      class="section world"
+      id="immersion"
+    >
 
-  align-items:center;
+      <div class="number">
+        02
+      </div>
 
-  gap:20px;
 
-  border-top:
-    1px solid var(--nx-line);
+      <div class="label">
+        NEXORA / IMMERSION
+      </div>
 
-  background:#050c15;
 
-  color:#526a80;
+      <div class="immersion-content">
 
-  font-size:7px;
 
-  letter-spacing:.17em;
-}
+        <div>
 
-footer strong{
-  color:white;
+          <h2 class="neon">
 
-  font-family:"Space Grotesk",sans-serif;
+            ENTER THE
 
-  font-size:16px;
-}
+            <span>
+              UNKNOWN.
+            </span>
 
-.system-status{
-  color:var(--nx-cyan);
-}
+          </h2>
 
-/* =====================================================
-   MOBILE
-   ===================================================== */
 
-@media(max-width:900px){
+          <p class="description">
 
-  .nav nav{
-    display:none;
-  }
+            Realtime 3D environments,
+            procedural worlds and motion
+            systems designed to transform
+            the way users experience the web.
 
-  .nav-ai-btn{
-    margin-left:auto;
-  }
+          </p>
 
-  .tech-list{
-    grid-template-columns:
-      repeat(2,1fr);
-  }
 
-  .diagnostics{
-    grid-template-columns:1fr;
-  }
+          <div class="tech-tags">
 
-  .diagnostics div{
-    border-right:0;
-    border-bottom:
-      1px solid var(--nx-line);
-  }
+            <span>
+              WEBGL
+            </span>
 
-  footer{
-    grid-template-columns:
-      1fr 1fr;
-  }
+            <span>
+              THREE.JS
+            </span>
 
-}
+            <span>
+              GPU
+            </span>
 
-@media(max-width:600px){
+            <span>
+              REALTIME
+            </span>
 
-  .hero h1{
-    font-size:27vw;
-  }
+          </div>
 
-  .hero-title{
-    font-size:12vw;
-  }
+        </div>
 
-  .cards{
-    grid-template-columns:1fr;
-  }
 
-  .tech-list{
-    grid-template-columns:1fr;
-  }
+        <!-- PARTICLE FIELD -->
 
-  footer{
-    grid-template-columns:1fr;
+        <div
+          id="particles"
+          class="particles"
+          aria-hidden="true"
+        ></div>
 
-    text-align:left;
-  }
 
-}
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         CREATIONS
+         =================================================== -->
+
+    <section
+      class="section projects"
+      id="creations"
+    >
+
+      <div class="number">
+        03
+      </div>
+
+
+      <div class="label">
+        NEXORA / CREATIONS
+      </div>
+
+
+      <h2>
+
+        DIGITAL
+
+        <span class="shimmer">
+          EXPERIENCES.
+        </span>
+
+      </h2>
+
+
+      <div class="creation-intro">
+
+        <p class="description">
+
+          Experiments, interfaces and
+          intelligent systems built at
+          the intersection of technology
+          and imagination.
+
+        </p>
+
+      </div>
+
+
+      <div class="cards project-grid">
+
+
+        <article
+          class="card project-card hover-light magnetic"
+        >
+
+          <small>
+            PROJECT / 001
+          </small>
+
+          <h3>
+            NEXORA AI
+          </h3>
+
+          <p>
+            INTELLIGENT CONVERSATIONAL
+            EXPERIENCE
+          </p>
+
+          <strong>
+            AI ↗
+          </strong>
+
+        </article>
+
+
+        <article
+          class="card project-card hover-light magnetic"
+        >
+
+          <small>
+            PROJECT / 002
+          </small>
+
+          <h3>
+            DIGITAL WORLD
+          </h3>
+
+          <p>
+            IMMERSIVE WEBGL
+            ENVIRONMENT
+          </p>
+
+          <strong>
+            3D ↗
+          </strong>
+
+        </article>
+
+
+        <article
+          class="card project-card hover-light magnetic"
+        >
+
+          <small>
+            PROJECT / 003
+          </small>
+
+          <h3>
+            CREATIVE ENGINE
+          </h3>
+
+          <p>
+            MOTION-DRIVEN
+            USER EXPERIENCE
+          </p>
+
+          <strong>
+            UX ↗
+          </strong>
+
+        </article>
+
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         TECHNOLOGY
+         =================================================== -->
+
+    <section
+      class="section tech"
+      id="technology"
+    >
+
+      <div class="number">
+        04
+      </div>
+
+
+      <div class="label">
+        NEXORA / TECHNOLOGY
+      </div>
+
+
+      <div class="technology-header">
+
+        <h2>
+
+          POWERED BY
+
+          <span>
+            THE FUTURE.
+          </span>
+
+        </h2>
+
+
+        <p class="description">
+
+          A modular technology stack
+          combining intelligent systems,
+          realtime graphics and cinematic
+          interaction.
+
+        </p>
+
+      </div>
+
+
+      <div class="tech-list">
+
+        <span>
+          01 / AI
+        </span>
+
+        <span>
+          02 / THREE.JS
+        </span>
+
+        <span>
+          03 / WEBGL
+        </span>
+
+        <span>
+          04 / GSAP
+        </span>
+
+        <span>
+          05 / REALTIME
+        </span>
+
+        <span>
+          06 / MOTION
+        </span>
+
+        <span>
+          07 / JAVASCRIPT
+        </span>
+
+        <span>
+          08 / CREATIVE CODE
+        </span>
+
+      </div>
+
+
+      <!-- SYSTEM DIAGNOSTICS -->
+
+      <div class="diagnostics">
+
+        <div>
+
+          <span>
+            RENDER
+          </span>
+
+          <b>
+            WEBGL
+          </b>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            MOTION
+          </span>
+
+          <b>
+            GSAP
+          </b>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            STATUS
+          </span>
+
+          <b>
+            ONLINE
+          </b>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         AI LAB
+         =================================================== -->
+
+    <section
+      class="section ai-lab"
+      id="ai-lab"
+    >
+
+      <div class="number">
+        05
+      </div>
+
+
+      <div class="label">
+        NEXORA / AI LAB
+      </div>
+
+
+      <div class="ai-lab-content">
+
+
+        <div>
+
+          <h2>
+
+            YOUR NEXT
+
+            <span class="shimmer">
+              CONVERSATION
+            </span>
+
+            STARTS HERE.
+
+          </h2>
+
+
+          <p class="description">
+
+            Connect with the NEXORA AI
+            chatbot and explore intelligent
+            interaction through a futuristic
+            conversational interface.
+
+          </p>
+
+
+          <a
+            href="https://ansh4013.github.io/p1/index.html"
+            class="feedback-btn magnetic energy-border"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+
+            <span class="feedback-dot"></span>
+
+            VISIT NEXORA AI CHATBOT
+
+            <strong>
+              ↗
+            </strong>
+
+          </a>
+
+        </div>
+
+
+        <!-- AI STATUS -->
+
+        <div class="ai-status">
+
+          <div>
+
+            <span>
+              NEURAL ENGINE
+            </span>
+
+            <b>
+              ● ONLINE
+            </b>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              RESPONSE
+            </span>
+
+            <b>
+              ● READY
+            </b>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              SYSTEM
+            </span>
+
+            <b>
+              ● ACTIVE
+            </b>
+
+          </div>
+
+        </div>
+
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         FEEDBACK PORTAL
+         =================================================== -->
+
+    <section
+      class="section feedback-portal"
+      id="feedback"
+    >
+
+      <div class="number">
+        06
+      </div>
+
+
+      <div class="feedback-content">
+
+
+        <div class="label">
+          NEXORA / USER SIGNAL
+        </div>
+
+
+        <h2>
+
+          YOUR INPUT
+
+          <span class="shimmer">
+            SHAPES
+          </span>
+
+          THE NEXT SYSTEM.
+
+        </h2>
+
+
+        <p class="description">
+
+          Share your ideas, suggestions,
+          discoveries or problems. Your
+          feedback helps evolve NEXORA.
+
+        </p>
+
+
+        <a
+          href="https://ansh4013.github.io/p1/feedback.html"
+          class="feedback-btn magnetic energy-border"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+
+          <span class="feedback-dot"></span>
+
+          FEEDBACK
+
+          <strong>
+            ↗
+          </strong>
+
+        </a>
+
+
+        <div class="feedback-types">
+
+          <span>
+            01 — IDEA
+          </span>
+
+          <span>
+            02 — BUG
+          </span>
+
+          <span>
+            03 — SUGGESTION
+          </span>
+
+          <span>
+            04 — EXPERIENCE
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- ORBIT -->
+
+      <div
+        class="feedback-orbit"
+        aria-hidden="true"
+      >
+
+        <div class="feedback-ring ring-one"></div>
+
+        <div class="feedback-ring ring-two"></div>
+
+        <div class="feedback-ring ring-three"></div>
+
+        <span>
+          USER SIGNAL
+        </span>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===================================================
+         FINAL CTA
+         =================================================== -->
+
+    <section
+      class="final"
+      id="contact"
+    >
+
+      <p>
+        THE NEXT INTERFACE IS ALREADY HERE
+      </p>
+
+
+      <h2>
+
+        BUILD
+
+        <span>
+          BEYOND.
+        </span>
+
+      </h2>
+
+
+      <div class="final-actions">
+
+
+        <a
+          href="https://ansh4013.github.io/p1/index.html"
+          class="btn magnetic energy-border"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+
+          VISIT AI CHATBOT ↗
+
+        </a>
+
+
+        <a
+          href="https://ansh4013.github.io/p1/feedback.html"
+          class="btn magnetic"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+
+          SEND FEEDBACK ↗
+
+        </a>
+
+
+      </div>
+
+    </section>
+
+
+  </main>
+
+
+
+  <!-- =====================================================
+       FOOTER
+       ===================================================== -->
+
+  <footer>
+
+
+    <strong>
+      NEXORA
+    </strong>
+
+
+    <span>
+      DIGITAL EXPERIENCE ENGINE
+    </span>
+
+
+    <span class="system-status">
+      SYSTEM ONLINE
+    </span>
+
+
+    <span>
+      AI / 3D / WEB / MOTION
+    </span>
+
+
+  </footer>
+
+
+</body>
+
+</html>
