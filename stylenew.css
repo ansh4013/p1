@@ -1,6 +1,9 @@
 body{
-  background:red !important;
-  color:white !important;
+background:
+radial-gradient(circle at 75% 20%,#123c4f55,transparent 35%),
+radial-gradient(circle at 20% 80%,#26306b55,transparent 35%),
+linear-gradient(135deg,#030812,#071521 55%,#02050b);
+color:#eefcff;
 }
 /* =========================================================
    NEXORA // STYLE SYSTEM
