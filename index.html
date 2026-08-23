@@ -1,270 +1,1165 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Chatbot</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <meta name="theme-color" content="#050816">
+
+  <meta name="description"
+        content="NEXORA — Digital Intelligence Reimagined. AI, 3D, WebGL, Motion and Creative Technology.">
+
+  <title>NEXORA // Digital Intelligence</title>
+
+  <!-- =====================================================
+       FONTS
+       ===================================================== -->
+
+  <link rel="preconnect"
+        href="https://fonts.googleapis.com">
+
+  <link rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+  <!-- =====================================================
+       MAIN CSS
+       ===================================================== -->
+
+  <link rel="stylesheet"
+        href="stylenew.css">
+
+  <!-- =====================================================
+       EXTERNAL ENGINES
+       DEFERRED LOADING
+       ===================================================== -->
+
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
+    defer>
+  </script>
+
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
+    defer>
+  </script>
+
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"
+    defer>
+  </script>
+
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"
+    defer>
+  </script>
+
+  <!-- NEXORA ENGINE -->
+  <script
+    src="scriptnew.js"
+    defer>
+  </script>
+
 </head>
+
+
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="logo">
-                <i class="fas fa-robot"></i>
-                <span>AI</span>
-                <span class="logo-accent">CHAT</span>
-            </div>
-            <ul class="nav-menu">
-                <li><a href="#home" class="nav-link">Home</a></li>
-                <li><a href="#features" class="nav-link">Features</a></li>
-                <li><a href="#chatbot" class="nav-link">Chat</a></li>
-                <li><a href="#about" class="nav-link">About</a></li>
-            </ul>
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
+
+  <!-- =====================================================
+       LOADER
+       ===================================================== -->
+
+  <div id="loader">
+
+    <div class="loader-core">
+
+      <div class="loading-dots">
+        <i></i>
+        <i></i>
+        <i></i>
+      </div>
+
+      <span>DIVING INTO AI WORLD</span>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       CUSTOM CURSOR
+       ===================================================== -->
+
+  <div class="cursor"></div>
+
+  <div class="cursor-ring"></div>
+
+
+  <!-- =====================================================
+       HEADER / NAVIGATION
+       ===================================================== -->
+
+  <header class="nav">
+
+    <!-- LOGO -->
+
+    <a
+      href="#home"
+      class="logo magnetic"
+      aria-label="NEXORA Home"
+    >
+
+      NEXORA
+
+      <span>/01</span>
+
+    </a>
+
+
+    <!-- MAIN NAVIGATION -->
+
+    <nav aria-label="Main navigation">
+
+      <a href="#home">
+        HOME
+      </a>
+
+      <a href="#intelligence">
+        INTELLIGENCE
+      </a>
+
+      <a href="#immersion">
+        IMMERSION
+      </a>
+
+      <a href="#creations">
+        CREATIONS
+      </a>
+
+      <a href="#technology">
+        TECHNOLOGY
+      </a>
+
+      <a href="#feedback">
+        FEEDBACK
+      </a>
+
     </nav>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="hero-content">
-            <div class="hero-badge">
-                <span class="badge-text">• Advanced AI Technology</span>
-            </div>
-            <h1 class="hero-title">
-                Next Generation
-                <span class="gradient-text">AI Assistant</span>
-            </h1>
-            <p class="hero-subtitle">Introduced by Ansh Katiyar• Always Learning • Always Ready</p>
-            <div class="hero-buttons">
-                <a href="#chatbot" class="btn btn-primary">
-                    <i class="fas fa-comments"></i> Start Chat
-                </a>
-                <a href="#features" class="btn btn-secondary">
-                    <i class="fas fa-arrow-right"></i> Learn More
-                </a>
-            </div>
+
+    <!-- =================================================
+         LARGE AI CHATBOT BUTTON
+         ================================================= -->
+
+    <a
+      href="https://ansh4013.github.io/p1/chat.html#%20home"
+      class="nav-ai-btn magnetic energy-border"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+
+      <span class="ai-pulse"></span>
+
+      <span>
+        VISIT NEXORA AI CHATBOT
+      </span>
+
+      <strong>
+        ↗
+      </strong>
+
+    </a>
+
+
+    <!-- MOBILE MENU -->
+
+    <button
+      class="menu"
+      type="button"
+      aria-label="Open navigation"
+    >
+
+      <i></i>
+      <i></i>
+
+    </button>
+
+  </header>
+
+
+  <!-- =====================================================
+       MAIN EXPERIENCE
+       ===================================================== -->
+
+  <main>
+
+
+    <!-- ===================================================
+         HERO
+         =================================================== -->
+
+    <section
+      class="hero"
+      id="home"
+    >
+
+      <!-- THREE.JS CANVAS -->
+
+      <canvas
+        id="heroCanvas"
+        aria-hidden="true">
+      </canvas>
+
+
+      <!-- GRID -->
+
+      <div
+        class="grid"
+        aria-hidden="true">
+      </div>
+
+
+      <!-- AMBIENT LIGHT -->
+
+      <div
+        class="ambient"
+        aria-hidden="true">
+      </div>
+
+      <div
+        class="ambient violet"
+        aria-hidden="true">
+      </div>
+
+
+      <!-- HERO CONTENT -->
+
+      <div class="hero-content">
+
+        <div class="eyebrow">
+
+          NEXORA / 001
+
+          <span>
+            DIGITAL INTELLIGENCE WITH AI
+          </span>
+
         </div>
-        <div class="hero-visual">
-            <div class="floating-card">
-                <div class="card-inner">
-                    <i class="fas fa-brain"></i>
-                    <span>AI Powered</span>
-                </div>
-            </div>
-            <div class="floating-card" style="animation-delay: 1s;">
-                <div class="card-inner">
-                    <i class="fas fa-bolt"></i>
-                    <span>Lightning Fast</span>
-                </div>
-            </div>
+
+
+        <h1
+          class="glitch"
+          data-text="NEXORA"
+        >
+
+          NEXORA AI
+
+        </h1>
+
+
+        <div class="hero-title">
+
+          DIGITAL
+
+          <span>
+            INTELLIGENCE
+          </span>
+
+          REIMAGINED.
+
         </div>
+
+
+        <p class="hero-text">
+
+          Think Beyond. Create Beyond.
+
+          <br>
+
+          Next Generation AI
+
+          Powered by intelligence. Driven by innovation. Built for the future.
+
+          <br>
+
+          Nexora is a next-generation artificial intelligence platform designed
+          to make technology smarter, faster, and more accessible. It combines
+          intelligent assistance, creative capabilities, and powerful AI-driven
+          solutions in one modern platform.
+
+        </p>
+
+
+        <!-- ACTIONS -->
+
+        <div class="actions">
+
+          <a
+            href="#intelligence"
+            class="btn magnetic"
+          >
+
+            ENTER NEXORA AI
+
+            <strong>↓</strong>
+
+          </a>
+
+
+          <a
+            href="https://ansh4013.github.io/p1/chat.html#%20home "
+            class="btn magnetic"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+
+            AI CHATBOT
+
+            <strong>↗</strong>
+
+          </a>
+
+        </div>
+
+      </div>
+
+
+      <!-- HERO SYSTEM DATA -->
+
+      <div class="hero-info">
+
+        <span>
+          SYS.001
+        </span>
+
+        <span>
+          AI / 3D / WEB
+        </span>
+
+        <span>
+          <i></i>
+          SYSTEM ONLINE
+        </span>
+
+      </div>
+
+
+      <!-- SCROLL INDICATOR -->
+
+      <div class="scroll-indicator">
+
+        <span>
+          SCROLL TO EXPLORE
+        </span>
+
+        <b>
+          ↓
+        </b>
+
+      </div>
+
     </section>
 
-    <!-- Features Section -->
-    <section id="features" class="features">
-        <div class="section-header">
-            <h2>Why Choose <span class="gradient-text">Our AI?</span></h2>
-            <p>Experience the future of conversational AI</p>
+
+    <!-- ===================================================
+         INTELLIGENCE
+         =================================================== -->
+
+    <section
+      class="section intelligence"
+      id="intelligence"
+    >
+
+      <div class="number">
+        01
+      </div>
+
+
+      <div class="label">
+        NEXORA / INTELLIGENCE
+      </div>
+
+
+      <div class="section-grid">
+
+
+        <div class="section-heading">
+
+          <h2>
+            WE DON'T JUST BUILD SOFTWARE.
+          </h2>
+
         </div>
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-brain"></i>
-                </div>
-                <h3>Advanced AI</h3>
-                <p>Powered by next generation AI for intelligent responses</p>
-                <div class="card-glow"></div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-zap"></i>
-                </div>
-                <h3>Lightning Fast</h3>
-                <p>Real-time responses with minimal latency</p>
-                <div class="card-glow"></div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-shield-alt"></i>
-                </div>
-                <h3>Secure</h3>
-                <p>Your conversations are encrypted and private</p>
-                <div class="card-glow"></div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <h3>Multi-Personality</h3>
-                <p>General, Coding, Tutor, or Creative modes</p>
-                <div class="card-glow"></div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-mobile-alt"></i>
-                </div>
-                <h3>Responsive</h3>
-                <p>Works seamlessly on all devices</p>
-                <div class="card-glow"></div>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-infinity"></i>
-                </div>
-                <h3>Always Available</h3>
-                <p>24/7 availability with instant support</p>
-                <div class="card-glow"></div>
-            </div>
+
+
+        <div class="section-copy">
+
+          <p class="description">
+
+            we help <br>
+            enginner to create
+            <br>
+            People to interact
+            <br>
+            Teachers to explore the world.
+
+            systems designed to interact,
+            adapt and evolve.
+
+          </p>
+
+
+          <div class="system-line">
+
+            <span>
+              🤖 Intelligent AI Assistant
+            </span>
+
+            <b>
+              Get fast, contextual, and helpful responses to your questions and tasks.
+            </b>
+
+          </div>
+
+
+          <div class="system-line">
+
+            <span>
+              💡 Smart Problem Solving
+            </span>
+
+            <b>
+              Turn complex problems into simple, actionable solutions.
+            </b>
+
+          </div>
+
+
+          <div class="system-line">
+
+            <span>
+              ✍️ AI Content Creation
+            </span>
+
+            <b>
+              Generate ideas, articles, scripts, presentations, captions, and more.
+            </b>
+
+          </div>
+
+
+          <div class="system-line">
+
+            <span>
+              📚 AI-Powered Learning
+            </span>
+
+            <b>
+              Understand difficult topics, simplify concepts, and learn at your own pace.
+            </b>
+
+          </div>
+
+
+          <div class="system-line">
+
+            <span>
+              🔎 AI Research Mode
+            </span>
+
+            <b>
+              Organizes information and produces structured insights.
+            </b>
+
+          </div>
+
+
+          <div class="system-line">
+
+            <span>
+              🧠 Deep Reasoning Engine
+            </span>
+
+            <b>
+              Breaks complicated problems into logical steps.
+            </b>
+
+          </div>
+
+
+          <div class="system-line">
+
+            <span>
+              💻 AI Coding Studio
+            </span>
+
+            <b>
+              Generate, explain, debug, and improve code.
+              Build projects with intelligent AI assistance.
+              Code smarter. Build beyond.
+            </b>
+
+          </div>
+
+
+          <div class="system-line">
+
+            <span>
+              ⚡ Fast & User-Friendly
+            </span>
+
+            <b>
+              A clean, modern experience designed to make AI easy for everyone.
+            </b>
+
+          </div>
+
         </div>
+
+      </div>
+
+
+      <!-- INTELLIGENCE CARDS -->
+
+      <div class="cards">
+
+
+        <article
+          class="card hover-light magnetic"
+        >
+
+          <small>
+            NEXORA / 001
+          </small>
+
+          <h3>
+            AI
+          </h3>
+
+          <p>
+            INFORMATION
+          </p>
+
+          <span>
+            ABOUT
+          </span>
+
+        </article>
+
+
+        <article
+          class="card hover-light magnetic"
+        >
+
+          <small>
+            AI WORLD / 002
+          </small>
+
+          <h3>
+            DATA
+          </h3>
+
+          <p>
+            INFORMATION
+            INTELLIGENCE
+          </p>
+
+          <span>
+            SIGNAL
+          </span>
+
+        </article>
+
+
+        <article
+          class="card hover-light magnetic"
+        >
+
+          <small>
+            SYSTEM / 003
+          </small>
+
+          <h3>
+            Above all
+          </h3>
+
+          <p>
+            SMART
+            AUTOMATION
+          </p>
+
+          <span>
+            WEBFLOW
+          </span>
+
+        </article>
+
+
+      </div>
+
     </section>
 
-    <!-- Chatbot Section -->
-    <section id="chatbot" class="chatbot-section">
-        <div class="section-header">
-            <h2>Meet Your <span class="gradient-text">AI Assistant</span></h2>
-            <p>Start a conversation now</p>
+
+    <!-- ===================================================
+         IMMERSION
+         =================================================== -->
+
+    <section
+      class="section world"
+      id="immersion"
+    >
+
+      <div class="number">
+        02
+      </div>
+
+
+      <div class="label">
+        NEXORA / AI WORLD
+      </div>
+
+
+      <div class="immersion-content">
+
+
+        <div>
+
+          <h2 class="neon">
+
+            ENTER THE
+
+            <span>
+              UNKNOWN AI WORLD
+            </span>
+
+          </h2>
+
+
+          <p class="description">
+
+            🌐 Our Vision
+
+            <br>
+
+            Nexora's vision is to build a future where AI is not just a tool,
+            but an intelligent partner that helps people think bigger,
+            work smarter, and create without limits.
+
+          </p>
+
+
+          <div class="tech-tags">
+
+            <span>
+              NEXORA
+            </span>
+
+            <span>
+              THE FUTURISTIC
+            </span>
+
+            <span>
+              GENERATION
+            </span>
+
+            <span>
+              (WITH ALL)
+            </span>
+
+          </div>
+
         </div>
 
-        <div class="chatbot-wrapper">
-            <!-- Chatbot Header -->
-            <div class="chatbot-header">
-                <div class="header-left">
-                    <div class="status-indicator"></div>
-                    <div class="header-info">
-                        <h2>AI Assistant</h2>
-                        <p>Online • Powered by ansh4013 Team</p>
-                    </div>
-                </div>
-                <button class="clear-btn" title="Clear chat">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
 
-            <!-- Personality Selector -->
-            <div class="personality-selector">
-                <button class="personality-btn active" data-personality="general">
-                    <i class="fas fa-lightbulb"></i>
-                    <span>General</span>
-                </button>
-                <button class="personality-btn" data-personality="coding">
-                    <i class="fas fa-code"></i>
-                    <span>Coding</span>
-                </button>
-                <button class="personality-btn" data-personality="tutor">
-                    <i class="fas fa-graduation-cap"></i>
-                    <span>Tutor</span>
-                </button>
-                <button class="personality-btn" data-personality="creative">
-                    <i class="fas fa-palette"></i>
-                    <span>Creative</span>
-                </button>
-            </div>
+        <!-- PARTICLE FIELD -->
 
-            <!-- Messages Container -->
-            <div class="messages-container" id="messagesContainer">
-                <div class="message ai-message">
-                    <div class="message-avatar">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <div class="message-content">
-                        <p>Hello, I'm your AI Assistant 👋</p>
-                        <p>Ask me anything I am made by Ansh Katiyar- I'm ready to help with coding, learning, creative projects, or general questions!</p>
-                    </div>
-                    <small class="message-time">Just now</small>
-                </div>
-            </div>
+        <div
+          id="particles"
+          class="particles"
+          aria-hidden="true"
+        ></div>
 
-            <!-- Typing Indicator -->
-            <div class="typing-indicator" id="typingIndicator" style="display: none;">
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
-            </div>
 
-            <!-- Input Form -->
-            <form class="input-form" id="messageForm">
-                <input 
-                    type="text" 
-                    id="messageInput" 
-                    placeholder="Type your message..." 
-                    class="message-input"
-                    autocomplete="off"
-                >
-                <button type="submit" class="send-btn" title="Send message">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
-            </form>
-        </div>
+      </div>
+
     </section>
 
-    <!-- About Section -->
-    <section id="about" class="about">
-        <div class="section-header">
-            <h2>About <span class="gradient-text">This Platform</span></h2>
-            <p>Built with cutting-edge technology</p>
-        </div>
-        <div class="about-content">
-            <div class="about-card">
-                <div class="about-icon">
-                    <i class="fas fa-rocket"></i>
-                </div>
-                <h3>Innovation First</h3>
-                <p>Built on the latest AI technologies and best practices in modern web development</p>
-            </div>
-            <div class="about-card">
-                <div class="about-icon">
-                    <i class="fas fa-lock"></i>
-                </div>
-                <h3>Privacy Focused</h3>
-                <p>Your data is secure. We respect your privacy and keep conversations confidential</p>
-            </div>
-            <div class="about-card">
-                <div class="about-icon">
-                    <i class="fas fa-star"></i>
-                </div>
-                <h3>User Experience</h3>
-                <p>Designed with you in mind - intuitive, responsive, and beautiful</p>
-            </div>
-        </div>
+
+    <!-- ===================================================
+         CREATIONS
+         =================================================== -->
+
+    <section
+      class="section projects"
+      id="creations"
+    >
+
+      <div class="number">
+        03
+      </div>
+
+
+      <div class="label">
+        NEXORA / CREATIONS
+      </div>
+
+
+      <h2>
+        DIGITAL EXPERIENCES WITH NEXORA
+      </h2>
+
+
+      <div class="creation-intro">
+
+        <p class="description">
+
+          Experiments, interfaces and
+          intelligent systems built at
+          the intersection of technology
+          and imagination.
+
+        </p>
+
+      </div>
+
+
+      <div class="cards project-grid">
+
+
+        <article
+          class="card project-card hover-light magnetic"
+        >
+
+          <small>
+            PROJECT / 001
+          </small>
+
+          <h3>
+            NEXORA AI
+          </h3>
+
+          <p>
+            INTELLIGENT CONVERSATIONAL
+            EXPERIENCE
+          </p>
+
+          <strong>
+            AI ↗
+          </strong>
+
+        </article>
+
+
+        <article
+          class="card project-card hover-light magnetic"
+        >
+
+          <small>
+            PROJECT / 002
+          </small>
+
+          <h3>
+            DIGITAL WORLD
+          </h3>
+
+          <p>
+            IMMERSIVE USER INTERFACE
+            ENVIRONMENT
+          </p>
+
+          <strong>
+            3D ↗
+          </strong>
+
+        </article>
+
+
+        <article
+          class="card project-card hover-light magnetic"
+        >
+
+          <small>
+            PROJECT / 003
+          </small>
+
+          <h3>
+            CREATIVE DESIGNING
+          </h3>
+
+          <p>
+            MOTION-DRIVEN
+            USER EXPERIENCE
+          </p>
+
+          <strong>
+            UX ↗
+          </strong>
+
+        </article>
+
+
+      </div>
+
     </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h4>AI Chat</h4>
-                <p>Your personal AI assistant powered by Itzmeansh</p>
-            </div>
-            <div class="footer-section">
-                <h4>Quick Links</h4>
-                <ul>
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#features">Features</a></li>
-                    <li><a href="#chatbot">Chat</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>Follow Us</h4>
-                <div class="social-links">
-                    <a href="#" title="GitHub"><i class="fab fa-github"></i></a>
-                    <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 AI Chat. All rights reserved.Designers designed with utmost CARE PERFECTION</p>
-            <p>Give your crucial feedback on <a href="https://ansh4013.github.io/p1/feedback.html">YOUR FEEDBACK</a></p>
-        </div>
-    </footer>
 
-    <script src="script.js"></script>
+    <!-- ===================================================
+         TECHNOLOGY
+         =================================================== -->
+
+    <section
+      class="section tech"
+      id="technology"
+    >
+
+      <div class="number">
+        04
+      </div>
+
+
+      <div class="label">
+        NEXORA / TECHNOLOGY
+      </div>
+       HAUL YOUR EMOTIONS BECAUSE:-
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; padding: 20px; box-sizing: border-box; min-height: 100vh; background-color: #000;">
+
+    <!-- Top Half: Image -->
+    <div style="width: 100%; max-width: 500px; text-align: center;">
+        <img src="IMG_20260823_183110.jpg" alt="Project Image" style="width: 100%; height: auto; max-height: 45vh; border-radius: 12px; object-fit: contain;">
+    </div>
+
+    <!-- Bottom Half: Video Player -->
+    <div style="width: 100%; max-width: 500px; text-align: center;">
+        <video controls style="width: 100%; height: auto; max-height: 45vh; border-radius: 12px; object-fit: contain;">
+            <source src="VID-20260823-WA9463.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+
+</div>
+
+    </div>
+
+</div>
+
+
+    </section>
+
+
+    <!-- ===================================================
+         AI LAB
+         =================================================== -->
+
+    <section
+      class="section ai-lab"
+      id="ai-lab"
+    >
+
+      <div class="number">
+        05
+      </div>
+
+
+      <div class="label">
+        NEXORA / AI LAB
+      </div>
+
+
+      <div class="ai-lab-content">
+
+
+        <div>
+
+          <h2>
+
+            YOUR NEXT CONVERSATION
+
+            <br>
+
+            STARTS HERE.
+
+          </h2>
+
+
+          <p class="description">
+
+            Connect with the NEXORA AI
+            chatbot and explore intelligent
+            interaction through a futuristic
+            conversational interface.
+
+          </p>
+
+
+          <a
+            href="   https://ansh4013.github.io/p1/chat.html#%20home   "
+            class="feedback-btn magnetic energy-border"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+
+            <span class="feedback-dot"></span>
+
+            VISIT NEXORA AI CHATBOT
+
+            <strong>
+              ↗
+            </strong>
+
+          </a>
+
+        </div>
+
+
+        <!-- AI STATUS -->
+
+        <div class="ai-status">
+
+          <div>
+
+            <span>
+              NEURAL ENGINE
+            </span>
+
+            <b>
+              ● ONLINE
+            </b>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              RESPONSE
+            </span>
+
+            <b>
+              ● READY
+            </b>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              SYSTEM
+            </span>
+
+            <b>
+              ● ACTIVE
+            </b>
+
+          </div>
+
+        </div>
+
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         FEEDBACK PORTAL
+         =================================================== -->
+
+    <section
+      class="section feedback-portal"
+      id="feedback"
+    >
+
+      <div class="number">
+        06
+      </div>
+
+
+      <div class="feedback-content">
+
+
+        <div class="label">
+          NEXORA / USER SIGNAL
+        </div>
+
+
+        <h2>
+
+          WE RESPECT YOUR EXPERIENCES
+
+          <br>
+
+          THE NEXT SYSTEM.
+
+        </h2>
+
+
+        <p class="description">
+
+          Share your ideas, suggestions,
+          discoveries or problems. Your
+          feedback helps evolve NEXORA.
+
+        </p>
+
+
+        <a
+          href="https://ansh4013.github.io/p1/feedback.html"
+          class="feedback-btn magnetic energy-border"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+
+          <span class="feedback-dot"></span>
+
+          FEEDBACK(AI NOT RELEASED) 
+
+          <strong>
+            ↗
+          </strong>
+
+        </a>
+
+
+        <div class="feedback-types">
+
+          <span>
+            01 — IDEA
+          </span>
+
+          <span>
+            02 — BUG
+          </span>
+
+          <span>
+            03 — SUGGESTION
+          </span>
+
+          <span>
+            04 — EXPERIENCE
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- ORBIT -->
+
+      <div
+        class="feedback-orbit"
+        aria-hidden="true"
+      >
+
+        <div class="feedback-ring ring-one"></div>
+
+        <div class="feedback-ring ring-two"></div>
+
+        <div class="feedback-ring ring-three"></div>
+
+        <span>
+          USER SIGNAL
+        </span>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         FINAL CTA
+         =================================================== -->
+
+    <section
+      class="final"
+      id="contact"
+    >
+
+      <p>
+        THE NEXT INTERFACE IS ALREADY HERE
+      </p>
+
+
+      <h2>
+
+        BUILD
+
+        <span>
+          BEYOND.
+        </span>
+
+      </h2>
+
+
+      <div class="final-actions">
+
+
+        <a
+          href="     https://ansh4013.github.io/p1/chat.html#%20home  "
+          class="btn magnetic energy-border"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+
+          VISIT AI CHATBOT ↗
+
+        </a>
+
+
+        <a
+          href="https://ansh4013.github.io/p1/feedback.html"
+          class="btn magnetic"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+
+          SEND FEEDBACK ↗(AI NOT RELEASED YET)
+
+        </a>
+
+
+      </div>
+
+    </section>
+
+
+  </main>
+
+
+  <!-- =====================================================
+       FOOTER
+       ===================================================== -->
+
+  <footer>
+
+    <strong>
+      NEXORA
+    </strong>
+
+
+    <span>
+      DIGITAL EXPERIENCE ENGINE
+    </span>
+
+
+    <span class="system-status">
+      SYSTEM ONLINE
+    </span>
+
+
+    <span>
+      AI / 3D / WEB / MOTION
+    </span>
+
+  </footer>
+
+
 </body>
+
 </html>
