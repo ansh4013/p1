@@ -84,7 +84,7 @@ async function handleSendMessage(e) {
         let errorMsg = 'Sorry, I encountered an error. Please try again.';
 
         if (error.message.includes('API')) {
-            errorMsg = 'API Error: Please check your API key and try again.';
+            errorMsg = 'Chat bot is still in ...progress.until Nexora is launched';
         } else if (error.message.includes('Network')) {
             errorMsg = 'Network Error: Please check your internet connection.';
         }
