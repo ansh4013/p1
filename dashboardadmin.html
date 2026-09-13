@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard (private)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+  --bg:#050816;
+  --surface-1:rgba(17,24,39,.65);
+  --surface-2:rgba(30,41,59,.7);
+  --border:rgba(56,189,248,.15);
+  --border-strong:rgba(0,255,255,.35);
+  --text-primary:#ffffff;
+  --text-secondary:#cbd5e1;
+  --text-muted:#94a3b8;
+  --cyan:#00ffff;
+  --blue:#38bdf8;
+  --purple:#7c3aed;
+  --pink:#ec4899;
+  --red:#ff6b6b;
+}
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text-primary);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  .glow{
+    position:fixed; top:-260px; left:-260px; width:520px; height:520px; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,0.06), transparent 70%);
+    pointer-events:none; z-index:0; filter:blur(10px);
+  }
+  .wrap{ max-width:960px; margin:0 auto; padding:40px 24px 100px; position:relative; z-index:1; }
+
+  .nav{ display:flex; align-items:center; justify-content:space-between; margin-bottom:80px; gap:16px; }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand-mark{ width:28px; height:28px; border:1px solid var(--text-primary); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; flex-shrink:0; }
+  .brand-text{ font-size:14px; font-weight:500; letter-spacing:0.02em; }
+
+  .btn-outline{
+    background:transparent; border:1px solid var(--border-strong); color:var(--text-primary);
+    border-radius:100px; padding:11px 20px; font-family:'Inter',sans-serif; font-weight:500; font-size:13px;
+    cursor:pointer; display:flex; align-items:center; gap:8px; transition:background .15s ease, color .15s ease;
+  }
+  .btn-outline:hover{ background:var(--text-primary); color:var(--bg); }
+  .link-btn{ background:none; border:none; color:var(--text-muted); font-size:12px; cursor:pointer; font-family:'Inter',sans-serif; text-decoration:underline; padding:0; }
+  .link-btn:hover{ color:var(--text-secondary); }
+  .edit-row{ text-align:right; margin-top:16px; }
+
+  .hero{ margin-bottom:70px; }
+  .hero-eyebrow{ font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-muted); margin-bottom:22px; display:flex; align-items:center; gap:8px; }
+  .hero-eyebrow-dot{ width:6px; height:6px; border-radius:50%; background:var(--text-primary); }
+  .hero-title{ font-size:clamp(52px, 11vw, 128px); font-weight:600; line-height:0.92; letter-spacing:-0.03em; margin:0; }
+  .hero-sub{ font-size:16px; color:var(--text-secondary); max-width:440px; margin-top:26px; line-height:1.6; font-weight:300; }
+
+  .section{ margin-bottom:80px; }
+  .section-label{ font-size:12px; font-weight:500; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-muted); margin-bottom:28px; padding-bottom:14px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+
+  .stats{ display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:var(--border); border:1px solid var(--border); }
+  @media(min-width:640px){ .stats{ grid-template-columns:repeat(4,1fr); } }
+  .stat{ background:var(--bg); padding:22px 20px; }
+  .stat-num{ font-size:32px; font-weight:600; letter-spacing:-0.01em; }
+  .stat-label{ font-size:12px; color:var(--text-muted); margin-top:6px; }
+
+  .list{ display:flex; flex-direction:column; }
+  .list-row{ display:flex; align-items:center; justify-content:space-between; gap:16px; padding:22px 0; border-bottom:1px solid var(--border); }
+  .list-row:first-child{ border-top:1px solid var(--border); }
+  .list-left{ display:flex; align-items:center; gap:14px; min-width:0; }
+  .status-dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .status-dot.live{ background:#FFFFFF; }
+  .status-dot.progress{ background:rgba(255,255,255,0.55); }
+  .status-dot.archived{ background:rgba(255,255,255,0.28); }
+  .list-body{ min-width:0; }
+  .list-name{ font-size:17px; font-weight:500; }
+  .list-url{ font-size:13px; color:var(--text-secondary); text-decoration:none; }
+  .list-url:hover{ color:var(--text-primary); }
+  .list-desc{ font-size:13px; color:var(--text-muted); margin-top:4px; }
+  .list-right{ display:flex; align-items:center; gap:16px; flex-shrink:0; }
+  .list-status{ font-size:12px; color:var(--text-muted); letter-spacing:0.04em; text-transform:uppercase; }
+  .icon-btn{ background:none; border:none; cursor:pointer; color:var(--text-muted); padding:2px; display:flex; }
+  .icon-btn:hover{ color:var(--text-primary); }
+  .icon-btn.danger:hover{ color:var(--red); }
+
+  .empty{ padding:32px 0; color:var(--text-muted); font-size:14px; border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+
+  .chips{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px; }
+  .chip{ border:1px solid var(--border-strong); border-radius:100px; padding:9px 18px; font-size:13px; display:flex; align-items:center; gap:8px; }
+  .chip button{ background:none; border:none; color:var(--text-muted); cursor:pointer; display:flex; padding:0; }
+  .chip button:hover{ color:var(--red); }
+  .chip-add{ display:flex; gap:8px; align-items:center; }
+  .chip-add input{ background:var(--surface-2); border:1px solid var(--border); border-radius:100px; padding:9px 16px; color:var(--text-primary); font-family:'Inter',sans-serif; font-size:13px; outline:none; width:180px; }
+  .chip-add input:focus{ border-color:var(--border-strong); }
+  .chip-add button{ background:transparent; border:1px solid var(--border-strong); color:var(--text-secondary); border-radius:100px; padding:9px 16px; font-size:13px; cursor:pointer; font-family:'Inter',sans-serif; }
+  .chip-add button:hover{ color:var(--text-primary); }
+
+  .cofounder-intro{ font-size:15px; line-height:1.7; color:var(--text-secondary); max-width:560px; margin-bottom:36px; font-weight:300; }
+  .cofounder-grid{ display:grid; grid-template-columns:1fr; gap:1px; background:var(--border); border:1px solid var(--border); margin-bottom:36px; }
+  @media(min-width:640px){ .cofounder-grid{ grid-template-columns:1fr 1fr; } }
+  .cofounder-card{ background:var(--bg); padding:24px 22px; }
+  .cofounder-name{ font-size:15px; font-weight:500; margin-bottom:8px; }
+  .cofounder-degrees{ font-size:13px; color:var(--text-secondary); line-height:1.6; }
+  .cta-link{ display:inline-flex; align-items:center; gap:8px; text-decoration:none; color:var(--bg); background:var(--text-primary); border-radius:100px; padding:14px 28px; font-weight:500; font-size:14px; transition:opacity .15s ease; }
+  .cta-link:hover{ opacity:0.8; }
+
+  .contact-list{ display:flex; flex-direction:column; }
+  .contact-row{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding:22px 0; border-bottom:1px solid var(--border); }
+  .contact-row:first-child{ border-top:1px solid var(--border); }
+  .contact-label{ font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:5px; }
+  .contact-value{ font-size:16px; font-weight:400; }
+  .contact-value.empty-val{ color:var(--text-muted); font-weight:300; }
+  .contact-value a{ color:var(--text-primary); text-decoration:none; border-bottom:1px solid var(--border-strong); }
+  .contact-cta{ background:transparent; border:1px solid var(--border-strong); color:var(--text-primary); border-radius:100px; padding:9px 18px; font-size:12.5px; font-weight:500; text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
+  .contact-cta:hover{ background:var(--text-primary); color:var(--bg); }
+
+  .foot{ font-size:12px; color:var(--text-muted); text-align:center; padding-top:20px; border-top:1px solid var(--border); }
+
+  .overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.82); backdrop-filter:blur(3px); display:none; align-items:flex-start; justify-content:center; padding:60px 20px; z-index:50; overflow-y:auto; }
+  .overlay.open{ display:flex; }
+  .modal{ background:var(--surface-1); border:1px solid var(--border-strong); border-radius:16px; width:100%; max-width:440px; padding:24px; }
+  .modal h2{ font-size:18px; font-weight:600; margin:0 0 18px; }
+  .field{ margin-bottom:14px; }
+  .field label{ display:block; font-size:12.5px; color:var(--text-secondary); margin-bottom:6px; font-weight:500; }
+  .field input, .field select, .field textarea{ width:100%; background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:10px 12px; color:var(--text-primary); font-family:'Inter',sans-serif; font-size:14px; outline:none; }
+  .field input:focus, .field select:focus, .field textarea:focus{ border-color:var(--border-strong); }
+  .field textarea{ resize:vertical; min-height:60px; }
+  .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .err{ color:var(--red); font-size:12px; margin-top:5px; display:none; }
+  .modal-actions{ display:flex; gap:10px; margin-top:18px; }
+  .btn-secondary{ flex:1; background:transparent; border:1px solid var(--border-strong); color:var(--text-secondary); border-radius:9px; padding:11px; font-weight:600; font-size:14px; cursor:pointer; font-family:'Inter',sans-serif; }
+  .btn-primary{ flex:1; background:var(--text-primary); border:none; color:var(--bg); border-radius:9px; padding:11px; font-weight:600; font-size:14px; cursor:pointer; font-family:'Inter',sans-serif; }
+
+  .lock-screen{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .lock-box{ border:1px solid var(--border-strong); border-radius:16px; padding:36px 28px; max-width:340px; width:100%; text-align:center; }
+  .lock-icon{ width:44px; height:44px; border-radius:50%; margin:0 auto 18px; border:1px solid var(--text-primary); display:flex; align-items:center; justify-content:center; }
+  .lock-title{ font-size:18px; font-weight:600; margin-bottom:6px; }
+  .lock-sub{ font-size:13px; color:var(--text-secondary); margin-bottom:22px; }
+  .lock-box input{ width:100%; background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:11px 14px; color:var(--text-primary); font-family:'Inter',sans-serif; font-size:14px; outline:none; margin-bottom:12px; text-align:center; }
+  .lock-box input:focus{ border-color:var(--border-strong); }
+  .lock-err{ color:var(--red); font-size:12.5px; margin-bottom:10px; display:none; }
+
+body{
+  background:
+  radial-gradient(circle at 20% 20%,rgba(0,255,255,.12),transparent 25%),
+  radial-gradient(circle at 80% 30%,rgba(124,58,237,.18),transparent 30%),
+  radial-gradient(circle at 50% 90%,rgba(56,189,248,.15),transparent 35%),
+  #050816 !important;
+}
+.nav,.stat,.list-row,.cofounder-card,.contact-row,.modal,.lock-box{
+  backdrop-filter:blur(20px);
+}
+.stat,.list-row,.cofounder-card,.contact-row{
+  background:rgba(255,255,255,.03) !important;
+  border:1px solid rgba(255,255,255,.08) !important;
+  border-radius:18px;
+}
+.hero-title{
+  background:linear-gradient(90deg,#ffffff,#00ffff,#7c3aed);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  font-weight:900 !important;
+}
+.btn-outline,.btn-primary{
+  background:linear-gradient(135deg,#00ffff,#7c3aed) !important;
+  border:none !important;
+  color:white !important;
+}
+
+</style>
+</head>
+<body>
+<div class="glow" id="glow"></div>
+
+<div class="lock-screen" id="lockScreen">
+  <div class="lock-box">
+    <div class="lock-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </div>
+    <div class="lock-title">Private dashboard</div>
+    <div class="lock-sub">Solve and enter(Q-The largest river of world).</div>
+    <input type="password" id="lockInput" placeholder="Passcode" autocomplete="off">
+    <div class="lock-err" id="lockErr">Wrong passcode. Try again.</div>
+    <button class="btn-primary" id="lockSubmit" style="width:100%;">Unlock</button>
+  </div>
+</div>
+
+<div class="wrap" id="appContent" style="display:none;">
+
+  <div class="nav">
+    <div class="brand">
+      <div class="brand-mark">M</div>
+      <div class="brand-text">My Sites</div>
+    </div>
+    <button class="btn-outline" id="openAdd">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      Add site
+    </button>
+  </div>
+
+  <div class="hero">
+    <div class="hero-eyebrow"><span class="hero-eyebrow-dot"></span>Live workspace</div>
+    <h1 class="hero-title">Dashboard</h1>
+    <div class="hero-sub">Every site I've shipped, my traction, and the people I'm looking to build with.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Overview</div>
+    <div class="stats">
+      <div class="stat"><div class="stat-num" id="statPeople">0</div><div class="stat-label">People on the team</div></div>
+      <div class="stat"><div class="stat-num" id="statSoftware">0</div><div class="stat-label">Software in progress</div></div>
+      <div class="stat"><div class="stat-num" id="statDemand">0</div><div class="stat-label">Companies interested</div></div>
+      <div class="stat"><div class="stat-num" id="statFollowers">0</div><div class="stat-label">Followers</div></div>
+    </div>
+    <div class="edit-row"><button class="link-btn" id="editStatsBtn">Edit stats</button></div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Liked by</div>
+    <div class="chips" id="likedChips"></div>
+    <div class="chip-add">
+      <input type="text" id="likedInput" placeholder="Add a name, once it's real">
+      <button id="likedAddBtn">Add</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Affiliations</div>
+    <div class="chips" id="affChips"></div>
+    <div class="chip-add">
+      <input type="text" id="affInput" placeholder="Add a partner, once confirmed">
+      <button id="affAddBtn">Add</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Sites</div>
+    <div class="list" id="grid"></div>
+    <div class="empty" id="emptyState" style="display:none;">No sites yet. Add the first one above.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Looking for co-founders</div>
+    <div class="cofounder-intro">Aiming to build something on the scale of Google, Microsoft, and IBM — not as an employee, but as a founder putting real ownership behind it. If you'd rather build a company than work inside one, get in touch.</div>
+    <div class="cofounder-grid">
+      <div class="cofounder-card"><div class="cofounder-name">Business and management</div><div class="cofounder-degrees">BTech + MBA<br>BTech + MIM</div></div>
+      <div class="cofounder-card"><div class="cofounder-name">Research field</div><div class="cofounder-degrees">BTech + MTech</div></div>
+      <div class="cofounder-card"><div class="cofounder-name">Tech field</div><div class="cofounder-degrees">BTech + MS</div></div>
+      <div class="cofounder-card"><div class="cofounder-name">Biotech engineers</div><div class="cofounder-degrees">BTech in Biotechnology</div></div>
+    </div>
+    <a class="cta-link" href="#contactSection">Contact now</a>
+  </div>
+
+  <div class="section" id="contactSection">
+    <div class="section-label">Contact</div>
+    <div class="contact-list">
+      <div class="contact-row">
+        <div><div class="contact-label">WhatsApp</div><div class="contact-value empty-val" id="waDisplay">Not set</div></div>
+        <a class="contact-cta" id="waLink" href="#" target="_blank" rel="noopener" style="display:none;">Message</a>
+      </div>
+      <div class="contact-row"><div><div class="contact-label">Phone</div><div class="contact-value empty-val" id="phoneDisplay">Not set</div></div></div>
+      <div class="contact-row"><div><div class="contact-label">Website</div><div class="contact-value empty-val" id="siteDisplay">Not set</div></div></div>
+    </div>
+    <div class="edit-row"><button class="link-btn" id="editContactBtn">Edit contact info</button></div>
+  </div>
+
+  <div class="foot">My Sites — built and maintained personally.</div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h2 id="modalTitle">Add a site</h2>
+    <div class="field">
+      <label>Name</label>
+      <input type="text" id="fName" placeholder="e.g. Portfolio site">
+      <div class="err" id="errName">Enter a name</div>
+    </div>
+    <div class="field">
+      <label>URL</label>
+      <input type="text" id="fUrl" placeholder="e.g. mysite.com">
+      <div class="err" id="errUrl">Enter a URL</div>
+    </div>
+    <div class="field">
+      <label>Status</label>
+      <select id="fStatus">
+        <option value="live">Live</option>
+        <option value="progress">In progress</option>
+        <option value="archived">Archived</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Description</label>
+      <textarea id="fDesc" placeholder="What does this site do?"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="cancelBtn">Cancel</button>
+      <button class="btn-primary" id="saveBtn">Save site</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="statsOverlay">
+  <div class="modal">
+    <h2>Edit stats</h2>
+    <div class="field-row">
+      <div class="field"><label>People on the team</label><input type="number" id="inPeople" min="0"></div>
+      <div class="field"><label>Software in progress</label><input type="number" id="inSoftware" min="0"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Companies interested</label><input type="number" id="inDemand" min="0"></div>
+      <div class="field"><label>Followers</label><input type="number" id="inFollowers" min="0"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="statsCancel">Cancel</button>
+      <button class="btn-primary" id="statsSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="contactOverlay">
+  <div class="modal">
+    <h2>Edit contact info</h2>
+    <div class="field"><label>WhatsApp number (with country code)</label><input type="text" id="inWa" placeholder="e.g. 15551234567"></div>
+    <div class="field"><label>Phone number</label><input type="text" id="inPhone" placeholder="e.g. +1 555 123 4567"></div>
+    <div class="field"><label>Official website</label><input type="text" id="inSite" placeholder="e.g. mysite.com"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="contactCancel">Cancel</button>
+      <button class="btn-primary" id="contactSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const glow = document.getElementById('glow');
+document.addEventListener('mousemove', (e) => {
+  glow.style.transform = 'translate(' + e.clientX + 'px,' + e.clientY + 'px)';
+});
+
+let sites = [];
+let likedBy = [];
+let affiliations = [];
+let stats = { people:0, software:0, demand:0, followers:0 };
+let contact = { wa:"", phone:"", site:"" };
+let editingId = null;
+
+const grid = document.getElementById('grid');
+const emptyState = document.getElementById('emptyState');
+const overlay = document.getElementById('overlay');
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+function normalizeUrl(u){
+  if(!/^https?:\/\//i.test(u)) return 'https://' + u;
+  return u;
+}
+function statusLabel(s){
+  if(s === 'live') return 'Live';
+  if(s === 'progress') return 'In progress';
+  return 'Archived';
+}
+function formatDate(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'});
+}
+
+function renderSites(){
+  grid.innerHTML = '';
+  if(sites.length === 0){
+    emptyState.style.display = 'block';
+  } else {
+    emptyState.style.display = 'none';
+    sites.slice().sort((a,b) => b.updated - a.updated).forEach(site => {
+      const row = document.createElement('div');
+      row.className = 'list-row';
+      row.innerHTML = `
+        <div class="list-left">
+          <span class="status-dot ${site.status}"></span>
+          <div class="list-body">
+            <div class="list-name">${escapeHtml(site.name)}</div>
+            <a class="list-url" href="${escapeHtml(site.url)}" target="_blank" rel="noopener">${escapeHtml(site.url.replace(/^https?:\/\//,''))}</a>
+            ${site.desc ? `<div class="list-desc">${escapeHtml(site.desc)}</div>` : ''}
+          </div>
+        </div>
+        <div class="list-right">
+          <span class="list-status">${statusLabel(site.status)}</span>
+          <button class="icon-btn" data-edit="${site.id}" aria-label="Edit">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          </button>
+          <button class="icon-btn danger" data-del="${site.id}" aria-label="Delete">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+          </button>
+        </div>
+      `;
+      grid.appendChild(row);
+    });
+  }
+  grid.querySelectorAll('[data-edit]').forEach(btn => {
+    btn.addEventListener('click', () => openEdit(btn.getAttribute('data-edit')));
+  });
+  grid.querySelectorAll('[data-del]').forEach(btn => {
+    btn.addEventListener('click', () => deleteSite(btn.getAttribute('data-del')));
+  });
+}
+
+function renderChips(containerId, list, storeKey){
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  if(list.length === 0){
+    el.innerHTML = `<div class="empty" style="border:none; padding:0;">Nothing added yet.</div>`;
+    return;
+  }
+  list.forEach((name, idx) => {
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.innerHTML = `<span>${escapeHtml(name)}</span><button aria-label="Remove" data-idx="${idx}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg></button>`;
+    chip.querySelector('button').addEventListener('click', () => {
+      list.splice(idx,1);
+      saveKey(storeKey, list);
+      renderChips(containerId, list, storeKey);
+    });
+    el.appendChild(chip);
+  });
+}
+
+function renderStats(){
+  document.getElementById('statPeople').textContent = stats.people;
+  document.getElementById('statSoftware').textContent = stats.software;
+  document.getElementById('statDemand').textContent = stats.demand;
+  document.getElementById('statFollowers').textContent = stats.followers;
+}
+
+function renderContact(){
+  const wa = document.getElementById('waDisplay');
+  const waLink = document.getElementById('waLink');
+  if(contact.wa){
+    wa.textContent = contact.wa;
+    wa.classList.remove('empty-val');
+    waLink.style.display = 'inline-flex';
+    waLink.href = 'https://wa.me/' + contact.wa.replace(/[^0-9]/g,'');
+  } else {
+    wa.textContent = 'Not set';
+    wa.classList.add('empty-val');
+    waLink.style.display = 'none';
+  }
+  const phone = document.getElementById('phoneDisplay');
+  if(contact.phone){ phone.textContent = contact.phone; phone.classList.remove('empty-val'); }
+  else { phone.textContent = 'Not set'; phone.classList.add('empty-val'); }
+  const site = document.getElementById('siteDisplay');
+  if(contact.site){
+    site.innerHTML = `<a href="${escapeHtml(normalizeUrl(contact.site))}" target="_blank" rel="noopener">${escapeHtml(contact.site)}</a>`;
+    site.classList.remove('empty-val');
+  } else { site.textContent = 'Not set'; site.classList.add('empty-val'); }
+}
+
+async function loadKey(key, fallback){
+  try{
+    const result = await window.storage.get(key, false);
+    return result ? JSON.parse(result.value) : fallback;
+  } catch(e){
+    return fallback;
+  }
+}
+async function saveKey(key, value){
+  try{
+    await window.storage.set(key, JSON.stringify(value), false);
+  } catch(e){
+    console.error('Storage error:', e);
+  }
+}
+
+async function loadAll(){
+  sites = await loadKey('sites-list', []);
+  likedBy = await loadKey('liked-by-list', []);
+  affiliations = await loadKey('affiliations-list', []);
+  stats = await loadKey('stats-data', stats);
+  contact = await loadKey('contact-data', contact);
+  renderSites();
+  renderChips('likedChips', likedBy, 'liked-by-list');
+  renderChips('affChips', affiliations, 'affiliations-list');
+  renderStats();
+  renderContact();
+}
+
+function openModal(el){ el.classList.add('open'); }
+function closeModal(el){ el.classList.remove('open'); }
+
+function closeAddModal(){
+  overlay.classList.remove('open');
+  editingId = null;
+  document.getElementById('fName').value = '';
+  document.getElementById('fUrl').value = '';
+  document.getElementById('fStatus').value = 'live';
+  document.getElementById('fDesc').value = '';
+  document.getElementById('errName').style.display = 'none';
+  document.getElementById('errUrl').style.display = 'none';
+}
+function openEdit(id){
+  const site = sites.find(s => s.id === id);
+  if(!site) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = 'Edit site';
+  document.getElementById('fName').value = site.name;
+  document.getElementById('fUrl').value = site.url.replace(/^https?:\/\//,'');
+  document.getElementById('fStatus').value = site.status;
+  document.getElementById('fDesc').value = site.desc || '';
+  openModal(overlay);
+}
+function deleteSite(id){
+  sites = sites.filter(s => s.id !== id);
+  saveKey('sites-list', sites);
+  renderSites();
+}
+
+document.getElementById('openAdd').addEventListener('click', () => {
+  document.getElementById('modalTitle').textContent = 'Add a site';
+  openModal(overlay);
+});
+document.getElementById('cancelBtn').addEventListener('click', closeAddModal);
+overlay.addEventListener('click', (e) => { if(e.target === overlay) closeAddModal(); });
+
+document.getElementById('saveBtn').addEventListener('click', () => {
+  const name = document.getElementById('fName').value.trim();
+  const url = document.getElementById('fUrl').value.trim();
+  const status = document.getElementById('fStatus').value;
+  const desc = document.getElementById('fDesc').value.trim();
+  let valid = true;
+  if(!name){ document.getElementById('errName').style.display = 'block'; valid = false; }
+  else { document.getElementById('errName').style.display = 'none'; }
+  if(!url){ document.getElementById('errUrl').style.display = 'block'; valid = false; }
+  else { document.getElementById('errUrl').style.display = 'none'; }
+  if(!valid) return;
+
+  if(editingId){
+    const site = sites.find(s => s.id === editingId);
+    site.name = name; site.url = normalizeUrl(url); site.status = status; site.desc = desc; site.updated = Date.now();
+  } else {
+    sites.push({ id: 'site_' + Date.now(), name, url: normalizeUrl(url), status, desc, updated: Date.now() });
+  }
+  saveKey('sites-list', sites);
+  renderSites();
+  closeAddModal();
+});
+
+document.getElementById('likedAddBtn').addEventListener('click', () => {
+  const input = document.getElementById('likedInput');
+  const val = input.value.trim();
+  if(!val) return;
+  likedBy.push(val);
+  saveKey('liked-by-list', likedBy);
+  renderChips('likedChips', likedBy, 'liked-by-list');
+  input.value = '';
+});
+document.getElementById('affAddBtn').addEventListener('click', () => {
+  const input = document.getElementById('affInput');
+  const val = input.value.trim();
+  if(!val) return;
+  affiliations.push(val);
+  saveKey('affiliations-list', affiliations);
+  renderChips('affChips', affiliations, 'affiliations-list');
+  input.value = '';
+});
+
+const statsOverlay = document.getElementById('statsOverlay');
+document.getElementById('editStatsBtn').addEventListener('click', () => {
+  document.getElementById('inPeople').value = stats.people;
+  document.getElementById('inSoftware').value = stats.software;
+  document.getElementById('inDemand').value = stats.demand;
+  document.getElementById('inFollowers').value = stats.followers;
+  openModal(statsOverlay);
+});
+document.getElementById('statsCancel').addEventListener('click', () => closeModal(statsOverlay));
+statsOverlay.addEventListener('click', (e) => { if(e.target === statsOverlay) closeModal(statsOverlay); });
+document.getElementById('statsSave').addEventListener('click', () => {
+  stats.people = parseInt(document.getElementById('inPeople').value) || 0;
+  stats.software = parseInt(document.getElementById('inSoftware').value) || 0;
+  stats.demand = parseInt(document.getElementById('inDemand').value) || 0;
+  stats.followers = parseInt(document.getElementById('inFollowers').value) || 0;
+  saveKey('stats-data', stats);
+  renderStats();
+  closeModal(statsOverlay);
+});
+
+const contactOverlay = document.getElementById('contactOverlay');
+document.getElementById('editContactBtn').addEventListener('click', () => {
+  document.getElementById('inWa').value = contact.wa;
+  document.getElementById('inPhone').value = contact.phone;
+  document.getElementById('inSite').value = contact.site;
+  openModal(contactOverlay);
+});
+document.getElementById('contactCancel').addEventListener('click', () => closeModal(contactOverlay));
+contactOverlay.addEventListener('click', (e) => { if(e.target === contactOverlay) closeModal(contactOverlay); });
+document.getElementById('contactSave').addEventListener('click', () => {
+  contact.wa = document.getElementById('inWa').value.trim();
+  contact.phone = document.getElementById('inPhone').value.trim();
+  contact.site = document.getElementById('inSite').value.trim();
+  saveKey('contact-data', contact);
+  renderContact();
+  closeModal(contactOverlay);
+});
+
+const PASSCODE = "anshsecure";
+function tryUnlock(){
+  const val = document.getElementById('lockInput').value;
+  if(val === PASSCODE){
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('appContent').style.display = 'block';
+    loadAll();
+  } else {
+    document.getElementById('lockErr').style.display = 'block';
+  }
+}
+document.getElementById('lockSubmit').addEventListener('click', tryUnlock);
+document.getElementById('lockInput').addEventListener('keydown', (e) => {
+  if(e.key === 'Enter') tryUnlock();
+  document.getElementById('lockErr').style.display = 'none';
+});
+</script>
+</body>
+</html>
