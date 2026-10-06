@@ -1,4 +1,3 @@
-
 import { GoogleGenAI } from "@google/genai";
 
 export default async function handler(req, res) {
@@ -27,7 +26,7 @@ export default async function handler(req, res) {
 
   if (req.method !== "POST") {
     return res.status(405).json({
-      error: "Only POST requests are allowed"
+      error: "NEXORA: This request method is not supported."
     });
   }
 
@@ -39,8 +38,11 @@ export default async function handler(req, res) {
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
+      console.error("NEXORA CONFIG ERROR: API key missing");
+
       return res.status(500).json({
-        error: "GEMINI_API_KEY is missing in Vercel"
+        error:
+          "NEXORA is temporarily unavailable. Please try again later."
       });
     }
 
@@ -51,104 +53,85 @@ export default async function handler(req, res) {
 
     if (!message || typeof message !== "string") {
       return res.status(400).json({
-        error: "Message is required"
+        error: "NEXORA: Please enter a message."
       });
     }
 
-    // =========================
-    // GEMINI
-    // =========================
     const ai = new GoogleGenAI({
       apiKey
     });
 
-    // =========================
-    // RETRY FUNCTION
-    // =========================
-    async function generate(model) {
-
-      const response = await ai.models.generateContent({
-        model,
-        contents: message
-      });
-
-      return response.text || "";
-    }
+    let lastError = null;
 
     // =========================
-    // FIRST MODEL
+    // MAXIMUM 5 ATTEMPTS
+    // 2 SECOND DELAY BETWEEN
+    // FAILED ATTEMPTS
     // =========================
-    try {
+    for (let attempt = 1; attempt <= 5; attempt++) {
 
-      const reply = await generate("gemini-3.8-flash");
-
-      return res.status(200).json({
-        reply
-      });
-
-    } catch (firstError) {
-
-      console.error(
-        "Gemini 3.8 Flash error:",
-        firstError
-      );
-
-      const errorText =
-        firstError?.message || "";
-
-      // Retry only for temporary availability problems
-      if (
-        errorText.includes("503") ||
-        errorText.includes("UNAVAILABLE") ||
-        errorText.includes("high demand")
-      ) {
+      try {
 
         console.log(
-          "Gemini 3.8 Flash is busy. Retrying..."
+          `NEXORA request attempt ${attempt}/5`
         );
 
-        // Wait 2 seconds
-        await new Promise(resolve =>
-          setTimeout(resolve, 2000)
+        const response = await ai.models.generateContent({
+          model: "gemini-3.8-flash",
+          contents: message
+        });
+
+        console.log(
+          `NEXORA request succeeded on attempt ${attempt}`
         );
 
-        try {
+        return res.status(200).json({
+          reply:
+            response.text ||
+            "NEXORA couldn't generate a response."
+        });
 
-          const reply =
-            await generate("gemini-3.8-flash");
+      } catch (error) {
 
-          return res.status(200).json({
-            reply
-          });
+        lastError = error;
 
-        } catch (retryError) {
+        console.error(
+          `NEXORA internal attempt ${attempt}/5 failed:`,
+          error?.message || error
+        );
 
-          console.error(
-            "Gemini retry failed:",
-            retryError
+        // Don't wait after the final attempt
+        if (attempt < 5) {
+          await new Promise(resolve =>
+            setTimeout(resolve, 2000)
           );
-
-          return res.status(503).json({
-            error:
-              "Gemini is temporarily busy. Please try again in a few seconds."
-          });
         }
       }
-
-      throw firstError;
     }
+
+    // =========================
+    // ALL 5 ATTEMPTS FAILED
+    // =========================
+    console.error(
+      "NEXORA INTERNAL ERROR: All 5 attempts failed",
+      lastError?.message || lastError
+    );
+
+    return res.status(503).json({
+      error:
+        "NEXORA is temporarily unable to process your request. Please try again."
+    });
 
   } catch (error) {
 
     console.error(
-      "GEMINI ERROR:",
+      "NEXORA INTERNAL ERROR:",
       error
     );
 
     return res.status(500).json({
       error:
-        error?.message ||
-        "Gemini API failed"
+        "NEXORA encountered a temporary problem. Please try again."
     });
   }
 }
