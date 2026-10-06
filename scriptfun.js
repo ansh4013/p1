@@ -1,5 +1,5 @@
 // ========== CONFIGURATION ==========
-const API_URL ="https://p1-two-orcin.vercel.app//api/gemini";
+const API_URL ="https://p1-two-orcin.vercel.app/api/gemini";
 
 // ========== PERSONALITIES ==========
 const personalities = {
