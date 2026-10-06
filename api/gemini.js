@@ -1,3 +1,4 @@
+
 import { GoogleGenAI } from "@google/genai";
 
 export default async function handler(req, res) {
@@ -20,12 +21,10 @@ export default async function handler(req, res) {
     "Content-Type"
   );
 
-  // Handle browser preflight request
   if (req.method === "OPTIONS") {
     return res.status(204).end();
   }
 
-  // Only POST is allowed
   if (req.method !== "POST") {
     return res.status(405).json({
       error: "Only POST requests are allowed"
@@ -35,7 +34,7 @@ export default async function handler(req, res) {
   try {
 
     // =========================
-    // CHECK API KEY
+    // API KEY
     // =========================
     const apiKey = process.env.GEMINI_API_KEY;
 
@@ -46,7 +45,7 @@ export default async function handler(req, res) {
     }
 
     // =========================
-    // GET MESSAGE
+    // MESSAGE
     // =========================
     const { message } = req.body || {};
 
@@ -57,33 +56,99 @@ export default async function handler(req, res) {
     }
 
     // =========================
-    // INITIALIZE GEMINI
+    // GEMINI
     // =========================
     const ai = new GoogleGenAI({
-      apiKey: apiKey
+      apiKey
     });
 
     // =========================
-    // GENERATE RESPONSE
+    // RETRY FUNCTION
     // =========================
-    const response = await ai.models.generateContent({
-      model: "gemini-3.8-flash",
-      contents: message
-    });
+    async function generate(model) {
+
+      const response = await ai.models.generateContent({
+        model,
+        contents: message
+      });
+
+      return response.text || "";
+    }
 
     // =========================
-    // SEND RESPONSE
+    // FIRST MODEL
     // =========================
-    return res.status(200).json({
-      reply: response.text || "I couldn't generate a response."
-    });
+    try {
+
+      const reply = await generate("gemini-3.8-flash");
+
+      return res.status(200).json({
+        reply
+      });
+
+    } catch (firstError) {
+
+      console.error(
+        "Gemini 3.8 Flash error:",
+        firstError
+      );
+
+      const errorText =
+        firstError?.message || "";
+
+      // Retry only for temporary availability problems
+      if (
+        errorText.includes("503") ||
+        errorText.includes("UNAVAILABLE") ||
+        errorText.includes("high demand")
+      ) {
+
+        console.log(
+          "Gemini 3.8 Flash is busy. Retrying..."
+        );
+
+        // Wait 2 seconds
+        await new Promise(resolve =>
+          setTimeout(resolve, 2000)
+        );
+
+        try {
+
+          const reply =
+            await generate("gemini-3.8-flash");
+
+          return res.status(200).json({
+            reply
+          });
+
+        } catch (retryError) {
+
+          console.error(
+            "Gemini retry failed:",
+            retryError
+          );
+
+          return res.status(503).json({
+            error:
+              "Gemini is temporarily busy. Please try again in a few seconds."
+          });
+        }
+      }
+
+      throw firstError;
+    }
 
   } catch (error) {
 
-    console.error("GEMINI ERROR:", error);
+    console.error(
+      "GEMINI ERROR:",
+      error
+    );
 
     return res.status(500).json({
-      error: error?.message || "Gemini API failed"
+      error:
+        error?.message ||
+        "Gemini API failed"
     });
   }
 }
