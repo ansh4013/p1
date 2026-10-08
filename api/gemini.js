@@ -1,9 +1,9 @@
 import { GoogleGenAI } from "@google/genai";
 
 export default async function handler(req, res) {
-  // ==========================================
+  // ==============================
   // CORS
-  //  ==========================================
+  // ==============================
 
   res.setHeader(
     "Access-Control-Allow-Origin",
@@ -20,17 +20,17 @@ export default async function handler(req, res) {
     "Content-Type"
   );
 
-  // ==========================================
+  // ==============================
   // OPTIONS
-  // ==========================================
+  // ==============================
 
   if (req.method === "OPTIONS") {
     return res.status(204).end();
   }
 
-  // ==========================================
+  // ==============================
   // METHOD CHECK
-  // ==========================================
+  // ==============================
 
   if (req.method !== "POST") {
     return res.status(405).json({
@@ -39,23 +39,23 @@ export default async function handler(req, res) {
   }
 
   try {
-    // ==========================================
-    // GET 5 GEMINI API KEYS
-    // ==========================================
+    // ==============================
+    // 5 GEMINI API KEYS
+    // ==============================
 
     const apiKeys = [
-      process.env.GEMINI_API_KEY_1,
-      process.env.GEMINI_API_KEY_2,
-      process.env.GEMINI_API_KEY_3,
-      process.env.GEMINI_API_KEY_4,
-      process.env.GEMINI_API_KEY_5
+      process.env.GEMINI_API_KEY1,
+      process.env.GEMINI_API_KEY2,
+      process.env.GEMINI_API_KEY3,
+      process.env.GEMINI_API_KEY4,
+      process.env.GEMINI_API_KEY5
     ].filter(
-      key => key && key.trim()
+      key => typeof key === "string" && key.trim() !== ""
     );
 
-    // ==========================================
+    // ==============================
     // CHECK KEYS
-    // ==========================================
+    // ==============================
 
     if (apiKeys.length === 0) {
       console.error(
@@ -72,9 +72,9 @@ export default async function handler(req, res) {
       `NEXORA: ${apiKeys.length} Gemini API key(s) configured.`
     );
 
-    // ==========================================
+    // ==============================
     // GET MESSAGE
-    // ==========================================
+    // ==============================
 
     const { message } = req.body || {};
 
@@ -84,57 +84,45 @@ export default async function handler(req, res) {
       !message.trim()
     ) {
       return res.status(400).json({
-        error:
-          "NEXORA: Please enter a message."
+        error: "NEXORA: Please enter a message."
       });
     }
 
-    // ==========================================
+    // ==============================
     // SETTINGS
-    // ==========================================
+    // ==============================
 
     const MAX_ATTEMPTS = 10;
     const DELAY_MS = 1000;
 
     let lastError = null;
 
-    // ==========================================
+    // ==============================
     // RETRY LOOP
-    // ==========================================
+    // ==============================
 
     for (
       let attempt = 1;
       attempt <= MAX_ATTEMPTS;
       attempt++
     ) {
-
-      // Rotate through the 5 keys
       const keyIndex =
         (attempt - 1) % apiKeys.length;
 
       const apiKey = apiKeys[keyIndex];
 
       try {
-
         console.log(
-          `NEXORA attempt ${attempt}/${MAX_ATTEMPTS}`
+          `NEXORA attempt ${attempt}/10 → Gemini key ${keyIndex + 1}`
         );
-
-        console.log(
-          `NEXORA using Gemini key ${keyIndex + 1}`
-        );
-
-        // ======================================
-        // CREATE GEMINI CLIENT
-        // ======================================
 
         const gemini = new GoogleGenAI({
           apiKey: apiKey
         });
 
-        // ======================================
+        // ==============================
         // GEMINI REQUEST
-        // ======================================
+        // ==============================
 
         const response =
           await gemini.models.generateContent({
@@ -142,16 +130,11 @@ export default async function handler(req, res) {
             contents: message.trim()
           });
 
-        // ======================================
-        // GET RESPONSE
-        // ======================================
+        const reply = response.text || "";
 
-        const reply =
-          response.text || "";
-
-        // ======================================
+        // ==============================
         // EMPTY RESPONSE
-        // ======================================
+        // ==============================
 
         if (!reply.trim()) {
           throw new Error(
@@ -159,12 +142,12 @@ export default async function handler(req, res) {
           );
         }
 
-        // ======================================
+        // ==============================
         // SUCCESS
-        // ======================================
+        // ==============================
 
         console.log(
-          `NEXORA SUCCESS: attempt ${attempt}/${MAX_ATTEMPTS}`
+          `NEXORA SUCCESS: Gemini key ${keyIndex + 1}`
         );
 
         return res.status(200).json({
@@ -172,7 +155,6 @@ export default async function handler(req, res) {
         });
 
       } catch (error) {
-
         lastError = error;
 
         const status =
@@ -182,18 +164,18 @@ export default async function handler(req, res) {
           null;
 
         console.error(
-          `NEXORA attempt ${attempt}/${MAX_ATTEMPTS} failed:`,
+          `NEXORA attempt ${attempt}/10 failed:`,
           {
-            status: status,
+            status,
             message:
               error?.message ||
               String(error)
           }
         );
 
-        // ======================================
-        // STOP FOR PERMANENT ERRORS
-        // ======================================
+        // ==============================
+        // STOP PERMANENT ERRORS
+        // ==============================
 
         if (
           status === 400 ||
@@ -202,43 +184,31 @@ export default async function handler(req, res) {
           status === 404
         ) {
           console.error(
-            "NEXORA: Permanent Gemini error. Stopping."
+            "NEXORA: Non-retryable Gemini error."
           );
 
           break;
         }
 
-        // ======================================
-        // WAIT 1 SECOND
-        // ======================================
+        // ==============================
+        // 1 SECOND DELAY
+        // ==============================
 
-        if (
-          attempt < MAX_ATTEMPTS
-        ) {
-
-          console.log(
-            "NEXORA: Waiting 1 second before retry..."
-          );
-
-          await new Promise(
-            resolve =>
-              setTimeout(
-                resolve,
-                DELAY_MS
-              )
+        if (attempt < MAX_ATTEMPTS) {
+          await new Promise(resolve =>
+            setTimeout(resolve, DELAY_MS)
           );
         }
       }
     }
 
-    // ==========================================
+    // ==============================
     // ALL ATTEMPTS FAILED
-    // ==========================================
+    // ==============================
 
     console.error(
       "NEXORA: All Gemini attempts failed.",
-      lastError?.message ||
-      lastError
+      lastError?.message || lastError
     );
 
     return res.status(503).json({
@@ -247,10 +217,9 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-
-    // ==========================================
+    // ==============================
     // INTERNAL ERROR
-    // ==========================================
+    // ==============================
 
     console.error(
       "NEXORA INTERNAL ERROR:",
