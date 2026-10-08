@@ -422,13 +422,38 @@ body::before {
     background: var(--bg-secondary);
     border: 2px solid var(--border-color);
     border-radius: 16px;
+
     display: flex;
     flex-direction: column;
-    height: 700px;
+
+    width: 100%;
+    max-width: 1500px;
+    height: 850px;
+    min-height: 750px;
+    margin: 0 auto;
+
     overflow: hidden;
     box-shadow: var(--shadow-lg);
     backdrop-filter: blur(10px);
 }
+
+/* Mobile screens */
+@media (max-width: 768px) {
+    .chatbot-wrapper {
+        height: 750px;
+        min-height: 750px;
+        border-radius: 14px;
+    }
+}
+
+/* Small mobile screens */
+@media (max-width: 480px) {
+    .chatbot-wrapper {
+        height: 78vh;
+        min-height: 650px;
+    }
+}
+
 
 /* ============ CHATBOT HEADER ============ */
 .chatbot-header {
