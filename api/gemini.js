@@ -1,11 +1,10 @@
 import { GoogleGenAI } from "@google/genai";
-import OpenAI from "openai";
 
 export default async function handler(req, res) {
-
-  // =========================
+  // ==========================================
   // CORS
-  // =========================
+  // ==========================================
+
   res.setHeader(
     "Access-Control-Allow-Origin",
     "https://ansh4013.github.io"
@@ -21,9 +20,17 @@ export default async function handler(req, res) {
     "Content-Type"
   );
 
+  // ==========================================
+  // OPTIONS
+  // ==========================================
+
   if (req.method === "OPTIONS") {
     return res.status(204).end();
   }
+
+  // ==========================================
+  // METHOD CHECK
+  // ==========================================
 
   if (req.method !== "POST") {
     return res.status(405).json({
@@ -32,16 +39,27 @@ export default async function handler(req, res) {
   }
 
   try {
+    // ==========================================
+    // GET 5 GEMINI API KEYS
+    // ==========================================
 
-    // =========================
-    // API KEYS
-    // =========================
-    const geminiKey = process.env.GEMINI_API_KEY;
-    const openaiKey = process.env.OPENAI_API_KEY;
+    const apiKeys = [
+      process.env.GEMINI_API_KEY_1,
+      process.env.GEMINI_API_KEY_2,
+      process.env.GEMINI_API_KEY_3,
+      process.env.GEMINI_API_KEY_4,
+      process.env.GEMINI_API_KEY_5
+    ].filter(
+      key => key && key.trim()
+    );
 
-    if (!geminiKey && !openaiKey) {
+    // ==========================================
+    // CHECK KEYS
+    // ==========================================
+
+    if (apiKeys.length === 0) {
       console.error(
-        "NEXORA ERROR: No AI provider API keys configured."
+        "NEXORA ERROR: No Gemini API keys configured."
       );
 
       return res.status(500).json({
@@ -50,163 +68,177 @@ export default async function handler(req, res) {
       });
     }
 
-    // =========================
-    // MESSAGE
-    // =========================
+    console.log(
+      `NEXORA: ${apiKeys.length} Gemini API key(s) configured.`
+    );
+
+    // ==========================================
+    // GET MESSAGE
+    // ==========================================
+
     const { message } = req.body || {};
 
-    if (!message || typeof message !== "string") {
+    if (
+      !message ||
+      typeof message !== "string" ||
+      !message.trim()
+    ) {
       return res.status(400).json({
-        error: "NEXORA: Please enter a message."
+        error:
+          "NEXORA: Please enter a message."
       });
     }
 
-    // =========================
-    // INITIALIZE PROVIDERS
-    // =========================
-    const gemini = geminiKey
-      ? new GoogleGenAI({
-          apiKey: geminiKey
-        })
-      : null;
+    // ==========================================
+    // SETTINGS
+    // ==========================================
 
-    const openai = openaiKey
-      ? new OpenAI({
-          apiKey: openaiKey
-        })
-      : null;
-
-    // =========================
-    // ALTERNATING PROVIDERS
-    // 1 = Gemini
-    // 2 = OpenAI
-    // 3 = Gemini
-    // 4 = OpenAI
-    // 5 = Gemini
-    // =========================
-    const providers = [
-      "gemini",
-      "openai",
-      "gemini",
-      "openai",
-      "gemini"
-    ];
+    const MAX_ATTEMPTS = 10;
+    const DELAY_MS = 1000;
 
     let lastError = null;
 
-    for (let attempt = 0; attempt < providers.length; attempt++) {
+    // ==========================================
+    // RETRY LOOP
+    // ==========================================
 
-      const provider = providers[attempt];
+    for (
+      let attempt = 1;
+      attempt <= MAX_ATTEMPTS;
+      attempt++
+    ) {
+
+      // Rotate through the 5 keys
+      const keyIndex =
+        (attempt - 1) % apiKeys.length;
+
+      const apiKey = apiKeys[keyIndex];
 
       try {
 
         console.log(
-          `NEXORA attempt ${attempt + 1}/5 → ${provider}`
+          `NEXORA attempt ${attempt}/${MAX_ATTEMPTS}`
         );
 
-        // =========================
-        // GEMINI
-        // =========================
-        if (provider === "gemini") {
+        console.log(
+          `NEXORA using Gemini key ${keyIndex + 1}`
+        );
 
-          if (!gemini) {
-            throw new Error(
-              "Gemini API key is not configured."
-            );
-          }
+        // ======================================
+        // CREATE GEMINI CLIENT
+        // ======================================
 
-          const response =
-            await gemini.models.generateContent({
+        const gemini = new GoogleGenAI({
+          apiKey: apiKey
+        });
 
-              model: "gemini-3.8-flash",
+        // ======================================
+        // GEMINI REQUEST
+        // ======================================
 
-              contents: message
-
-            });
-
-          const reply = response.text || "";
-
-          if (!reply.trim()) {
-            throw new Error(
-              "Gemini returned an empty response."
-            );
-          }
-
-          console.log(
-            `NEXORA succeeded using Gemini on attempt ${attempt + 1}`
-          );
-
-          return res.status(200).json({
-            reply
+        const response =
+          await gemini.models.generateContent({
+            model: "gemini-3.8-flash",
+            contents: message.trim()
           });
+
+        // ======================================
+        // GET RESPONSE
+        // ======================================
+
+        const reply =
+          response.text || "";
+
+        // ======================================
+        // EMPTY RESPONSE
+        // ======================================
+
+        if (!reply.trim()) {
+          throw new Error(
+            "Gemini returned an empty response."
+          );
         }
 
-        // =========================
-        // OPENAI
-        // =========================
-        if (provider === "openai") {
+        // ======================================
+        // SUCCESS
+        // ======================================
 
-          if (!openai) {
-            throw new Error(
-              "OpenAI API key is not configured."
-            );
-          }
+        console.log(
+          `NEXORA SUCCESS: attempt ${attempt}/${MAX_ATTEMPTS}`
+        );
 
-          const response =
-            await openai.responses.create({
-
-              model: "gpt-5-mini",
-
-              input: message
-
-            });
-
-          const reply = response.output_text || "";
-
-          if (!reply.trim()) {
-            throw new Error(
-              "OpenAI returned an empty response."
-            );
-          }
-
-          console.log(
-            `NEXORA succeeded using OpenAI on attempt ${attempt + 1}`
-          );
-
-          return res.status(200).json({
-            reply
-          });
-        }
+        return res.status(200).json({
+          reply: reply.trim()
+        });
 
       } catch (error) {
 
         lastError = error;
 
-        // Technical information stays in Vercel logs.
+        const status =
+          error?.status ||
+          error?.code ||
+          error?.response?.status ||
+          null;
+
         console.error(
-          `NEXORA attempt ${attempt + 1}/5 (${provider}) failed:`,
-          error?.message || error
+          `NEXORA attempt ${attempt}/${MAX_ATTEMPTS} failed:`,
+          {
+            status: status,
+            message:
+              error?.message ||
+              String(error)
+          }
         );
 
-        // =========================
-        // WAIT 1 SECOND
-        // BEFORE NEXT PROVIDER
-        // =========================
-        if (attempt < providers.length - 1) {
+        // ======================================
+        // STOP FOR PERMANENT ERRORS
+        // ======================================
 
-          await new Promise(resolve =>
-            setTimeout(resolve, 1000)
+        if (
+          status === 400 ||
+          status === 401 ||
+          status === 403 ||
+          status === 404
+        ) {
+          console.error(
+            "NEXORA: Permanent Gemini error. Stopping."
+          );
+
+          break;
+        }
+
+        // ======================================
+        // WAIT 1 SECOND
+        // ======================================
+
+        if (
+          attempt < MAX_ATTEMPTS
+        ) {
+
+          console.log(
+            "NEXORA: Waiting 1 second before retry..."
+          );
+
+          await new Promise(
+            resolve =>
+              setTimeout(
+                resolve,
+                DELAY_MS
+              )
           );
         }
       }
     }
 
-    // =========================
-    // ALL 5 ATTEMPTS FAILED
-    // =========================
+    // ==========================================
+    // ALL ATTEMPTS FAILED
+    // ==========================================
+
     console.error(
-      "NEXORA: All 5 AI attempts failed.",
-      lastError?.message || lastError
+      "NEXORA: All Gemini attempts failed.",
+      lastError?.message ||
+      lastError
     );
 
     return res.status(503).json({
@@ -216,7 +248,10 @@ export default async function handler(req, res) {
 
   } catch (error) {
 
-    // Technical error only in Vercel logs.
+    // ==========================================
+    // INTERNAL ERROR
+    // ==========================================
+
     console.error(
       "NEXORA INTERNAL ERROR:",
       error
