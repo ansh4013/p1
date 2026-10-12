@@ -93,7 +93,7 @@ export default async function handler(req, res) {
     // ==============================
 
     const MAX_ATTEMPTS = 10;
-    const DELAY_MS = 1000;
+    const DELAY_MS = 10;
 
     let lastError = null;
 
