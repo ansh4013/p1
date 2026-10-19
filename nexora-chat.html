@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Nexora AI conversational workspace.">
+  <title>Nexora AI Chat</title>
+  <style>
+:root{--bg:#070916;--panel:#0d1227;--panel2:#111936;--line:rgba(150,170,255,.18);--text:#f4f6ff;--muted:#9ba7cb;--blue:#62c8ff;--purple:#a78bfa;--danger:#fb7185}*{box-sizing:border-box}body{margin:0;background:radial-gradient(800px 500px at 20% -10%,rgba(79,140,255,.2),transparent 65%),var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;min-height:100vh}.chat-nav{height:66px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(18px,5vw,70px);background:rgba(7,9,22,.78);backdrop-filter:blur(16px)}.brand{font-weight:800;letter-spacing:.18em;text-decoration:none;color:var(--text)}.brand span{color:var(--blue)}.nav-actions{display:flex;gap:16px;align-items:center}.nav-actions a,.nav-actions button,.head-actions button,.tool-row button,.file-btn,.sidebar-bottom button{color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:9px;padding:9px 12px;cursor:pointer;font:inherit;font-size:12px;text-decoration:none}.nav-actions a:hover,.nav-actions button:hover,.head-actions button:hover,.tool-row button:hover,.file-btn:hover{color:var(--text);border-color:var(--blue)}.workspace{max-width:1400px;margin:auto;display:grid;grid-template-columns:285px minmax(0,1fr);min-height:calc(100vh - 66px)}.sidebar{border-right:1px solid var(--line);padding:22px 16px;display:flex;flex-direction:column;gap:16px}.new-chat{background:linear-gradient(110deg,var(--blue),var(--purple));color:#071022;border:0;border-radius:10px;padding:13px;font-weight:800;cursor:pointer}.search{display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:9px;padding:9px;color:var(--muted)}.search input{width:100%;background:none;border:0;outline:0;color:var(--text)}.history{display:grid;gap:6px;overflow:auto}.history button{border:0;border-radius:8px;background:transparent;color:var(--muted);text-align:left;padding:11px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.history button.active,.history button:hover{background:var(--panel2);color:var(--text)}.sidebar-bottom{margin-top:auto;display:grid;gap:8px}.sidebar-bottom button{font-size:11px}.sidebar-bottom button:last-child{color:var(--danger)}.chat-shell{min-width:0;display:flex;flex-direction:column;padding:clamp(20px,4vw,54px);max-width:1000px;width:100%;margin:auto}.chat-head{display:flex;justify-content:space-between;gap:20px;align-items:start}.eyebrow{font:500 10px 'DM Mono',monospace;letter-spacing:.16em;color:var(--blue)}h1{font-size:clamp(28px,4vw,48px);letter-spacing:-.06em;margin:10px 0 5px}.chat-head p,.privacy-note{color:var(--muted);font-size:12px}.head-actions{display:flex;gap:8px}.mode-row,.tool-row{display:flex;gap:7px;flex-wrap:wrap;margin:24px 0 10px}.mode,.tool-row button,.file-btn{border:1px solid var(--line);border-radius:99px;padding:8px 12px;background:transparent;color:var(--muted);cursor:pointer;font-size:12px}.mode.active,.mode:hover{background:var(--text);color:#081022;border-color:var(--text)}.tool-row{margin:0 0 20px}.tool-row button,.file-btn{font-size:11px;padding:7px 10px}.file-btn input{display:none}.messages{display:grid;gap:18px;flex:1;overflow:auto;padding:18px 0}.message{display:flex;gap:12px;max-width:85%}.message.user{margin-left:auto;flex-direction:row-reverse}.avatar{flex:0 0 34px;height:34px;display:grid;place-items:center;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--purple));color:#061022;font-weight:800}.bubble{padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--panel);line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}.user .bubble{background:linear-gradient(135deg,rgba(98,200,255,.16),rgba(167,139,250,.13))}.message-actions{display:flex;gap:7px;margin-top:8px}.message-actions button{background:none;border:0;color:var(--muted);cursor:pointer;font-size:11px}.message-actions button:hover{color:var(--blue)}.typing{display:flex;gap:5px;align-items:center;color:var(--muted);font-size:12px;padding:8px 0}.typing i{width:6px;height:6px;background:var(--blue);border-radius:50%;animation:bounce 1s infinite alternate}.typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}@keyframes bounce{to{transform:translateY(-5px);opacity:.35}}.composer{border:1px solid var(--line);border-radius:15px;background:rgba(13,18,39,.9);padding:13px;margin-top:8px}.composer textarea{display:block;width:100%;resize:none;min-height:34px;max-height:180px;background:none;border:0;outline:0;color:var(--text);font:inherit;line-height:1.5}.composer-bottom{display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--muted);font-size:11px}.composer-bottom>div{display:flex;gap:8px}.composer-bottom button{border:1px solid var(--line);border-radius:8px;background:transparent;color:var(--muted);padding:8px 10px;cursor:pointer}.composer-bottom .send{background:var(--text);color:#081022;border-color:var(--text);font-weight:700}.privacy-note{text-align:center;padding-top:14px}.privacy-note a{color:var(--blue)}body.light{--bg:#f3f6ff;--panel:#fff;--panel2:#e9efff;--line:rgba(30,50,120,.18);--text:#10162d;--muted:#526084}.light .chat-nav{background:rgba(243,246,255,.8)}@media(max-width:760px){.workspace{display:block}.sidebar{border-right:0;border-bottom:1px solid var(--line);padding:12px 16px}.history{display:flex;overflow:auto}.history button{min-width:170px}.sidebar-bottom{display:none}.chat-shell{min-height:calc(100vh - 220px);padding:24px 16px}.chat-head{display:block}.head-actions{margin-top:14px}.message{max-width:96%}.tool-row{overflow:auto;flex-wrap:nowrap}.nav-actions a{display:none}}
+</style>
+</head>
+<body data-site="nexora" data-page-type="chatbot">
+  <header class="chat-nav"><a class="brand" href="./dashboard.html">NEXORA <span>AI</span></a><div class="nav-actions"><a href="./analysis.html">Analysis</a><button id="themeBtn" type="button">Theme</button></div></header>
+  <main class="workspace">
+    <aside class="sidebar" id="sidebar">
+      <button class="new-chat" id="newChat">＋ New conversation</button>
+      <label class="search"><span>⌕</span><input id="historySearch" placeholder="Search history" aria-label="Search conversation history"></label>
+      <div class="history" id="historyList"></div>
+      <div class="sidebar-bottom"><button id="exportAll">Export history</button><button id="clearAll">Delete all history</button></div>
+    </aside>
+    <section class="chat-shell">
+      <div class="chat-head"><div><span class="eyebrow">NEXORA / CONVERSATION</span><h1 id="chatTitle">New conversation</h1><p id="sessionMeta">Private local history · no message analytics</p></div><div class="head-actions"><button id="voiceOutput" title="Toggle read aloud">🔊</button><button id="clearChat" title="Clear current conversation">Clear</button></div></div>
+      <div class="mode-row" id="modeRow" aria-label="Assistant mode"><button class="mode active" data-mode="general">General</button><button class="mode" data-mode="coding">Coding</button><button class="mode" data-mode="tutor">Tutor</button><button class="mode" data-mode="creative">Creative</button><button class="mode" data-mode="research">Research</button></div>
+      <div class="tool-row"><button data-tool="simplify">Simplify</button><button data-tool="rewrite">Rewrite</button><button data-tool="summarize">Summarize</button><button data-tool="translate">Translate</button><label class="file-btn">＋ Attach text<input id="fileInput" type="file" accept=".txt,.md,.csv,.json,text/plain,text/markdown,text/csv,application/json"></label></div>
+      <div class="messages" id="messages" aria-live="polite"></div>
+      <div class="typing" id="typing" hidden><i></i><i></i><i></i><span>Nexora is thinking</span></div>
+      <form class="composer" id="messageForm"><textarea id="messageInput" data-chat-input rows="1" placeholder="Ask Nexora anything…" autocomplete="off"></textarea><div class="composer-bottom"><span id="attachmentName">No attachment</span><div><button type="button" id="voiceInput" title="Voice input">🎙</button><button class="send" type="submit">Send ↗</button></div></div></form>
+      <div class="privacy-note">Nexora metrics record events, not message content. <a href="./CHATBOT-METRICS.md">Metric documentation</a></div>
+    </section>
+  </main>
+  <script data-site="nexora" data-respect-dnt="true">
+/**
+ * Nexora / Discipline / Dashboard — Lightweight Real-time Tracker
+ * ---------------------------------------------------------------
+ * Drop this script on any of your pages.
+ * It increments a free public counter (no signup, no cookies required)
+ * and optionally records basic session info in sessionStorage.
+ *
+ * Usage (add before </body> on each site):
+ *
+ *   <script src="https://YOUR-CDN-OR-GITHUB-RAW/tracker.js"
+ *           data-site="nexora"          <!-- or "discipline" | "dashboard" -->
+ *           data-debug="false"
+ *           data-respect-dnt="true"     <!-- skip visitors who send Do Not Track / GPC -->
+ *           async></script>
+ *
+ * Or inline the whole file if you prefer.
+ *
+ * Counters used (public, readable by anyone who knows the key):
+ *   ansh4013_nexora_views
+ *   ansh4013_discipline_views
+ *   ansh4013_dashboard_views
+ *   ansh4013_online_ping   (short-lived presence, refreshed every 30s)
+ *
+ * Extra counters per site (used by analysis-engine.js):
+ *   <key>_YYYYMMDD   views per UTC day
+ *   <key>_sessions   unique sessions (one per browser tab session)
+ *   <key>_engaged    sessions that stayed visible for 30s+
+ *   <key>_chat_starts / _chat_messages / _chat_completions
+ *   <key>_chat_feedback / _chat_errors / _chat_modes
+ */
+
+(function () {
+  'use strict';
+
+  const API = 'https://countapi.mileshilliard.com/api/v1';
+  const KEYS = {
+    nexora: 'ansh4013_nexora_views',
+    discipline: 'ansh4013_discipline_views',
+    dashboard: 'ansh4013_dashboard_views',
+    online: 'ansh4013_online_ping',
+    chatStarts: 'ansh4013_nexora_chat_starts',
+    chatMessages: 'ansh4013_nexora_chat_messages',
+    chatCompletions: 'ansh4013_nexora_chat_completions',
+    chatFeedback: 'ansh4013_nexora_chat_feedback',
+    chatErrors: 'ansh4013_nexora_chat_errors',
+    chatModes: 'ansh4013_nexora_chat_modes',
+    chatTools: 'ansh4013_nexora_chat_tools',
+    chatUploads: 'ansh4013_nexora_chat_uploads',
+    chatVoice: 'ansh4013_nexora_chat_voice',
+    chatRegenerations: 'ansh4013_nexora_chat_regenerations'
+  };
+
+  // Detect which site we are on
+  function detectSite() {
+    const script = document.currentScript || document.querySelector('script[data-site]');
+    if (script && script.dataset.site) {
+      return script.dataset.site.toLowerCase();
+    }
+    const host = location.hostname + location.pathname;
+    if (host.includes('aichatbot') || host.includes('nexora')) return 'nexora';
+    if (host.includes('discipline')) return 'discipline';
+    if (host.includes('dashboard')) return 'dashboard';
+    return 'dashboard'; // fallback
+  }
+
+  const site = detectSite();
+  const debug = (document.currentScript && document.currentScript.dataset.debug === 'true');
+
+  // Privacy: honour Do Not Track, Global Privacy Control and a manual opt-out.
+  // Turn the automatic check off with data-respect-dnt="false" on the script tag.
+  const respectDnt = !(document.currentScript && document.currentScript.dataset.respectDnt === 'false');
+  function optedOut() {
+    try { if (localStorage.getItem('analysis_optout') === '1') return true; } catch (e) { /* ignore */ }
+    return respectDnt && (navigator.doNotTrack === '1' || window.doNotTrack === '1' || navigator.globalPrivacyControl === true);
+  }
+  window.AnalysisPrivacy = {
+    optOut: function () { try { localStorage.setItem('analysis_optout', '1'); } catch (e) { /* ignore */ } },
+    optIn: function () { try { localStorage.removeItem('analysis_optout'); } catch (e) { /* ignore */ } },
+    isOptedOut: optedOut
+  };
+  if (optedOut()) { if (debug) console.log('[NexoraTracker] tracking disabled (privacy signal / opt-out)'); return; }
+
+  function log(...args) {
+    if (debug) console.log('[NexoraTracker]', ...args);
+  }
+
+  // Unique visitor approximation (session only — no persistent cookies)
+  function isNewSession() {
+    const key = 'nexora_tracker_session';
+    if (sessionStorage.getItem(key)) return false;
+    sessionStorage.setItem(key, Date.now().toString());
+    return true;
+  }
+
+  // Hit the counter once per page load
+  async function hit(key) {
+    try {
+      const res = await fetch(`${API}/hit/${key}`, { mode: 'cors', cache: 'no-store' });
+      const data = await res.json();
+      log('Hit', key, '→', data.value);
+      return data.value;
+    } catch (e) {
+      log('Hit failed', e);
+      return null;
+    }
+  }
+
+  // Read without incrementing
+  async function get(key) {
+    try {
+      const res = await fetch(`${API}/get/${key}`, { mode: 'cors', cache: 'no-store' });
+      const data = await res.json();
+      return data.value ?? 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  // Presence ping (rough "online now" signal)
+  // Note: free counters only go up; real concurrent users need a proper backend.
+  // This just keeps a secondary counter alive so the dashboard can show activity.
+  function startPresence() {
+    const ping = () => hit(KEYS.online);
+    ping();
+    setInterval(ping, 30000); // every 30s while tab is open
+  }
+
+  // Chatbot-specific metrics. No message text is transmitted or stored.
+  function installChatbotMetrics() {
+    if (site !== 'nexora') return;
+    const fired = new Set();
+    const eventKeys = {
+      'chat-session-start': KEYS.chatStarts,
+      'chat-message-sent': KEYS.chatMessages,
+      'chat-session-complete': KEYS.chatCompletions,
+      'chat-feedback-submitted': KEYS.chatFeedback,
+      'chat-error': KEYS.chatErrors,
+      'chat-mode-selected': KEYS.chatModes,
+      'prompt-tool-used': KEYS.chatTools,
+      'chat-file-uploaded': KEYS.chatUploads,
+      'chat-voice-used': KEYS.chatVoice,
+      'chat-regenerated': KEYS.chatRegenerations
+    };
+    function metric(name) {
+      const key = eventKeys[name];
+      if (key) hit(key);
+    }
+    // Integrate with any chatbot implementation by dispatching these events.
+    Object.keys(eventKeys).forEach((name) => window.addEventListener(name, () => metric(name)));
+    // Automatic fallbacks for common chat controls.
+    document.addEventListener('submit', (event) => {
+      if (event.target && event.target.matches('form[data-chat], form.chat-form, form#chat-form')) metric('chat-message-sent');
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' && !event.shiftKey && event.target.matches('textarea[data-chat-input], input[data-chat-input]')) metric('chat-message-sent');
+    });
+    document.addEventListener('click', (event) => {
+      const el = event.target.closest('[data-chat-start], [data-chat-complete], [data-chat-feedback], [data-chat-error], [data-chat-mode]');
+      if (!el) return;
+      if (el.hasAttribute('data-chat-start')) metric('chat-session-start');
+      if (el.hasAttribute('data-chat-complete')) metric('chat-session-complete');
+      if (el.hasAttribute('data-chat-feedback')) metric('chat-feedback-submitted');
+      if (el.hasAttribute('data-chat-error')) metric('chat-error');
+      if (el.hasAttribute('data-chat-mode')) metric('chat-mode-selected');
+    });
+    // Count one chatbot start per browser session.
+    if (!sessionStorage.getItem('nexora_chat_start_recorded')) {
+      sessionStorage.setItem('nexora_chat_start_recorded', '1');
+      metric('chat-session-start');
+    }
+    window.NexoraChatMetrics = { track: metric, counters: eventKeys };
+  }
+
+  // Main
+  async function init() {
+    const key = KEYS[site] || KEYS.dashboard;
+    const views = await hit(key);
+
+    // Optional: also hit a daily key
+    const day = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    await hit(`${key}_${day}`);
+
+    // Ranking-system counters: unique session + engaged session (30s+ visible)
+    if (isNewSession()) {
+      hit(`${key}_sessions`);
+      let visible = 0;
+      const tick = setInterval(() => {
+        if (document.visibilityState === 'visible') visible += 1;
+        if (visible >= 30) { clearInterval(tick); hit(`${key}_engaged`); }
+      }, 1000);
+    }
+
+    startPresence();
+    installChatbotMetrics();
+
+    // Expose a tiny public API so the analysis dashboard can read live numbers
+    window.__NEXORA_TRACKER__ = {
+      site,
+      views,
+      getViews: () => get(key),
+      getAll: async () => ({
+        nexora: await get(KEYS.nexora),
+        discipline: await get(KEYS.discipline),
+        dashboard: await get(KEYS.dashboard),
+        onlinePings: await get(KEYS.online),
+        chatbot: {
+          starts: await get(KEYS.chatStarts),
+          messages: await get(KEYS.chatMessages),
+          completions: await get(KEYS.chatCompletions),
+          feedback: await get(KEYS.chatFeedback),
+          errors: await get(KEYS.chatErrors),
+          modes: await get(KEYS.chatModes),
+          tools: await get(KEYS.chatTools),
+          uploads: await get(KEYS.chatUploads),
+          voice: await get(KEYS.chatVoice),
+          regenerations: await get(KEYS.chatRegenerations)
+        }
+      })
+    };
+
+    log('Tracker ready for', site, '| total views so far:', views);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+
+  </script>
+  <script>
+const API_URL = 'https://p1-two-orcin.vercel.app/api/gemini';
+const STORE = 'nexora.conversations.v2';
+const MODE_STORE = 'nexora.mode';
+const modes = {
+  general: 'You are a helpful, accurate, concise AI assistant.',
+  coding: 'You are an expert programming assistant. Explain tradeoffs and provide safe, tested code.',
+  tutor: 'You are a patient tutor. Teach step by step and check understanding.',
+  creative: 'You are a creative partner. Offer original ideas and clear drafts.',
+  research: 'You are a careful research assistant. Separate facts, assumptions, and uncertainty.'
+};
+let conversations = read(STORE, []), currentId = crypto.randomUUID(), currentMode = localStorage.getItem(MODE_STORE) || 'general';
+let messages = [], loading = false, lastPrompt = '', attachment = '';
+const $ = (q) => document.querySelector(q);
+const messagesEl = $('#messages'), input = $('#messageInput');
+function read(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } }
+function save() { localStorage.setItem(STORE, JSON.stringify(conversations.slice(-50))); }
+function event(name, detail = {}) { window.dispatchEvent(new CustomEvent(name, { detail })); }
+function track(name, detail = {}) { event(name, detail); }
+function current() { return conversations.find((x) => x.id === currentId); }
+function ensureConversation() { if (!current()) conversations.push({ id: currentId, title: 'New conversation', mode: currentMode, messages: [], createdAt: Date.now(), updatedAt: Date.now() }); }
+function renderHistory(filter = '') { const list = $('#historyList'); list.innerHTML = ''; conversations.filter((c) => c.title.toLowerCase().includes(filter.toLowerCase())).slice().reverse().forEach((c) => { const b = document.createElement('button'); b.textContent = c.title; b.className = c.id === currentId ? 'active' : ''; b.onclick = () => loadConversation(c.id); list.appendChild(b); }); }
+function loadConversation(id) { const c = conversations.find((x) => x.id === id); if (!c) return; currentId = id; messages = c.messages || []; currentMode = c.mode || 'general'; applyMode(); renderMessages(); renderHistory($('#historySearch').value); }
+function newConversation() { ensureConversation(); currentId = crypto.randomUUID(); messages = []; currentMode = 'general'; ensureConversation(); save(); applyMode(); renderMessages(); renderHistory(); track('chat-session-start'); }
+function renderMessages() { messagesEl.innerHTML = ''; if (!messages.length) addBubble('ai', 'Hello, I’m Nexora. Choose a mode or ask me anything.'); else messages.forEach((m, i) => addBubble(m.role, m.text, i)); $('#chatTitle').textContent = current()?.title || 'New conversation'; $('#sessionMeta').textContent = `${currentMode} mode · local history · ${messages.length} messages`; }
+function addBubble(role, text, index = -1) { const row = document.createElement('article'); row.className = `message ${role}`; row.innerHTML = `<div class="avatar">${role === 'ai' ? 'N' : 'U'}</div><div><div class="bubble"></div>${role === 'ai' && index >= 0 ? '<div class="message-actions"><button data-action="copy">Copy</button><button data-action="regenerate">Regenerate</button><button data-action="up">Helpful</button><button data-action="down">Not helpful</button></div>' : ''}</div>`; row.querySelector('.bubble').textContent = text; if (index >= 0) row.querySelectorAll('[data-action]').forEach((b) => b.onclick = () => action(b.dataset.action, index)); messagesEl.appendChild(row); messagesEl.scrollTop = messagesEl.scrollHeight; }
+function renderAndSave() { const c = current(); if (!c) return; c.messages = messages; c.mode = currentMode; c.updatedAt = Date.now(); c.title = c.title === 'New conversation' && messages.find((m) => m.role === 'user') ? messages.find((m) => m.role === 'user').text.slice(0, 42) : c.title; save(); renderMessages(); renderHistory($('#historySearch').value); }
+function applyMode() { document.querySelectorAll('.mode').forEach((b) => b.classList.toggle('active', b.dataset.mode === currentMode)); }
+async function send(text = input.value.trim()) { if (!text || loading) return; loading = true; lastPrompt = text; messages.push({ role: 'user', text }); renderAndSave(); input.value = ''; $('#typing').hidden = false; track('chat-message-sent'); const started = performance.now(); try { const reply = await ask(text); messages.push({ role: 'ai', text: reply }); track('chat-session-complete', { latencyMs: Math.round(performance.now() - started) }); if ($('#voiceOutput').classList.contains('on')) speak(reply); } catch (error) { messages.push({ role: 'ai', text: `I couldn't complete that request. ${error.message || 'Please try again.'}` }); track('chat-error'); } finally { loading = false; $('#typing').hidden = true; renderAndSave(); } }
+async function ask(text) { const history = messages.slice(-12).map((m) => `${m.role}: ${m.text}`).join('\n'); const prompt = `${modes[currentMode]}\n\nConversation:\n${history}\n\nUser request:\n${text}${attachment ? `\n\nAttached text:\n${attachment.slice(0, 12000)}` : ''}`; const response = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ message: prompt }) }); const type = response.headers.get('content-type') || ''; const data = type.includes('json') ? await response.json() : { reply: await response.text() }; if (!response.ok) throw new Error(data.error || data.message || `Server returned ${response.status}`); if (!data.reply?.trim()) throw new Error('The AI server returned an empty reply.'); return data.reply.trim(); }
+async function action(type, index) { const text = messages[index]?.text || ''; if (type === 'copy') { await navigator.clipboard?.writeText(text); return; } if (type === 'up' || type === 'down') { track('chat-feedback-submitted', { sentiment: type === 'up' ? 'positive' : 'negative' }); return; } if (type === 'regenerate') { track('chat-regenerated'); const previous = messages.slice(0, index).reverse().find((m) => m.role === 'user'); if (previous) { messages = messages.slice(0, index); await send(previous.text); } } }
+function speak(text) { if ('speechSynthesis' in window) { speechSynthesis.cancel(); speechSynthesis.speak(new SpeechSynthesisUtterance(text)); } }
+function exportData() { const blob = new Blob([JSON.stringify(conversations, null, 2)], { type: 'application/json' }); const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'nexora-conversations.json' }); a.click(); URL.revokeObjectURL(a.href); }
+function applyTool(tool) { const prompts = { simplify: 'Rewrite the following answer in simpler language:', rewrite: 'Rewrite the following answer with improved clarity:', summarize: 'Summarize the following answer in concise bullet points:', translate: 'Translate the following answer into English:' }; const last = messages.slice().reverse().find((m) => m.role === 'ai'); if (last) { input.value = `${prompts[tool]}\n\n${last.text}`; input.focus(); track('prompt-tool-used', { tool }); } }
+$('#messageForm').onsubmit = (e) => { e.preventDefault(); send(); }; input.oninput = () => { input.style.height = 'auto'; input.style.height = `${Math.min(input.scrollHeight, 180)}px`; }; input.onkeydown = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } };
+$('#newChat').onclick = newConversation; $('#clearChat').onclick = () => { messages = []; renderAndSave(); }; $('#historySearch').oninput = (e) => renderHistory(e.target.value); $('#exportAll').onclick = exportData; $('#clearAll').onclick = () => { if (confirm('Delete all local conversation history?')) { conversations = []; localStorage.removeItem(STORE); newConversation(); } };
+$('#themeBtn').onclick = () => document.body.classList.toggle('light'); $('#voiceOutput').onclick = (e) => e.currentTarget.classList.toggle('on');
+document.querySelectorAll('.mode').forEach((b) => b.onclick = () => { currentMode = b.dataset.mode; localStorage.setItem(MODE_STORE, currentMode); applyMode(); track('chat-mode-selected', { mode: currentMode }); renderMessages(); });
+document.querySelectorAll('[data-tool]').forEach((b) => b.onclick = () => applyTool(b.dataset.tool));
+$('#fileInput').onchange = async (e) => { const file = e.target.files[0]; if (!file) return; attachment = await file.text(); $('#attachmentName').textContent = `${file.name} attached`; track('chat-file-uploaded', { extension: file.name.split('.').pop() }); };
+$('#voiceInput').onclick = () => { const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition; if (!Recognition) return alert('Voice input is not supported in this browser.'); const r = new Recognition(); r.lang = 'en-US'; r.onresult = (e) => { input.value = e.results[0][0].transcript; input.dispatchEvent(new Event('input')); }; r.onerror = () => track('chat-voice-used', { type: 'voice-input' }); track('chat-error', { type: 'voice-input' }); r.start(); };
+ensureConversation(); applyMode(); renderHistory(); renderMessages(); track('chat-session-start');
+
+  </script>
+</body>
+</html>
