@@ -1103,3 +1103,119 @@ body::before {
     .hero-title {
         font-size: 24px;
         letter-spacing: 1p
+}
+/* ==========================================
+   NEXORA — FORMATTED AI RESPONSES
+========================================== */
+
+.ai-message .message-content {
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.ai-message .message-content h1,
+.ai-message .message-content h2,
+.ai-message .message-content h3,
+.ai-message .message-content h4 {
+    color: #00e5ff;
+    line-height: 1.4;
+    margin: 18px 0 10px;
+}
+
+.ai-message .message-content h1 {
+    font-size: 1.35rem;
+}
+
+.ai-message .message-content h2 {
+    font-size: 1.2rem;
+}
+
+.ai-message .message-content h3 {
+    font-size: 1.08rem;
+}
+
+.ai-message .message-content p {
+    margin: 9px 0;
+    line-height: 1.75;
+}
+
+.ai-message .message-content strong {
+    color: #00e5ff;
+    font-weight: 700;
+}
+
+.ai-message .message-content ul,
+.ai-message .message-content ol {
+    padding-left: 25px;
+    margin: 12px 0;
+}
+
+.ai-message .message-content li {
+    margin: 6px 0;
+    padding-left: 3px;
+}
+
+.ai-message .message-content blockquote {
+    border-left: 3px solid #00e5ff;
+    padding: 8px 14px;
+    margin: 14px 0;
+    background: rgba(0, 229, 255, 0.05);
+    border-radius: 4px;
+}
+
+.ai-message .message-content pre {
+    background: #080e18;
+    border: 1px solid rgba(0, 229, 255, 0.25);
+    border-radius: 10px;
+    padding: 14px;
+    margin: 14px 0;
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+.ai-message .message-content pre code {
+    color: #d9f7ff;
+    background: transparent;
+    padding: 0;
+    white-space: pre;
+}
+
+.ai-message .message-content code {
+    font-family: monospace;
+    color: #00e5ff;
+    background: rgba(0, 229, 255, 0.08);
+    padding: 2px 5px;
+    border-radius: 4px;
+}
+
+.ai-message .message-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    display: block;
+    overflow-x: auto;
+}
+
+.ai-message .message-content th,
+.ai-message .message-content td {
+    border: 1px solid #344155;
+    padding: 9px 12px;
+    text-align: left;
+}
+
+.ai-message .message-content th {
+    color: #00e5ff;
+    background: #152234;
+}
+
+.ai-message .message-content a {
+    color: #00e5ff;
+    text-decoration: underline;
+}
+
+.ai-message .message-content hr {
+    border: 0;
+    border-top: 1px solid #344155;
+    margin: 16px 0;
+}
+
