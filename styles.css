@@ -1219,77 +1219,100 @@ body::before {
     border-top: 1px solid #344155;
     margin: 16px 0;
 }
-/* NEXORA — FIX MOBILE CHAT HEIGHT */
+/* =========================================
+   NEXORA — RESPONSIVE FULL-HEIGHT CHAT
+========================================= */
 
-@media (max-width: 768px) {
-    .chatbot-section {
-        height: auto;
-        min-height: calc(100dvh - 60px);
-        display: flex;
-        flex-direction: column;
-    }
-
-    .chatbot-section .section-header {
-        flex-shrink: 0;
-    }
-
-    .chatbot-wrapper {
-        width: 100%;
-        height: calc(100dvh - 60px);
-        min-height: 500px;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .messages-container {
-        flex: 1;
-        min-height: 0;
-        overflow-y: auto;
-    }
-
-    .input-form {
-        flex-shrink: 0;
-        margin-top: auto;
-    }
+/* Desktop and laptop */
+.chatbot-section {
+    width: 100%;
+    max-width: 100%;
+    height: calc(100vh - 70px);
+    height: calc(100dvh - 70px);
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
 }
-/* NEXORA — FILL REMAINING MOBILE SCREEN */
 
+.chatbot-section .section-header {
+    flex-shrink: 0;
+    margin-bottom: 15px;
+}
+
+.chatbot-wrapper {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: 0;
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin: 0;
+}
+
+.chatbot-header,
+.personality-selector,
+.input-form {
+    flex-shrink: 0;
+}
+
+.messages-container {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.input-form {
+    margin-top: auto;
+}
+
+/* Mobile */
 @media (max-width: 768px) {
 
     .chatbot-section {
-        display: flex;
-        flex-direction: column;
-        height: calc(100vh - 60px);
         height: calc(100dvh - 60px);
         min-height: 0;
         padding: 0;
     }
 
     .chatbot-section .section-header {
-        flex-shrink: 0;
         margin-bottom: 15px;
     }
 
     .chatbot-wrapper {
-        display: flex;
-        flex-direction: column;
-        flex: 1 1 0;
-        width: 100%;
         height: auto;
         min-height: 0;
-        overflow: hidden;
+        flex: 1 1 0;
     }
 
-    .chatbot-header,
-    .personality-selector,
-    .input-form {
+    .chatbot-header {
+        padding: 14px;
+    }
+
+    .personality-selector {
+        flex-wrap: nowrap;
+        padding: 10px;
+    }
+
+    .personality-btn {
         flex-shrink: 0;
+        padding: 9px 12px;
+        font-size: 11px;
     }
 
     .messages-container {
-        flex: 1 1 0;
-        min-height: 0;
-        overflow-y: auto;
+        padding: 16px 10px;
+    }
+
+    .message-content {
+        max-width: 92%;
+    }
+
+    .input-form {
+        padding: 10px;
+        padding-bottom: max(12px, env(safe-area-inset-bottom));
     }
 }
