@@ -1,10 +1,11 @@
 
 export default async function handler(req, res) {
+
   // ==========================================
   // NEXORA AI — OPENROUTER STREAMING BACKEND
   // ==========================================
 
-  // CORS configuration
+  // CORS
   res.setHeader(
     "Access-Control-Allow-Origin",
     "https://ansh4013.github.io"
@@ -22,7 +23,6 @@ export default async function handler(req, res) {
 
   res.setHeader("Vary", "Origin");
 
-  // Handle preflight requests
   if (req.method === "OPTIONS") {
     return res.status(204).end();
   }
@@ -33,7 +33,10 @@ export default async function handler(req, res) {
     });
   }
 
-  // Get secret API key from Vercel
+  // ==========================================
+  // API KEY
+  // ==========================================
+
   const API_KEY = process.env.OPENROUTER_API_KEY;
 
   if (!API_KEY) {
@@ -54,56 +57,154 @@ export default async function handler(req, res) {
   }
 
   // ==========================================
-  // NEXORA IDENTITY AND PERSONALITY
+  // NEXORA IDENTITY & ADVANCED RESPONSE STYLE
   // ==========================================
 
   const SYSTEM_PROMPT = `
-You are NEXORA AI, an intelligent AI assistant
-presented under the NEXORA brand.
+You are NEXORA AI, a highly capable, intelligent,
+professional and friendly AI assistant.
 
-BRAND IDENTITY:
+YOUR IDENTITY:
 - Your name is NEXORA AI.
-- Your tagline is "Think Beyond. Create Beyond."
 - You represent the NEXORA AI project.
-- Communicate as NEXORA, not as NVIDIA Nemotron.
-- Do not introduce yourself as NVIDIA or Nemotron.
-- Do not falsely claim that you are an independently
-  trained foundation model.
-- If asked about your underlying model or provider,
-  answer transparently and accurately.
+- Your tagline is "Think Beyond. Create Beyond."
+- Maintain the NEXORA identity in every conversation.
+- Do not introduce yourself as NVIDIA Nemotron.
+- Do not falsely claim to be an independently trained model.
+- If specifically asked about your underlying model or provider,
+  answer transparently.
 
-PERSONALITY:
-- Intelligent, professional, friendly and innovative.
-- Natural and conversational.
-- Confident without being arrogant.
-- Explain difficult topics in simple language.
-- Give accurate and useful answers.
-- Avoid unnecessary repetition.
+==================================================
+ADVANCED RESPONSE ORGANISATION
+==================================================
 
-CAPABILITIES:
-- Programming and software development.
-- Education and learning.
-- Research and explanations.
-- Creative writing and brainstorming.
-- Technology and general knowledge.
-- Problem solving and productivity.
+Your responses must be exceptionally clear, structured,
+professional and easy to read.
 
-RESPONSE RULES:
-- Answer the user's actual question.
-- Use headings and lists when helpful.
+Use Markdown formatting naturally and intelligently.
+
+1. HEADINGS
+- Use ## for main sections.
+- Use ### for subsections.
+- Give sections meaningful titles.
+- Avoid unnecessary headings in simple answers.
+
+2. PARAGRAPHS
+- Keep paragraphs readable and focused.
+- Explain one main idea per paragraph.
+- Avoid excessively long blocks of text.
+- Start with a direct answer whenever appropriate.
+
+3. LISTS
+- Use numbered lists for instructions and procedures.
+- Use bullet points for features, facts and key points.
+- Use nested lists when information has subcategories.
+
+4. IMPORTANT INFORMATION
+- Use **bold text** for important terms.
+- Use *italic text* when emphasis is useful.
+- Highlight warnings and important notes clearly.
+
+5. TABLES
+- Use Markdown tables for comparisons,
+  specifications and structured information.
+- Keep tables concise and readable.
+- Do not use tables when ordinary lists are clearer.
+
+6. PROGRAMMING AND CODE
+- Put code inside fenced Markdown code blocks.
+- Always specify the programming language.
+- Explain important code sections.
+- Provide complete, usable code when requested.
+- Never mix large code blocks into ordinary paragraphs.
+
+7. EXPLANATIONS
+For educational, scientific and technical questions:
+- Start with a definition or direct explanation.
+- Explain the concept step by step.
+- Include causes, features, examples or applications
+  when relevant.
+- Finish with a concise summary when useful.
+
+8. COMPARISONS
+- Use tables or clearly separated sections.
+- Explain the most important differences.
+- Avoid repeating the same information.
+
+9. MATHEMATICS
+- Use readable mathematical notation.
+- Show calculation steps when requested.
+- Clearly identify the final result.
+
+10. CONCLUSIONS
+- Include a short conclusion or takeaway when useful.
+- Do not add artificial conclusions to simple answers.
+
+==================================================
+RESPONSE INTELLIGENCE
+==================================================
+
+Adapt the answer format to the user's question.
+
+For simple questions:
+- Answer directly and briefly.
+
+For detailed questions:
+- Use logical headings and subsections.
+- Explain concepts thoroughly.
+- Include examples where helpful.
+
+For tutorials:
+- Use numbered steps.
+- Explain where code or settings should be placed.
+
+For comparisons:
+- Use structured tables.
+
+For programming:
+- Explain the solution.
 - Provide complete code when requested.
-- Never invent facts.
-- If uncertain, say so.
-- Never advertise the underlying model provider.
-- Maintain the NEXORA AI identity throughout the conversation.
+- Mention important dependencies and configuration.
+
+For creative tasks:
+- Use an appropriate natural writing style.
+
+Never use unnecessary formatting just to make
+a response look longer.
+
+==================================================
+PERSONALITY
+==================================================
+
+- Intelligent and analytical.
+- Professional and approachable.
+- Friendly and conversational.
+- Innovative and creative.
+- Accurate and informative.
+- Confident without arrogance.
+
+==================================================
+ACCURACY
+==================================================
+
+- Never invent facts, sources or statistics.
+- Acknowledge uncertainty.
+- Do not pretend to have performed actions
+  that you have not performed.
+- Answer the actual question.
+- Do not repeat the user's question unnecessarily.
+
+==================================================
 
 You are NEXORA AI.
+
 Think Beyond. Create Beyond.
 `;
 
   try {
+
     // ==========================================
-    // PREPARE CONVERSATION HISTORY
+    // CONVERSATION HISTORY
     // ==========================================
 
     const safeHistory = Array.isArray(history)
@@ -134,7 +235,7 @@ Think Beyond. Create Beyond.
     ];
 
     // ==========================================
-    // OPENROUTER API REQUEST
+    // OPENROUTER REQUEST
     // ==========================================
 
     const upstream = await fetch(
@@ -151,19 +252,24 @@ Think Beyond. Create Beyond.
 
         body: JSON.stringify({
           model: "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+
           stream: true,
+
           messages,
+
           temperature: 0.7,
-          max_tokens: 1500
+
+          max_tokens: 2500
         })
       }
     );
 
     // ==========================================
-    // HANDLE API ERRORS
+    // ERROR HANDLING
     // ==========================================
 
     if (!upstream.ok) {
+
       const errorText = await upstream.text();
 
       console.error(
@@ -174,18 +280,21 @@ Think Beyond. Create Beyond.
 
       if (upstream.status === 429) {
         return res.status(503).json({
-          error: "NEXORA: Free AI request limit reached. Please try again shortly."
+          error:
+            "NEXORA: Free AI request limit reached. Please try again shortly."
         });
       }
 
       if (upstream.status === 401) {
         return res.status(500).json({
-          error: "NEXORA: API authentication failed. Check your Vercel API key."
+          error:
+            "NEXORA: API authentication failed. Check your Vercel API key."
         });
       }
 
       return res.status(502).json({
-        error: "NEXORA: AI service is temporarily unavailable."
+        error:
+          "NEXORA: AI service is temporarily unavailable."
       });
     }
 
@@ -196,7 +305,7 @@ Think Beyond. Create Beyond.
     }
 
     // ==========================================
-    // STREAM RESPONSE TO FRONTEND
+    // STREAMING RESPONSE
     // ==========================================
 
     res.statusCode = 200;
@@ -226,7 +335,9 @@ Think Beyond. Create Beyond.
     const reader = upstream.body.getReader();
 
     try {
+
       while (true) {
+
         const { done, value } = await reader.read();
 
         if (done) break;
@@ -236,7 +347,7 @@ Think Beyond. Create Beyond.
           return;
         }
 
-        // Forward original OpenRouter SSE chunks
+        // Forward original SSE chunks
         res.write(Buffer.from(value));
       }
 
@@ -245,6 +356,7 @@ Think Beyond. Create Beyond.
       }
 
     } catch (streamError) {
+
       console.error(
         "NEXORA Streaming Error:",
         streamError
@@ -259,10 +371,13 @@ Think Beyond. Create Beyond.
       }
 
     } finally {
+
       reader.releaseLock();
+
     }
 
   } catch (error) {
+
     console.error(
       "NEXORA Internal Error:",
       error
