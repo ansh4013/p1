@@ -1,3 +1,4 @@
+
 // ============================================================
 // NEXORA AI CHAT — scriptfun.js
 // ============================================================
@@ -101,22 +102,17 @@ if (clearBtn) {
 }
 
 personalityBtns.forEach(btn => {
-
     btn.addEventListener(
         "click",
         changePersonality
     );
-
 });
 
-
 if (hamburger) {
-
     hamburger.addEventListener(
         "click",
         toggleMenu
     );
-
 }
 
 
@@ -141,55 +137,36 @@ document
 
 
 // ============================================================
-// MAIN SEND FUNCTION
+// MAIN SEND FUNCTION — STREAMING
 // ============================================================
 
 async function handleSendMessage(event) {
 
     event.preventDefault();
 
-    if (!messageInput) {
+    if (!messageInput || !messagesContainer) {
         return;
     }
 
     const message =
         messageInput.value.trim();
 
-
-    // Don't send empty messages
-
-    if (!message) {
+    if (!message || isLoading) {
         return;
     }
-
-
-    // Prevent multiple requests
-
-    if (isLoading) {
-        return;
-    }
-
 
     console.log(
         "NEXORA: Sending message:",
         message
     );
 
+    // Display user message
 
-    // Display user's message
-
-    addMessage(
-        message,
-        "user"
-    );
-
-
-    // Clear input
+    addMessage(message, "user");
 
     messageInput.value = "";
 
     messageInput.focus();
-
 
     // Loading state
 
@@ -197,43 +174,57 @@ async function handleSendMessage(event) {
 
     showTypingIndicator();
 
+    // Create empty AI message
+
+    addMessage("", "ai");
+
+    const aiMessages =
+        messagesContainer.querySelectorAll(
+            ".ai-message"
+        );
+
+    const aiMessage =
+        aiMessages[aiMessages.length - 1];
+
+    const aiContent =
+        aiMessage.querySelector(
+            ".message-content"
+        );
 
     try {
 
         const aiResponse =
-            await getAIResponse(message);
+            await getAIResponse(
+                message,
+                (partialResponse) => {
 
+                    hideTypingIndicator();
 
-        hideTypingIndicator();
+                    // Display incoming tokens
 
+                    aiContent.textContent =
+                        partialResponse;
 
-        // Display AI response
+                    scrollMessages();
 
-        addMessage(
-            aiResponse,
-            "ai"
-        );
-
+                }
+            );
 
         // Save conversation
 
-        conversationHistory.push({
+        conversationHistory.push(
+            {
+                role: "user",
+                text: message
+            },
+            {
+                role: "ai",
+                text: aiResponse
+            }
+        );
 
-            role: "user",
-
-            text: message
-
-        });
-
-
-        conversationHistory.push({
-
-            role: "ai",
-
-            text: aiResponse
-
-        });
-
+        aiContent.textContent =
+            aiResponse;
 
     }
 
@@ -241,33 +232,20 @@ async function handleSendMessage(event) {
 
         hideTypingIndicator();
 
-
         console.error(
             "NEXORA Chat Error:",
             error
         );
 
-
-        let errorMessage =
+        aiContent.textContent =
+            error.message ||
             "Sorry, I couldn't process your request.";
-
-
-        if (error && error.message) {
-
-            errorMessage =
-                error.message;
-
-        }
-
-
-        addMessage(
-            errorMessage,
-            "ai"
-        );
 
     }
 
     finally {
+
+        hideTypingIndicator();
 
         isLoading = false;
 
@@ -279,98 +257,18 @@ async function handleSendMessage(event) {
 
 
 // ============================================================
-// AI API FUNCTION
-// =========================================================
-
-async function handleSendMessage(event) {
-
-    event.preventDefault();
-
-    if (!messageInput) return;
-
-    const message = messageInput.value.trim();
-
-    if (!message || isLoading) return;
-
-    addMessage(message, "user");
-
-    messageInput.value = "";
-    messageInput.focus();
-
-    isLoading = true;
-    showTypingIndicator();
-
-    // Create an empty AI message
-    addMessage("", "ai");
-
-    const aiMessages = messagesContainer.querySelectorAll(
-        ".ai-message"
-    );
-
-    const aiMessage = aiMessages[aiMessages.length - 1];
-
-    const aiContent = aiMessage.querySelector(
-        ".message-content"
-    );
-
-    let finalReply = "";
-
-    try {
-
-        finalReply = await getAIResponse(
-            message,
-            (partial) => {
-
-                // Display response as it arrives
-                aiContent.textContent = partial;
-
-                messagesContainer.scrollTop =
-                    messagesContainer.scrollHeight;
-
-            }
-        );
-
-        // Save conversation
-        conversationHistory.push({
-            role: "user",
-            text: message
-        });
-
-        conversationHistory.push({
-            role: "ai",
-            text: finalReply
-        });
-
-    } catch (error) {
-
-        console.error("NEXORA:", error);
-
-        aiContent.textContent =
-            error.message || "NEXORA could not respond.";
-
-    } finally {
-
-        hideTypingIndicator();
-
-        isLoading = false;
-
-        messageInput.focus();
-
-    }
-}
-
-
-// ==========================================
-// STREAMING AI RESPONSE
-// ==========================================
+// OPENROUTER STREAMING AI FUNCTION
+// ============================================================
 
 async function getAIResponse(userMessage, onToken) {
 
     let historyText = "";
 
     conversationHistory.forEach(message => {
+
         historyText +=
             `${message.role}: ${message.text}\n`;
+
     });
 
     const prompt = `
@@ -382,7 +280,7 @@ ${historyText}
 User:
 ${userMessage}
 
-Please answer naturally and helpfully.
+Please answer naturally, accurately and helpfully.
 `;
 
     const response = await fetch(API_URL, {
@@ -402,90 +300,166 @@ Please answer naturally and helpfully.
 
     if (!response.ok) {
 
-        let error = {};
+        let errorData = {};
 
         try {
-            error = await response.json();
-        } catch {}
+            errorData = await response.json();
+        }
+
+        catch (parseError) {
+            // Use HTTP status as fallback.
+        }
 
         throw new Error(
-            error.error ||
+            errorData.error ||
             `NEXORA server error: ${response.status}`
         );
+
     }
 
     if (!response.body) {
-        throw new Error("Streaming is unavailable.");
+
+        throw new Error(
+            "NEXORA: Streaming is unavailable."
+        );
+
     }
 
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
+    const reader =
+        response.body.getReader();
+
+    const decoder =
+        new TextDecoder();
 
     let buffer = "";
+
     let fullReply = "";
-    let finished = false;
 
-    while (!finished) {
+    let streamFinished = false;
 
-        const { done, value } = await reader.read();
+    try {
 
-        if (done) break;
+        while (!streamFinished) {
 
-        buffer += decoder.decode(value, {
-            stream: true
-        });
+            const {
+                done,
+                value
+            } = await reader.read();
 
-        const events = buffer.split("\n");
-        buffer = events.pop() || "";
+            if (done) break;
 
-        for (const line of events) {
-
-            if (!line.startsWith("data:")) continue;
-
-            const data = line.slice(5).trim();
-
-            if (data === "[DONE]") {
-                finished = true;
-                break;
-            }
-
-            let chunk;
-
-            try {
-                chunk = JSON.parse(data);
-            } catch {
-                continue;
-            }
-
-            if (chunk.error) {
-                throw new Error(
-                    chunk.error.message || "AI stream failed."
-                );
-            }
-
-            const token =
-                chunk.choices?.[0]?.delta?.content;
-
-            if (typeof token === "string" && token) {
-
-                fullReply += token;
-
-                if (onToken) {
-                    onToken(fullReply);
+            buffer += decoder.decode(
+                value,
+                {
+                    stream: true
                 }
+            );
+
+            // SSE events are separated by blank lines
+
+            const events =
+                buffer.split(/\r?\n\r?\n/);
+
+            buffer =
+                events.pop() || "";
+
+            for (const event of events) {
+
+                const lines =
+                    event.split(/\r?\n/);
+
+                for (const line of lines) {
+
+                    if (!line.startsWith("data:")) {
+                        continue;
+                    }
+
+                    const data =
+                        line.slice(5).trim();
+
+                    if (data === "[DONE]") {
+
+                        streamFinished = true;
+
+                        break;
+
+                    }
+
+                    let chunk;
+
+                    try {
+
+                        chunk = JSON.parse(data);
+
+                    }
+
+                    catch (parseError) {
+
+                        continue;
+
+                    }
+
+                    if (chunk.error) {
+
+                        throw new Error(
+                            chunk.error.message ||
+                            "NEXORA: AI streaming failed."
+                        );
+
+                    }
+
+                    const token =
+                        chunk.choices?.[0]?.delta?.content;
+
+                    if (
+                        typeof token === "string" &&
+                        token.length > 0
+                    ) {
+
+                        fullReply += token;
+
+                        if (typeof onToken === "function") {
+
+                            onToken(fullReply);
+
+                        }
+
+                    }
+
+                }
+
+                if (streamFinished) break;
+
             }
+
         }
+
+        // Flush remaining decoder data
+
+        buffer += decoder.decode();
+
     }
 
-    buffer += decoder.decode();
+    finally {
+
+        reader.releaseLock();
+
+    }
 
     if (!fullReply.trim()) {
-        throw new Error("NEXORA received an empty response.");
+
+        throw new Error(
+            "NEXORA: Empty AI response."
+        );
+
     }
 
     return fullReply.trim();
+
 }
- ============================================================
+
+
+// ============================================================
 // ADD MESSAGE
 // ============================================================
 
@@ -498,14 +472,11 @@ function addMessage(
         return;
     }
 
-
     const messageDiv =
         document.createElement("div");
 
-
     messageDiv.className =
         `message ${sender}-message`;
-
 
     // AI avatar
 
@@ -514,14 +485,11 @@ function addMessage(
         const avatarDiv =
             document.createElement("div");
 
-
         avatarDiv.className =
             "message-avatar";
 
-
         avatarDiv.innerHTML =
             '<i class="fas fa-robot"></i>';
-
 
         messageDiv.appendChild(
             avatarDiv
@@ -529,24 +497,16 @@ function addMessage(
 
     }
 
-
     // Message content
 
     const contentDiv =
         document.createElement("div");
 
-
     contentDiv.className =
         "message-content";
 
-
-    // Convert text to string
-
     const safeText =
         String(text || "");
-
-
-    // Split lines
 
     const paragraphs =
         safeText
@@ -556,41 +516,28 @@ function addMessage(
                     paragraph.trim()
             );
 
+    paragraphs.forEach(paragraph => {
 
-    paragraphs.forEach(
-        paragraph => {
+        const p =
+            document.createElement("p");
 
-            const p =
-                document.createElement("p");
+        p.textContent =
+            paragraph;
 
+        contentDiv.appendChild(p);
 
-            p.textContent =
-                paragraph;
-
-
-            contentDiv.appendChild(
-                p
-            );
-
-        }
-    );
-
+    });
 
     // Time
 
     const timeDiv =
         document.createElement("small");
 
-
     timeDiv.className =
         "message-time";
 
-
     timeDiv.textContent =
-        formatTime(
-            new Date()
-        );
-
+        formatTime(new Date());
 
     // Add elements
 
@@ -598,18 +545,13 @@ function addMessage(
         contentDiv
     );
 
-
     messageDiv.appendChild(
         timeDiv
     );
 
-
     messagesContainer.appendChild(
         messageDiv
     );
-
-
-    // Scroll
 
     scrollMessages();
 
@@ -625,7 +567,6 @@ function scrollMessages() {
     if (!messagesContainer) {
         return;
     }
-
 
     setTimeout(
         () => {
@@ -650,10 +591,8 @@ function showTypingIndicator() {
         return;
     }
 
-
     typingIndicator.style.display =
         "flex";
-
 
     scrollMessages();
 
@@ -665,7 +604,6 @@ function hideTypingIndicator() {
     if (!typingIndicator) {
         return;
     }
-
 
     typingIndicator.style.display =
         "none";
@@ -684,11 +622,9 @@ function clearChat() {
             "🗑️ Clear all messages?"
         );
 
-
     if (!confirmed) {
         return;
     }
-
 
     if (messagesContainer) {
 
@@ -725,9 +661,7 @@ function clearChat() {
 
     }
 
-
     conversationHistory = [];
-
 
     if (messageInput) {
 
@@ -751,24 +685,19 @@ function changePersonality(event) {
             ".personality-btn"
         );
 
-
     if (!btn) {
         return;
     }
 
-
     // Remove active
 
-    personalityBtns.forEach(
-        button => {
+    personalityBtns.forEach(button => {
 
-            button.classList.remove(
-                "active"
-            );
+        button.classList.remove(
+            "active"
+        );
 
-        }
-    );
-
+    });
 
     // Activate selected button
 
@@ -776,18 +705,15 @@ function changePersonality(event) {
         "active"
     );
 
-
     // Get personality
 
     currentPersonality =
         btn.dataset.personality ||
         "general";
 
-
     // Reset history
 
     conversationHistory = [];
-
 
     const personalityNames = {
 
@@ -805,19 +731,14 @@ function changePersonality(event) {
 
     };
 
-
     const selectedName =
-        personalityNames[
-            currentPersonality
-        ] ||
+        personalityNames[currentPersonality] ||
         "🧠 General Assistant";
-
 
     addMessage(
         `Switched to ${selectedName} mode!`,
         "ai"
     );
-
 
     if (messageInput) {
         messageInput.focus();
@@ -836,10 +757,8 @@ function toggleMenu() {
         return;
     }
 
-
     const isOpen =
         navMenu.style.display === "flex";
-
 
     if (isOpen) {
 
@@ -866,55 +785,43 @@ document
     .querySelectorAll(
         'a[href^="#"]'
     )
-    .forEach(
-        anchor => {
+    .forEach(anchor => {
 
-            anchor.addEventListener(
-                "click",
-                function(event) {
+        anchor.addEventListener(
+            "click",
+            function(event) {
 
-                    const href =
-                        this.getAttribute(
-                            "href"
-                        );
+                const href =
+                    this.getAttribute("href");
 
+                if (
+                    !href ||
+                    href === "#"
+                ) {
+                    return;
+                }
 
-                    if (
-                        !href ||
-                        href === "#"
-                    ) {
-                        return;
-                    }
+                event.preventDefault();
 
+                const target =
+                    document.querySelector(href);
 
-                    event.preventDefault();
+                if (target) {
 
+                    target.scrollIntoView({
 
-                    const target =
-                        document.querySelector(
-                            href
-                        );
+                        behavior: "smooth",
 
+                        block: "start"
 
-                    if (target) {
-
-                        target.scrollIntoView({
-
-                            behavior:
-                                "smooth",
-
-                            block:
-                                "start"
-
-                        });
-
-                    }
+                    });
 
                 }
-            );
 
-        }
-    );
+            }
+        );
+
+    });
 
 
 // ============================================================
@@ -925,9 +832,7 @@ document.addEventListener(
     "keydown",
     event => {
 
-
         // CTRL + K / CMD + K
-        // Focus chat input
 
         if (
             (
@@ -939,16 +844,13 @@ document.addEventListener(
 
             event.preventDefault();
 
-
             if (messageInput) {
                 messageInput.focus();
             }
 
         }
 
-
         // CTRL + L / CMD + L
-        // Clear chat
 
         if (
             (
@@ -978,8 +880,6 @@ if (messageInput) {
         "keydown",
         event => {
 
-            // Enter sends message
-
             if (
                 event.key === "Enter" &&
                 !event.shiftKey
@@ -987,11 +887,8 @@ if (messageInput) {
 
                 event.preventDefault();
 
-
                 if (messageForm) {
-
                     messageForm.requestSubmit();
-
                 }
 
             }
@@ -1012,18 +909,15 @@ function initializeNexora() {
         "🚀 NEXORA AI Ready"
     );
 
-
     console.log(
         "🔗 API:",
         API_URL
     );
 
-
     console.log(
         "🧠 Personality:",
         currentPersonality
     );
-
 
     if (messageInput) {
 
@@ -1068,11 +962,9 @@ function formatTime(date) {
         [],
         {
 
-            hour:
-                "2-digit",
+            hour: "2-digit",
 
-            minute:
-                "2-digit"
+            minute: "2-digit"
 
         }
     );
@@ -1087,14 +979,10 @@ function formatTime(date) {
 function escapeHtml(text) {
 
     const div =
-        document.createElement(
-            "div"
-        );
-
+        document.createElement("div");
 
     div.textContent =
         String(text || "");
-
 
     return div.innerHTML;
 
