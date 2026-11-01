@@ -21,25 +21,32 @@ const personalities = {
     general:
         "You are a helpful, friendly AI assistant. " +
         "Answer questions clearly and concisely. " +
-        "Be engaging, accurate, and conversational.",
+        "Be engaging, accurate, and conversational. " +
+        "Organise detailed answers using headings, lists, " +
+        "bold text and tables whenever appropriate.",
 
     coding:
         "You are an expert programming assistant. " +
         "Help with code, debugging, programming concepts, " +
         "and best practices. Provide code examples when useful. " +
-        "Explain concepts clearly.",
+        "Explain concepts clearly. " +
+        "Use properly formatted Markdown code blocks with " +
+        "programming language identifiers.",
 
     tutor:
         "You are a patient tutor. " +
         "Explain concepts step by step. " +
         "Break complex topics into simple parts. " +
         "Help the student learn rather than simply giving answers. " +
-        "Ask clarifying questions when necessary.",
+        "Ask clarifying questions when necessary. " +
+        "Use headings, numbered steps, examples and tables " +
+        "to organise educational explanations.",
 
     creative:
         "You are a creative writing assistant. " +
         "Help with stories, poems, scripts, ideas, captions, " +
-        "and creative projects. Be imaginative and engaging."
+        "and creative projects. Be imaginative and engaging. " +
+        "Use clear formatting whenever appropriate."
 };
 
 
@@ -137,6 +144,45 @@ document
 
 
 // ============================================================
+// MARKDOWN FORMATTING — NEW
+// ============================================================
+
+function formatAIResponse(text) {
+
+    const safeText = String(text || "");
+
+    // Fallback if Markdown libraries are unavailable
+
+    if (
+        !window.marked ||
+        !window.DOMPurify
+    ) {
+
+        return escapeHtml(safeText).replace(
+            /\n/g,
+            "<br>"
+        );
+
+    }
+
+    // Convert Markdown into HTML
+
+    const html = window.marked.parse(
+        safeText,
+        {
+            gfm: true,
+            breaks: true
+        }
+    );
+
+    // Sanitize HTML before displaying it
+
+    return window.DOMPurify.sanitize(html);
+
+}
+
+
+// ============================================================
 // MAIN SEND FUNCTION — STREAMING
 // ============================================================
 
@@ -200,10 +246,10 @@ async function handleSendMessage(event) {
 
                     hideTypingIndicator();
 
-                    // Display incoming tokens
+                    // Display formatted incoming tokens
 
-                    aiContent.textContent =
-                        partialResponse;
+                    aiContent.innerHTML =
+                        formatAIResponse(partialResponse);
 
                     scrollMessages();
 
@@ -223,8 +269,12 @@ async function handleSendMessage(event) {
             }
         );
 
-        aiContent.textContent =
-            aiResponse;
+        // Final formatted response
+
+        aiContent.innerHTML =
+            formatAIResponse(aiResponse);
+
+        scrollMessages();
 
     }
 
@@ -281,6 +331,17 @@ User:
 ${userMessage}
 
 Please answer naturally, accurately and helpfully.
+
+IMPORTANT FORMATTING INSTRUCTIONS:
+- Use Markdown for organised responses.
+- Use clear headings and subheadings when appropriate.
+- Use numbered lists for steps and procedures.
+- Use bullet points for key information.
+- Use bold text for important terms.
+- Use Markdown tables for comparisons when useful.
+- Use fenced code blocks with language identifiers for code.
+- Keep paragraphs clear and readable.
+- Avoid unnecessary formatting for simple questions.
 `;
 
     const response = await fetch(API_URL, {
@@ -1009,23 +1070,4 @@ document.addEventListener(
 
 
 // ============================================================
-// BEFORE UNLOAD
-// ============================================================
-
-window.addEventListener(
-    "beforeunload",
-    event => {
-
-        if (
-            conversationHistory.length > 0 &&
-            !isLoading
-        ) {
-
-            event.preventDefault();
-
-            event.returnValue = "";
-
-        }
-
-    }
-);
+// BEF
