@@ -1102,7 +1102,8 @@ body::before {
 
     .hero-title {
         font-size: 24px;
-        letter-spacing: 1p
+        letter-spacing: 1px
+}
 }
 /* ==========================================
    NEXORA — FORMATTED AI RESPONSES
