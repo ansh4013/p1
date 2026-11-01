@@ -1219,4 +1219,37 @@ body::before {
     border-top: 1px solid #344155;
     margin: 16px 0;
 }
+/* NEXORA — FIX MOBILE CHAT HEIGHT */
 
+@media (max-width: 768px) {
+    .chatbot-section {
+        height: auto;
+        min-height: calc(100dvh - 60px);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chatbot-section .section-header {
+        flex-shrink: 0;
+    }
+
+    .chatbot-wrapper {
+        width: 100%;
+        height: calc(100dvh - 60px);
+        min-height: 500px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .messages-container {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+    }
+
+    .input-form {
+        flex-shrink: 0;
+        margin-top: auto;
+    }
+}
