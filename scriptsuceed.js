@@ -280,31 +280,100 @@ async function handleSendMessage(event) {
 
 // ============================================================
 // AI API FUNCTION
-// ============================================================
+// =========================================================
 
-async function getAIResponse(userMessage) {
+async function handleSendMessage(event) {
+
+    event.preventDefault();
+
+    if (!messageInput) return;
+
+    const message = messageInput.value.trim();
+
+    if (!message || isLoading) return;
+
+    addMessage(message, "user");
+
+    messageInput.value = "";
+    messageInput.focus();
+
+    isLoading = true;
+    showTypingIndicator();
+
+    // Create an empty AI message
+    addMessage("", "ai");
+
+    const aiMessages = messagesContainer.querySelectorAll(
+        ".ai-message"
+    );
+
+    const aiMessage = aiMessages[aiMessages.length - 1];
+
+    const aiContent = aiMessage.querySelector(
+        ".message-content"
+    );
+
+    let finalReply = "";
 
     try {
 
-        // Build conversation history
+        finalReply = await getAIResponse(
+            message,
+            (partial) => {
 
-        let historyText = "";
+                // Display response as it arrives
+                aiContent.textContent = partial;
 
-
-        conversationHistory.forEach(
-            message => {
-
-                historyText +=
-                    `${message.role}: ${message.text}\n`;
+                messagesContainer.scrollTop =
+                    messagesContainer.scrollHeight;
 
             }
         );
 
+        // Save conversation
+        conversationHistory.push({
+            role: "user",
+            text: message
+        });
 
-        // Build prompt
+        conversationHistory.push({
+            role: "ai",
+            text: finalReply
+        });
 
-        const prompt = `
+    } catch (error) {
 
+        console.error("NEXORA:", error);
+
+        aiContent.textContent =
+            error.message || "NEXORA could not respond.";
+
+    } finally {
+
+        hideTypingIndicator();
+
+        isLoading = false;
+
+        messageInput.focus();
+
+    }
+}
+
+
+// ==========================================
+// STREAMING AI RESPONSE
+// ==========================================
+
+async function getAIResponse(userMessage, onToken) {
+
+    let historyText = "";
+
+    conversationHistory.forEach(message => {
+        historyText +=
+            `${message.role}: ${message.text}\n`;
+    });
+
+    const prompt = `
 ${personalities[currentPersonality]}
 
 Conversation History:
@@ -313,217 +382,110 @@ ${historyText}
 User:
 ${userMessage}
 
-Please answer the user's message naturally and helpfully.
+Please answer naturally and helpfully.
 `;
 
+    const response = await fetch(API_URL, {
 
-        console.log(
-            "NEXORA: API URL:",
-            API_URL
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "text/event-stream"
+        },
+
+        body: JSON.stringify({
+            message: prompt
+        })
+
+    });
+
+    if (!response.ok) {
+
+        let error = {};
+
+        try {
+            error = await response.json();
+        } catch {}
+
+        throw new Error(
+            error.error ||
+            `NEXORA server error: ${response.status}`
         );
+    }
 
+    if (!response.body) {
+        throw new Error("Streaming is unavailable.");
+    }
 
-        console.log(
-            "NEXORA: Sending API request..."
-        );
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
 
+    let buffer = "";
+    let fullReply = "";
+    let finished = false;
 
-        // Send request
+    while (!finished) {
 
-        const response =
-            await fetch(
-                API_URL,
-                {
+        const { done, value } = await reader.read();
 
-                    method: "POST",
+        if (done) break;
 
-                    headers: {
+        buffer += decoder.decode(value, {
+            stream: true
+        });
 
-                        "Content-Type":
-                            "application/json",
+        const events = buffer.split("\n");
+        buffer = events.pop() || "";
 
-                        "Accept":
-                            "application/json"
+        for (const line of events) {
 
-                    },
+            if (!line.startsWith("data:")) continue;
 
-                    body: JSON.stringify({
+            const data = line.slice(5).trim();
 
-                        message: prompt
+            if (data === "[DONE]") {
+                finished = true;
+                break;
+            }
 
-                    })
+            let chunk;
 
+            try {
+                chunk = JSON.parse(data);
+            } catch {
+                continue;
+            }
+
+            if (chunk.error) {
+                throw new Error(
+                    chunk.error.message || "AI stream failed."
+                );
+            }
+
+            const token =
+                chunk.choices?.[0]?.delta?.content;
+
+            if (typeof token === "string" && token) {
+
+                fullReply += token;
+
+                if (onToken) {
+                    onToken(fullReply);
                 }
-            );
-
-
-        console.log(
-            "NEXORA: HTTP status:",
-            response.status
-        );
-
-
-        // Get response content type
-
-        const contentType =
-            response.headers.get(
-                "content-type"
-            ) || "";
-
-
-        let data;
-
-
-        // JSON response
-
-        if (
-            contentType
-                .toLowerCase()
-                .includes("application/json")
-        ) {
-
-            data =
-                await response.json();
-
-        }
-
-        // Non-JSON response
-
-        else {
-
-            const text =
-                await response.text();
-
-
-            console.error(
-                "NEXORA: Server returned non-JSON response:",
-                text
-            );
-
-
-            if (response.status === 404) {
-
-                throw new Error(
-                    "API endpoint not found (404). Check your Vercel /api/gemini deployment."
-                );
-
             }
-
-
-            if (response.status === 405) {
-
-                throw new Error(
-                    "API does not allow POST requests (405)."
-                );
-
-            }
-
-
-            if (response.status >= 500) {
-
-                throw new Error(
-                    "Vercel server error (" +
-                    response.status +
-                    "). Check your backend and Gemini API configuration."
-                );
-
-            }
-
-
-            throw new Error(
-                "Server returned an invalid response (" +
-                response.status +
-                ")."
-            );
-
         }
-
-
-        console.log(
-            "NEXORA: API response:",
-            data
-        );
-
-
-        // HTTP error
-
-        if (!response.ok) {
-
-            const serverError =
-                data &&
-                (
-                    data.error ||
-                    data.message
-                );
-
-
-            throw new Error(
-
-                serverError ||
-
-                `Server returned HTTP ${response.status}.`
-
-            );
-
-        }
-
-
-        // Check reply
-
-        if (
-            !data ||
-            typeof data.reply !== "string" ||
-            !data.reply.trim()
-        ) {
-
-            console.error(
-                "NEXORA: Invalid API response:",
-                data
-            );
-
-
-            throw new Error(
-                "The AI server did not return a valid reply."
-            );
-
-        }
-
-
-        return data.reply.trim();
-
     }
 
-    catch (error) {
+    buffer += decoder.decode();
 
-        console.error(
-            "NEXORA: Gemini request failed:",
-            error
-        );
-
-
-        // Actual browser/network failure
-
-        if (
-            error instanceof TypeError
-        ) {
-
-            throw new Error(
-                "Unable to connect to the NEXORA AI server. Check the Vercel API deployment or CORS configuration."
-            );
-
-        }
-
-
-        // Preserve useful error
-
-        throw error;
-
+    if (!fullReply.trim()) {
+        throw new Error("NEXORA received an empty response.");
     }
 
+    return fullReply.trim();
 }
-
-
-// ============================================================
+ ============================================================
 // ADD MESSAGE
 // ============================================================
 
