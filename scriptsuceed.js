@@ -1070,4 +1070,23 @@ document.addEventListener(
 
 
 // ============================================================
-// BEF
+// BEFORE UNLOAD
+// ============================================================
+
+window.addEventListener(
+    "beforeunload",
+    event => {
+
+        if (
+            conversationHistory.length > 0 &&
+            !isLoading
+        ) {
+
+            event.preventDefault();
+
+            event.returnValue = "";
+
+        }
+
+    }
+);
