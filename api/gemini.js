@@ -1,14 +1,19 @@
-import { GoogleGenAI } from "@google/genai";
 
 export default async function handler(req, res) {
-  // ==============================
-  // CORS
-  // ==============================
 
-  res.setHeader(
-    "Access-Control-Allow-Origin",
+  // =====================================
+  // NEXORA CORS CONFIGURATION
+  // =====================================
+
+  const allowedOrigins = [
     "https://ansh4013.github.io"
-  );
+  ];
+
+  const origin = req.headers.origin;
+
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
 
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -17,69 +22,47 @@ export default async function handler(req, res) {
 
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "Content-Type"
+    "Content-Type, Authorization"
   );
 
-  // ==============================
-  // OPTIONS
-  // ==============================
+  res.setHeader("Vary", "Origin");
 
   if (req.method === "OPTIONS") {
     return res.status(204).end();
   }
 
-  // ==============================
-  // METHOD CHECK
-  // ==============================
-
   if (req.method !== "POST") {
     return res.status(405).json({
-      error: "NEXORA: This request method is not supported."
+      error: "NEXORA: Method not supported."
     });
   }
 
   try {
-    // ==============================
-    // 5 GEMINI API KEYS
-    // ==============================
 
-    const apiKeys = [
-      process.env.GEMINI_API_KEY1,
-      process.env.GEMINI_API_KEY2,
-      process.env.GEMINI_API_KEY3,
-      process.env.GEMINI_API_KEY4,
-      process.env.GEMINI_API_KEY5
-    ].filter(
-      key => typeof key === "string" && key.trim() !== ""
-    );
+    // =====================================
+    // OPENROUTER CONFIGURATION
+    // =====================================
 
-    // ==============================
-    // CHECK KEYS
-    // ==============================
+    const API_KEY = process.env.OPENROUTER_API_KEY;
 
-    if (apiKeys.length === 0) {
-      console.error(
-        "NEXORA ERROR: No Gemini API keys configured."
-      );
+    const MODEL =
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free";
+
+    if (!API_KEY) {
+      console.error("NEXORA: OpenRouter API key missing.");
 
       return res.status(500).json({
-        error:
-          "NEXORA is temporarily unavailable. Please try again later."
+        error: "NEXORA: AI configuration is incomplete."
       });
     }
 
-    console.log(
-      `NEXORA: ${apiKeys.length} Gemini API key(s) configured.`
-    );
-
-    // ==============================
-    // GET MESSAGE
-    // ==============================
+    // =====================================
+    // VALIDATE USER MESSAGE
+    // =====================================
 
     const { message } = req.body || {};
 
     if (
-      !message ||
       typeof message !== "string" ||
       !message.trim()
     ) {
@@ -88,147 +71,185 @@ export default async function handler(req, res) {
       });
     }
 
-    // ==============================
-    // SETTINGS
-    // ==============================
+    // =====================================
+    // OPENROUTER REQUEST FUNCTION
+    // =====================================
 
-    const MAX_ATTEMPTS = 10;
-    const DELAY_MS = 10;
+    async function openRouterRequest(messages, reasoning = false) {
 
-    let lastError = null;
+      const controller = new AbortController();
 
-    // ==============================
-    // RETRY LOOP
-    // ==============================
-
-    for (
-      let attempt = 1;
-      attempt <= MAX_ATTEMPTS;
-      attempt++
-    ) {
-      const keyIndex =
-        (attempt - 1) % apiKeys.length;
-
-      const apiKey = apiKeys[keyIndex];
+      const timeout = setTimeout(
+        () => controller.abort(),
+        60000
+      );
 
       try {
-        console.log(
-          `NEXORA attempt ${attempt}/10 → Gemini key ${keyIndex + 1}`
-        );
 
-        const gemini = new GoogleGenAI({
-          apiKey: apiKey
-        });
-
-        // ==============================
-        // GEMINI REQUEST
-        // ==============================
-
-        const response =
-          await gemini.models.generateContent({
-            model: "gemini-3.8-flash",
-            contents: message.trim()
-          });
-
-        const reply = response.text || "";
-
-        // ==============================
-        // EMPTY RESPONSE
-        // ==============================
-
-        if (!reply.trim()) {
-          throw new Error(
-            "Gemini returned an empty response."
-          );
-        }
-
-        // ==============================
-        // SUCCESS
-        // ==============================
-
-        console.log(
-          `NEXORA SUCCESS: Gemini key ${keyIndex + 1}`
-        );
-
-        return res.status(200).json({
-          reply: reply.trim()
-        });
-
-      } catch (error) {
-        lastError = error;
-
-        const status =
-          error?.status ||
-          error?.code ||
-          error?.response?.status ||
-          null;
-
-        console.error(
-          `NEXORA attempt ${attempt}/10 failed:`,
+        const response = await fetch(
+          "https://openrouter.ai/api/v1/chat/completions",
           {
-            status,
-            message:
-              error?.message ||
-              String(error)
+            method: "POST",
+
+            headers: {
+              "Authorization": `Bearer ${API_KEY}`,
+              "Content-Type": "application/json",
+              "HTTP-Referer": "https://ansh4013.github.io",
+              "X-Title": "NEXORA AI"
+            },
+
+            body: JSON.stringify({
+              model: MODEL,
+              messages: messages,
+
+              ...(reasoning
+                ? { reasoning: { enabled: true } }
+                : {})
+            }),
+
+            signal: controller.signal
           }
         );
 
-        // ==============================
-        // STOP PERMANENT ERRORS
-        // ==============================
+        const data = await response.json();
 
-        if (
-          status === 400 ||
-          status === 401 ||
-          status === 403 ||
-          status === 404
-        ) {
-          console.error(
-            "NEXORA: Non-retryable Gemini error."
+        if (!response.ok) {
+
+          const error = new Error(
+            data?.error?.message ||
+            `OpenRouter error: ${response.status}`
           );
 
-          break;
+          error.status = response.status;
+
+          throw error;
         }
 
-        // ==============================
-        // 1 SECOND DELAY
-        // ==============================
+        return data;
 
-        if (attempt < MAX_ATTEMPTS) {
-          await new Promise(resolve =>
-            setTimeout(resolve, DELAY_MS)
-          );
-        }
+      } finally {
+        clearTimeout(timeout);
       }
     }
 
-    // ==============================
-    // ALL ATTEMPTS FAILED
-    // ==============================
+    // =====================================
+    // FIRST AI REQUEST WITH REASONING
+    // =====================================
 
-    console.error(
-      "NEXORA: All Gemini attempts failed.",
-      lastError?.message || lastError
+    console.log("NEXORA: Starting reasoning request.");
+
+    const firstResult = await openRouterRequest(
+      [
+        {
+          role: "user",
+          content: message.trim()
+        }
+      ],
+      true
     );
 
-    return res.status(503).json({
-      error:
-        "NEXORA is temporarily unable to process your request. Please try again."
+    const firstMessage =
+      firstResult?.choices?.[0]?.message;
+
+    if (!firstMessage) {
+      throw new Error("Empty first AI response.");
+    }
+
+    // =====================================
+    // PRESERVE REASONING DETAILS
+    // =====================================
+
+    const messages = [
+      {
+        role: "user",
+        content: message.trim()
+      },
+      {
+        role: "assistant",
+        content: firstMessage.content || "",
+        ...(firstMessage.reasoning_details
+          ? {
+              reasoning_details:
+                firstMessage.reasoning_details
+            }
+          : {})
+      },
+      {
+        role: "user",
+        content: "Please review your answer carefully and provide the final, accurate response."
+      }
+    ];
+
+    // =====================================
+    // SECOND AI REQUEST
+    // CONTINUE REASONING
+    // =====================================
+
+    console.log("NEXORA: Continuing reasoning.");
+
+    const secondResult = await openRouterRequest(
+      messages,
+      false
+    );
+
+    const finalReply =
+      secondResult?.choices?.[0]?.message?.content;
+
+    // =====================================
+    // VALIDATE FINAL RESPONSE
+    // =====================================
+
+    if (
+      typeof finalReply !== "string" ||
+      !finalReply.trim()
+    ) {
+      throw new Error("NEXORA received an empty final response.");
+    }
+
+    // =====================================
+    // SUCCESS
+    // =====================================
+
+    console.log("NEXORA: AI response successful.");
+
+    return res.status(200).json({
+      reply: finalReply.trim(),
+      model: MODEL,
+      provider: "OpenRouter"
     });
 
   } catch (error) {
-    // ==============================
-    // INTERNAL ERROR
-    // ==============================
 
-    console.error(
-      "NEXORA INTERNAL ERROR:",
-      error
-    );
+    // =====================================
+    // ERROR HANDLING
+    // =====================================
 
-    return res.status(500).json({
-      error:
-        "NEXORA encountered a temporary problem. Please try again."
+    console.error("NEXORA ERROR:", {
+      status: error.status,
+      message: error.message
     });
+
+    if (error.name === "AbortError") {
+      return res.status(504).json({
+        error: "NEXORA: AI response timed out. Please try again."
+      });
+    }
+
+    if (error.status === 401 || error.status === 403) {
+      return res.status(502).json({
+        error: "NEXORA: AI authentication failed. Check API configuration."
+      });
+    }
+
+    if (error.status === 429) {
+      return res.status(503).json({
+        error: "NEXORA: AI service is busy. Please try again shortly."
+      });
+    }
+
+    return res.status(503).json({
+      error: "NEXORA: AI is temporarily unavailable. Please try again."
+    });
+
   }
 }
