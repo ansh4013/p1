@@ -1253,3 +1253,43 @@ body::before {
         margin-top: auto;
     }
 }
+/* NEXORA — FILL REMAINING MOBILE SCREEN */
+
+@media (max-width: 768px) {
+
+    .chatbot-section {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 60px);
+        height: calc(100dvh - 60px);
+        min-height: 0;
+        padding: 0;
+    }
+
+    .chatbot-section .section-header {
+        flex-shrink: 0;
+        margin-bottom: 15px;
+    }
+
+    .chatbot-wrapper {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 0;
+        width: 100%;
+        height: auto;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .chatbot-header,
+    .personality-selector,
+    .input-form {
+        flex-shrink: 0;
+    }
+
+    .messages-container {
+        flex: 1 1 0;
+        min-height: 0;
+        overflow-y: auto;
+    }
+}
