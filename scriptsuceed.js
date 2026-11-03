@@ -275,7 +275,8 @@ async function handleSendMessage(event) {
 
                     aiContent.innerHTML =
                         formatAIResponse(partialResponse);
-
+  // Render mathematical formulas
+await renderNexoraMath(aiContent);
                     scrollMessages();
 
                 }
@@ -299,7 +300,7 @@ async function handleSendMessage(event) {
         aiContent.innerHTML =
             formatAIResponse(aiResponse);
       // Render mathematical formulas
-renderNexoraMath(aiContent);
+await renderNexoraMath(aiContent);
         scrollMessages();
 
     }
