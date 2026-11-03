@@ -1316,3 +1316,112 @@ body::before {
         padding-bottom: max(12px, env(safe-area-inset-bottom));
     }
 }
+/* ==========================================
+   NEXORA — FINAL FULL SCREEN CHAT FIX
+========================================== */
+
+html,
+body {
+    min-height: 100%;
+}
+
+.chatbot-section {
+    width: 100%;
+    max-width: 100%;
+
+    height: calc(100vh - 70px);
+    height: calc(100dvh - 70px);
+
+    min-height: 0;
+
+    padding: 8px 0 0;
+    margin: 0;
+
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.chatbot-section > .section-header {
+    flex: 0 0 auto;
+
+    margin: 0 0 10px;
+    padding: 0 12px;
+}
+
+.chatbot-wrapper {
+    width: 100%;
+    max-width: 100%;
+
+    height: auto;
+    min-height: 0;
+
+    flex: 1 1 0;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+    margin: 0;
+}
+
+.chatbot-wrapper > .chatbot-header,
+.chatbot-wrapper > .personality-selector,
+.chatbot-wrapper > .input-form {
+    flex: 0 0 auto;
+}
+
+.chatbot-wrapper > .messages-container {
+    flex: 1 1 0;
+
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.chatbot-wrapper > .input-form {
+    margin-top: auto;
+}
+
+/* Mobile layout */
+@media (max-width: 768px) {
+
+    .chatbot-section {
+        height: calc(100vh - 60px);
+        height: calc(100dvh - 60px);
+
+        padding-top: 6px;
+    }
+
+    .chatbot-section > .section-header {
+        margin-bottom: 8px;
+    }
+
+    .chatbot-wrapper {
+        flex: 1 1 0;
+
+        height: auto;
+        min-height: 0;
+    }
+
+    .chatbot-header {
+        padding: 12px 14px;
+    }
+
+    .personality-selector {
+        padding: 9px 10px;
+    }
+
+    .messages-container {
+        min-height: 0;
+        padding: 14px 10px;
+    }
+
+    .input-form {
+        padding: 9px 10px;
+        padding-bottom: max(
+            12px,
+            env(safe-area-inset-bottom)
+        );
+    }
+}
