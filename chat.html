@@ -267,24 +267,20 @@
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
 
-<!-- NEXORA Mathematical Formula Renderer -->
+<!-- Mathematical formula renderer -->
 <script>
 window.MathJax = {
     tex: {
-        inlineMath: [['\\(', '\\)'], ['$', '$']],
-        displayMath: [['$$', '$$'], ['\\[', '\\]']],
-        processEscapes: true
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
     },
     options: {
-        skipHtmlTags: [
-            'script', 'noscript', 'style',
-            'textarea', 'pre', 'code'
-        ]
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
     }
 };
 </script>
-
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js"></script>
-<script defer src="scriptsuceed.js"></script>
+
+<script src="scriptsuceed.js"></script>
 </body>
 </html>
