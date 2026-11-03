@@ -179,34 +179,7 @@ function formatAIResponse(text) {
 
     return window.DOMPurify.sanitize(html);
 
-}
-// ==========================================
-// NEXORA — MATHEMATICAL FORMULA RENDERER
-// ==========================================
-
-async function renderNexoraMath(element) {
-
-    if (!element || !window.MathJax) return;
-
-    try {
-
-        await window.MathJax.startup.promise;
-
-        window.MathJax.typesetClear([element]);
-
-        await window.MathJax.typesetPromise([element]);
-
-    } catch (error) {
-
-        console.error(
-            "NEXORA Math Rendering Error:",
-            error
-        );
-
-    }
-}
-
-
+}       
 // ============================================================
 // MAIN SEND FUNCTION — STREAMING
 // ============================================================
@@ -275,8 +248,6 @@ async function handleSendMessage(event) {
 
                     aiContent.innerHTML =
                         formatAIResponse(partialResponse);
-  // Render mathematical formulas
-await renderNexoraMath(aiContent);
                     scrollMessages();
 
                 }
@@ -299,8 +270,6 @@ await renderNexoraMath(aiContent);
 
         aiContent.innerHTML =
             formatAIResponse(aiResponse);
-      // Render mathematical formulas
-await renderNexoraMath(aiContent);
         scrollMessages();
 
     }
