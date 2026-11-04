@@ -9,7 +9,7 @@
 // ============================================================
 
 const API_URL =
-    "https://p1-two-orcin.vercel.app/api/nemotronsupervl";
+    "https://p1-two-orcin.vercel.app/api/gemini";
 
 
 // ============================================================
