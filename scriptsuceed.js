@@ -1085,24 +1085,4 @@ window.addEventListener(
         }
 
     }
-);
-// 2. inside your chat code
-const chat = window.AnalysisTracker && window.AnalysisTracker.chat;
-
-// when the user sends a message
-chat && chat.messageSent(userText);       // the text stays on the device; only a topic label is counted
-
-// around the model call
-const done = chat && chat.replyStarted();
-try {
-  const answer = await askModel(userText);
-  done && done();                         // success: reply + latency counted
-} catch (e) {
-  done && done(false);                    // failure: error counted
-}
-
-// on your buttons
-chat && chat.feedback("up");              // or "down"
-chat && chat.regenerate();
-chat && chat.copied();
-chat && chat.newConversation();           // "New chat" button
+);           
